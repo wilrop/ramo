@@ -1,12 +1,13 @@
 import random
 import numpy as np
 from scipy.optimize import minimize
-import warnings
-#from utils import *
-import itertools
 
 
 class QLearnerESR:
+    """
+    This class represents an agent that uses the SER optimisation criterion.
+    """
+
     def __init__(self, agent_id, alpha, gamma, epsilon, num_states, num_actions, num_objectives, opt=False,
                  rand_prob=False):
         self.agent_id = agent_id
@@ -39,6 +40,12 @@ class QLearnerESR:
         self.q_table[prev_state][action] = new_q
 
     def update_joint_table(self, actions, payoffs):
+        """
+        Log the payoff vector of a joint action in the joint table.
+        :param actions: The joint action.
+        :param payoffs: The multi-objective payoff vector.
+        :return: /
+        """
         coords = tuple(actions)
         utility = calc_utility(self.agent_id, payoffs)
         self.joint_table[coords] = utility
@@ -94,7 +101,7 @@ class QLearnerESR:
             s0 = np.random.random(self.num_actions)
             s0 /= np.sum(s0)
         else:
-            s0 = np.full(self.num_actions, 1.0/self.num_actions)  # initial guess set to equal prob over all actions
+            s0 = np.full(self.num_actions, 1.0 / self.num_actions)  # initial guess set to equal prob over all actions
 
         b = (0.0, 1.0)
         bnds = (b,) * self.num_actions  # Each pair in x will have this b as min, max
@@ -108,23 +115,21 @@ class QLearnerESR:
     def objective(self, strategy):
         """
         This method is the objective function to be minimised by the nonlinear optimiser.
-        Therefore it returns the negative of SER.
+        Therefore it returns the negative of ESR.
         :param strategy: The mixed strategy for the agent.
-        :return: The SER.
+        :return: The ESR.
         """
         return - self.calc_esr_from_strategy(strategy)
 
-    # Calculates the SER for a given strategy using the agent's own Q values
     def calc_esr_from_strategy(self, strategy):
         """
-        This method will calculate the SER from a mixed strategy.
+        This method will calculate the ESR from a mixed strategy.
         :param strategy: The mixed strategy.
-        :return: The SER.
+        :return: The ESR.
         """
         esr = self.calc_esr(self.current_state, strategy)
         return esr
 
-    # Calculates the expected payoff vector for a given strategy using the agent's own Q values
     def calc_esr(self, state, strategy):
         """
         This method calculates the expected scalarised reward for a given strategy using the agent's own Q values.
@@ -135,18 +140,13 @@ class QLearnerESR:
         esr = np.dot(self.q_table[state], np.array(strategy))
         return esr
 
-    def select_preferred_action(self, state):
-        joint_action = np.unravel_index(state, self.q_table.shape)  # Unravel the flat index to a coordinate array
-        preferred_action = joint_action[self.agent_id]
-        return preferred_action
-
 
 def calc_utility(agent, vector):
     """
-    This function will calculate the SER for an agent and their expected results vector.
+    This function will calculate the utility for an agent and a payoff vector.
     :param agent: The agent id.
-    :param vector: Their expected results for the objectives.
-    :return: The SER.
+    :param vector: The results for the objectives.
+    :return: The utility.
     """
     utility = 0
     if agent == 0:

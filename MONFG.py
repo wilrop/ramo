@@ -1,27 +1,21 @@
-import pandas as pd
-import QLearnerSER as ql
-from QLearnerESR import QLearnerESR, calc_utility
-import numpy as np
-from QLearnerSER import QLearnerSER, calc_ser
-from collections import Counter
 import time
 import argparse
+import pandas as pd
+import numpy as np
 from utils import *
+from QLearnerESR import QLearnerESR, calc_utility
+from QLearnerSER import QLearnerSER
+from collections import Counter
 
 
 def select_actions():
     """
     This function will select actions from the starting message for each agent
-    :param communicator: The agent that is broadcasting the message.
-    :param message: Starting state. This is the preferred joint action from one player.
     :return: The actions that were selected.
     """
     global communicator, message
     selected = []
     for ag in range(num_agents):
-        '''if ag == communicator:
-            selected.append(agents[ag].select_preferred_action(message))
-        else:'''
         selected.append(agents[ag].select_action_mixed_nonlinear(message))
     return selected
 
@@ -118,7 +112,8 @@ parser = argparse.ArgumentParser()
 
 # Optimistic initialization can encourage exploration
 parser.add_argument('-opt_init', dest='opt_init', action='store_true', help="optimistic initialization")
-parser.add_argument('-game', type=str, default='game1', help="which MONFG game to play")
+parser.add_argument('-game', type=str, default='game1', choices=['game1', 'game2', 'game3', 'game4', 'game5'],
+                    help="which MONFG game to play")
 parser.add_argument('-criterion', type=str, default='ESR', choices=['SER', 'SRE'], help="optimization criterion to use")
 parser.add_argument('-rand_prob', dest='rand_prob', action='store_true', help="rand init for optimization prob")
 
@@ -129,8 +124,14 @@ parser.add_argument('-episodes', type=int, default=10000, help="number of episod
 
 args = parser.parse_args()
 
+# Extracting the arguments
 game = args.game
 criterion = args.criterion
+num_runs = args.runs
+num_episodes = args.episodes
+provide_comms = args.provide_comms
+rand_prob = args.rand_prob
+opt_init = args.opt_init
 
 if game == 'game1':
     # Called game 1 in the paper
@@ -176,15 +177,12 @@ elif game == 'game5':
                             [1, 2, 2],
                             [2, 1, 3]])
 
-
-num_runs = args.runs
-num_episodes = args.episodes
 communicator = -1
 message = 0
 num_objectives = 2
 num_agents = 2
 num_actions = payoffsObj1.shape[0]
-num_states = num_actions**num_agents  # Number of possible joint action messages
+num_states = num_actions ** num_agents  # Number of possible joint action messages
 agents = []
 selected_actions = [-1, -1]
 payoffs = [-1, -1]
@@ -198,11 +196,6 @@ epsilon_decay = 0.999
 gamma = 0.0  # this should always be zero as a MONFG is a stateless one shot decision problem
 payoff_log = []
 
-rand_prob = args.rand_prob
-opt_init = args.opt_init
-
-provide_comms = args.provide_comms
-
 payoff_episode_log1 = []
 payoff_episode_log2 = []
 state_distribution_log = np.zeros((num_actions, num_actions))
@@ -211,27 +204,19 @@ act_hist_log = [[], []]
 window = 100
 final_policy_log = [[], []]
 
-path_data = 'data'
-
-if criterion == 'SER':
-    path_data += '/SER'
-else:
-    path_data += '/ESR'
-
-path_data += f'/{game}'
+path_data = f'data/{criterion}/{game}'
 
 if opt_init:
-    path_data +='/opt_init'
+    path_data += '/opt_init'
 else:
-    path_data +='/zero_init'
+    path_data += '/zero_init'
 
 if rand_prob:
     path_data += '/opt_rand'
 else:
     path_data += '/opt_eq'
 
-
-print(path_data)
+print("Creating data path: " + repr(path_data))
 mkdir_p(path_data)
 
 start = time.time()
@@ -253,8 +238,8 @@ for r in range(num_runs):
     # transform action history into probabilities
     for a, el in enumerate(action_hist):
         for i in range(len(el)):
-            if i+window < len(el):
-                count = Counter(el[i:i+window])
+            if i + window < len(el):
+                count = Counter(el[i:i + window])
             else:
                 count = Counter(el[-window:])
             total = sum(count.values())
@@ -287,7 +272,6 @@ df2 = pd.DataFrame(act_hist_log[1], columns=columns)
 
 df1.to_csv(f'{path_data}/agent1_probs_{info}.csv', index=False)
 df2.to_csv(f'{path_data}/agent2_probs_{info}.csv', index=False)
-
 
 state_distribution_log /= num_runs * (0.1 * num_episodes)
 df = pd.DataFrame(state_distribution_log)

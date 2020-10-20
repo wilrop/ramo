@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib
+
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['ps.fonttype'] = 42
 import matplotlib.pyplot as plt
@@ -8,8 +9,9 @@ from utils import *
 
 sns.set()
 sns.despine()
-sns.set_context("paper", rc={"font.size":18,"axes.labelsize":18,"xtick.labelsize": 16,"ytick.labelsize": 16,"legend.fontsize": 16})
-sns.set_style('white', {'axes.edgecolor': "0.5","pdf.fonttype": 42})
+sns.set_context("paper", rc={"font.size": 18, "axes.labelsize": 18, "xtick.labelsize": 16, "ytick.labelsize": 16,
+                             "legend.fontsize": 16})
+sns.set_style('white', {'axes.edgecolor': "0.5", "pdf.fonttype": 42})
 plt.gcf().subplots_adjust(bottom=0.15)
 
 provide_comms = True
@@ -18,7 +20,7 @@ rand_prob = False
 episodes = 10000
 
 for game in ['game1', 'game2', 'game3', 'game4', 'game5']:
-    for opt_init in [False]: #[True, False]:
+    for opt_init in [False]:  # [True, False]:
         path_data = f'data/{criterion}/{game}'
         path_plots = f'plots/{criterion}/{game}'
 
@@ -36,8 +38,7 @@ for game in ['game1', 'game2', 'game3', 'game4', 'game5']:
             path_data += '/opt_eq'
             path_plots += '/opt_eq'
 
-
-        print(path_plots)
+        print("Creating plot path: " + repr(path_plots))
         mkdir_p(path_plots)
 
         info = 'NE_'
@@ -94,7 +95,6 @@ for game in ['game1', 'game2', 'game3', 'game4', 'game5']:
         if game in ['game1', 'game5']:
             ax = sns.lineplot(x='Episode', y='Action 3', linewidth=2.0, data=df1, ci='sd', label='R')
         ax.set(ylabel='Action probability')
-        #if provide_recs:
         ax.set_ylim(-0.05, 1.05)
         ax.set_xlim(0, episodes)
         plot_name = f"{path_plots}/{game}_{criterion}_A2_{info}"
@@ -117,9 +117,9 @@ for game in ['game1', 'game2', 'game3', 'game4', 'game5']:
             x_axis_labels = ["L", "M", "R"]
             y_axis_labels = ["L", "M", "R"]
 
-        ax = sns.heatmap(df, annot=True, cmap="YlGnBu", vmin=0, vmax=1, xticklabels=x_axis_labels, yticklabels=y_axis_labels)
+        ax = sns.heatmap(df, annot=True, cmap="YlGnBu", vmin=0, vmax=1, xticklabels=x_axis_labels,
+                         yticklabels=y_axis_labels)
         plot_name = f"{path_plots}/{game}_{criterion}_states_{info}"
 
         plt.savefig(plot_name + ".pdf")
         plt.clf()
-

@@ -1,12 +1,13 @@
 import random
 import numpy as np
 from scipy.optimize import minimize
-import warnings
-#from utils import *
-import itertools
 
 
 class QLearnerSER:
+    """
+    This class represents an agent that uses the SER optimisation criterion.
+    """
+
     def __init__(self, agent_id, alpha, gamma, epsilon, num_states, num_actions, num_objectives, opt=False,
                  rand_prob=False):
         self.agent_id = agent_id
@@ -40,6 +41,12 @@ class QLearnerSER:
             self.q_table[prev_state][action][o] = new_q[o]
 
     def update_joint_table(self, actions, payoffs):
+        """
+        Log the payoff vector of a joint action in the joint table.
+        :param actions: The joint action.
+        :param payoffs: The multi-objective payoff vector.
+        :return: /
+        """
         coords = tuple(actions)
         ser = calc_ser(self.agent_id, payoffs)
         self.joint_table[coords] = ser
@@ -47,7 +54,7 @@ class QLearnerSER:
     def pref_joint_action(self):
         """
         This method will calculate the preferred joint-action for an agent based on the payoffs of joint actions.
-        :return: The joint action that will result in the highest SER for the agent.
+        :return: The joint action that will result in the highest utility for the agent.
         """
         return np.argmax(self.joint_table)
 
@@ -95,7 +102,7 @@ class QLearnerSER:
             s0 = np.random.random(self.num_actions)
             s0 /= np.sum(s0)
         else:
-            s0 = np.full(self.num_actions, 1.0/self.num_actions)  # initial guess set to equal prob over all actions
+            s0 = np.full(self.num_actions, 1.0 / self.num_actions)  # initial guess set to equal prob over all actions
 
         b = (0.0, 1.0)
         bnds = (b,) * self.num_actions  # Each pair in x will have this b as min, max
@@ -138,11 +145,6 @@ class QLearnerSER:
         for o in range(self.num_objectives):
             expected_vec[o] = np.dot(self.q_table[state, :, o], np.array(strategy))
         return expected_vec
-
-    def select_preferred_action(self, state):
-        joint_action = np.unravel_index(state, self.q_table.shape)  # Unravel the flat index to a coordinate array
-        preferred_action = joint_action[self.agent_id]
-        return preferred_action
 
 
 def calc_ser(agent, vector):
