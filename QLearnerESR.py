@@ -5,7 +5,7 @@ from scipy.optimize import minimize
 
 class QLearnerESR:
     """
-    This class represents an agent that uses the SER optimisation criterion.
+    This class represents an agent that uses the ESR optimisation criterion.
     """
 
     def __init__(self, agent_id, alpha, gamma, epsilon, num_states, num_actions, num_objectives, opt=False,

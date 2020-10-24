@@ -114,7 +114,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-opt_init', dest='opt_init', action='store_true', help="optimistic initialization")
 parser.add_argument('-game', type=str, default='game1', choices=['game1', 'game2', 'game3', 'game4', 'game5'],
                     help="which MONFG game to play")
-parser.add_argument('-criterion', type=str, default='ESR', choices=['SER', 'SRE'], help="optimization criterion to use")
+parser.add_argument('-criterion', type=str, default='ESR', choices=['SER', 'ESR'], help="optimization criterion to use")
 parser.add_argument('-rand_prob', dest='rand_prob', action='store_true', help="rand init for optimization prob")
 
 parser.add_argument('-provide_comms', dest='provide_comms', action='store_true', help="Allow communication")
