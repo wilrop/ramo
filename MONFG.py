@@ -208,7 +208,7 @@ if __name__ == "__main__":
                         help="optimization criterion to use")
 
     parser.add_argument('-name', type=str, default='no_comms', help='The name under which to save the results')
-    parser.add_argument('-runs', type=int, default=1, help="number of trials")
+    parser.add_argument('-runs', type=int, default=100, help="number of trials")
     parser.add_argument('-episodes', type=int, default=5000, help="number of episodes")
     parser.add_argument('-rollout', type=int, default=100, help="Rollout period to test the current strategies")
 
