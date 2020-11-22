@@ -8,186 +8,233 @@ from QLearnerSER import QLearnerSER
 from collections import Counter
 
 
-def select_actions():
+def select_actions(agents):
     """
     This function will select actions from the starting message for each agent
     :return: The actions that were selected.
     """
-    global communicator, message
     selected = []
-    for ag in range(num_agents):
-        selected.append(agents[ag].select_action_mixed_nonlinear(message))
+    for agent in agents:
+        selected.append(agent.select_action_mixed_nonlinear(message))
     return selected
 
 
-def calc_payoffs():
+def calc_payoffs(agents, selected_actions, payoff_matrix):
     """
     This function will calculate the payoffs of the agents.
     :return: /
     """
-    global payoffs
-    payoffs.clear()
-    for ag in range(num_agents):
+    payoffs = []
+    for agent in agents:
         payoffs.append(payoff_matrix[selected_actions[0]][selected_actions[1]])  # Append the payoffs from the actions.
+    return payoffs
 
 
-def decay_params():
+def calc_returns(payoffs, criterion):
+    if criterion == 'SER':
+        payoffs1 = payoffs[0]
+        payoffs2 = payoffs[1]
+        returns1 = u1(np.mean(payoffs1, axis=0))
+        returns2 = u2(np.mean(payoffs2, axis=0))
+
+        return [returns1, returns2]
+    else:
+        payoffs1 = payoffs[0]
+        payoffs2 = payoffs[1]
+        returns1 = np.mean([u1(payoff) for payoff in payoffs1])
+        returns2 = np.mean([u2(payoff) for payoff in payoffs2])
+
+        return [returns1, returns2]
+
+
+def decay_params(agents, alpha_decay, epsilon_decay):
     """
     Decay the parameters of the Q-learning algorithm.
     :return: /
     """
-    global alpha, epsilon
-    alpha *= alpha_decay
-    epsilon *= epsilon_decay
-    for ag in range(num_agents):
-        agents[ag].alpha = alpha
-        agents[ag].epsilon = epsilon
+    for agent in agents:
+        agent.alpha *= alpha_decay
+        agent.epsilon *= epsilon_decay
 
 
-def update():
+def update(agents, selected_actions, returns):
     """
     This function gets called after every episode to update the Q-tables.
     :return: /
     """
-    for ag in range(num_agents):
-        agents[ag].update_q_table(message, selected_actions[ag], payoffs[ag])
-        agents[ag].update_joint_table(selected_actions, payoffs[ag])
+    for idx, agent in enumerate(agents):
+        agent.update_q_table(message, selected_actions[idx], returns[idx])
+        agent.update_joint_table(selected_actions, returns[idx])
 
 
-def get_message(ep):
+def get_message(agents, communicate, episode):
     """
     This function prepares the communication for this episode. This is the preferred action of a specific agent.
     :param ep: The current episode.
     :return: The preferred joint action.
     """
-    global communicator, message
-    communicator = ep % num_agents
-    if 1:  # TODO: Let the agent decide when it wishes to communicate something
+    communicator = episode % len(agents)
+    if communicate:
         message = agents[communicator].pref_joint_action()
     else:
-        message = None
+        message = 0
     return communicator, message
 
 
-def do_episode(ep):
+def do_episode(agents, communicate, episode):
     """
     Runs an entire episode of the game.
-    :param ep: The current episode.
-    :return: /
+    :param episode: The current episode.
+    :return: The actions that were selected.
     """
     global selected_actions, payoffs, current_states
-    if provide_comms:
-        get_message(ep)
-    selected_actions = select_actions()
-    calc_payoffs()
+    if communicate:
+        get_message(episode)
+    selected_actions = select_actions(agents)
+    payoffs = calc_payoffs(payoff_matrix, selected_actions)
     update()
     decay_params()
+    return selected_actions, payoffs
 
 
-def reset(opt=False, rand_prob=False):
+def do_rollout(agents, communicate, episode):
+    if communicate:
+        get_message(episode)
+    selected_actions = select_actions(agents)
+    payoffs = calc_payoffs(payoff_matrix, selected_actions)
+    return selected_actions, payoffs
+
+
+def reset(num_agents, num_actions, num_objectives, alpha, epsilon, opt=False, rand_prob=False):
     """
     This function will reset all variables for the new episode.
     :param opt: Boolean that decides on optimistic initialization of the Q-tables.
     :param rand_prob: Boolean that decides on random initialization for the mixed  strategy.
-    :return: /
+    :return: A list of agents.
     """
-    global communicator, message, current_states, selected_actions, alpha, epsilon
-    agents.clear()
+    agents = []
     for ag in range(num_agents):
         if criterion == 'SER':
-            new_agent = QLearnerSER(ag, alpha, gamma, epsilon, num_states, num_actions, num_objectives, opt, rand_prob)
+            new_agent = QLearnerSER(ag, alpha, 0, epsilon, num_actions, num_actions, num_objectives, opt, rand_prob)
         else:
-            new_agent = QLearnerESR(ag, alpha, gamma, epsilon, num_states, num_actions, num_objectives, opt, rand_prob)
+            new_agent = QLearnerESR(ag, alpha, 0, epsilon, num_actions, num_actions, num_objectives, opt, rand_prob)
         agents.append(new_agent)
-    communicator = -1
-    message = 0
-    current_states = [0, 0]
-    selected_actions = [-1, -1]
-    alpha = alpha_start
-    epsilon = epsilon_start
+    return agents
 
 
-def run_experiment(runs, episodes, payoff_matrix, num_agents, num_objectives):
+def update_state_dist(selected_actions, state_dist_log):
+    actions1 = selected_actions[0]
+    actions2 = selected_actions[1]
+    for action1, action2 in zip(actions1, actions2):
+        state_dist_log[action1, action2] += 1
+    return state_dist_log
+
+
+def run_experiment(runs, episodes, rollout, criterion, communicate, payoff_matrix, opt_init, rand_prob):
+    # Setting hyperparameters.
+    num_agents = 2
+    num_actions = payoff_matrix.shape[0]
+    num_objectives = 2
+    epsilon = 0.9
+    epsilon_decay = 0.999
+    alpha = 0.05
+    alpha_decay = 1
+
+    # Setting up lists containing the results.
+    payoffs_log1 = []
+    payoffs_log2 = []
+    act_hist_log = [[], []]
+    state_dist_log = np.zeros((num_actions, num_actions))
+
     start = time.time()
 
     for run in range(runs):
-        print("Starting run ", r)
-        reset(opt_init, rand_prob)
-        action_hist = [[] for ag in range(num_agents)]
+        print("Starting run: ", run)
+        agents = reset(num_agents, num_actions, num_objectives, alpha, epsilon, opt_init, rand_prob)
+
         for episode in range(episodes):
-            do_episode(episode)
-            payoffs = []
-            actions = []
+            episode_payoffs = [[], []]
+            action_hist1 = np.array([0, 0, 0])
+            action_hist2 = np.array([0, 0, 0])
+
+            communicator, message = get_message(agents, communicate, episode)
+
             for r in range(rollout):
-                actions, payoffs = do_episode(episode)
+                actions, payoffs = do_rollout(agents, communicate, episode)
+                episode_payoffs[0].append(payoffs[0])
+                episode_payoffs[1].append(payoffs[1])
+                action_hist1[actions[0]] += 1
+                action_hist2[actions[1]] += 1
 
-            payoff_episode_log1.append([e, r, calc_utility(0, payoffs[0])])
-            payoff_episode_log2.append([e, r, calc_utility(1, payoffs[1])])
-            for i in range(num_agents):
-                action_hist[i].append(selected_actions[i])
-            if e >= 0.9 * num_episodes:
-                state_distribution_log[selected_actions[0], selected_actions[1]] += 1
+            # Transform the action history for this episode to probabilities.
+            action_hist1 /= rollout
+            action_hist2 /= rollout
 
-            payoffs = []
+            returns = calc_returns(episode_payoffs, criterion)  # Calculate the SER or ESR of the current strategy
+            update(agents, actions, returns)  # Update the current strategy based on the returns.
+            decay_params(agents, alpha_decay, epsilon_decay)  # Decay the parameters after the rollout period.
 
-        # transform action history into probabilities
-        for a, el in enumerate(action_hist):
-            for i in range(len(el)):
-                if i + window < len(el):
-                    count = Counter(el[i:i + window])
-                else:
-                    count = Counter(el[-window:])
-                total = sum(count.values())
-                act_probs = [0, 0, 0]
-                for action in range(num_actions):
-                    act_probs[action] = count[action] / total
-                act_hist_log[a].append([i, r, act_probs[0], act_probs[1], act_probs[2]])
+            # Append the returns under the criterion and the action probabilities to the logs.
+            payoffs_log1.append([episode, run, returns[0]])
+            payoffs_log2.append([episode, run, returns[1]])
+            act_hist_log[0].append([episode, run, action_hist1[0], action_hist1[1], action_hist1[2]])
+            act_hist_log[1].append([episode, run, action_hist2[0], action_hist2[1], action_hist2[2]])
+
+            # If we are in the last 10% of episodes we build up a state distribution log.
+            if episode >= 0.9 * episodes:
+                state_dist_log = update_state_dist(selected_actions, state_dist_log)
 
     end = time.time()
     elapsed_mins = (end - start) / 60.0
     print("Minutes elapsed: " + str(elapsed_mins))
 
+    return payoffs_log1, payoffs_log2, act_hist_log, state_dist_log
 
-def save_data():
-        path_data = f'data/{criterion}/{game}'
 
-        if opt_init:
-            path_data += '/opt_init'
-        else:
-            path_data += '/zero_init'
+def create_data_dir(criterion, game, opt_init, rand_prob):
+    path = f'data/{criterion}/{game}'
 
-        if rand_prob:
-            path_data += '/opt_rand'
-        else:
-            path_data += '/opt_eq'
+    if opt_init:
+        path += '/opt_init'
+    else:
+        path += '/zero_init'
 
-        print("Creating data path: " + repr(path_data))
-        mkdir_p(path_data)
+    if rand_prob:
+        path += '/opt_rand'
+    else:
+        path += '/opt_eq'
 
-        info = 'NE_'
+    print("Creating data path: " + repr(path))
+    mkdir_p(path)
 
-        if provide_comms:
-            info += 'comm'
-        else:
-            info += 'no_comm'
+    return path
 
-        columns = ['Episode', 'Trial', 'Payoff']
-        df1 = pd.DataFrame(payoff_episode_log1, columns=columns)
-        df2 = pd.DataFrame(payoff_episode_log2, columns=columns)
 
-        df1.to_csv(f'{path_data}/agent1_{info}.csv', index=False)
-        df2.to_csv(f'{path_data}/agent2_{info}.csv', index=False)
+def save_data(path, payoffs_log1, payoffs_log2, act_hist_log, state_dist_log, runs, episodes, communicate):
+    info = 'NE_'
 
-        columns = ['Episode', 'Trial', 'Action 1', 'Action 2', 'Action 3']
-        df1 = pd.DataFrame(act_hist_log[0], columns=columns)
-        df2 = pd.DataFrame(act_hist_log[1], columns=columns)
+    if communicate:
+        info += 'comm'
+    else:
+        info += 'no_comm'
 
-        df1.to_csv(f'{path_data}/agent1_probs_{info}.csv', index=False)
-        df2.to_csv(f'{path_data}/agent2_probs_{info}.csv', index=False)
+    columns = ['Episode', 'Trial', 'Payoff']
+    df1 = pd.DataFrame(payoffs_log1, columns=columns)
+    df2 = pd.DataFrame(payoffs_log2, columns=columns)
 
-        state_distribution_log /= num_runs * (0.1 * num_episodes)
-        df = pd.DataFrame(state_distribution_log)
-        df.to_csv(f'{path_data}/states_{info}.csv', index=False, header=None)
+    df1.to_csv(f'{path}/agent1_{info}.csv', index=False)
+    df2.to_csv(f'{path}/agent2_{info}.csv', index=False)
+
+    columns = ['Episode', 'Trial', 'Action 1', 'Action 2', 'Action 3']
+    df1 = pd.DataFrame(act_hist_log[0], columns=columns)
+    df2 = pd.DataFrame(act_hist_log[1], columns=columns)
+
+    df1.to_csv(f'{path}/agent1_probs_{info}.csv', index=False)
+    df2.to_csv(f'{path}/agent2_probs_{info}.csv', index=False)
+
+    state_dist_log /= runs * (0.1 * episodes)
+    df = pd.DataFrame(state_dist_log)
+    df.to_csv(f'{path}/states_{info}.csv', index=False, header=False)
 
 
 if __name__ == "__main__":
@@ -200,7 +247,7 @@ if __name__ == "__main__":
     parser.add_argument('-communicate', action='store_true', help="Allow communication")
 
     parser.add_argument('-runs', type=int, default=100, help="number of trials")
-    parser.add_argument('-episodes', type=int, default=10000, help="number of episodes")
+    parser.add_argument('-episodes', type=int, default=5000, help="number of episodes")
     parser.add_argument('-rollout', type=int, default=100, help="Rollout period to test the current strategies")
 
     # Optimistic initialization can encourage exploration.
@@ -221,35 +268,9 @@ if __name__ == "__main__":
 
     # Starting the experiments.
     payoff_matrix = get_payoff_matrix(game)
-    data = run_experiment(runs, episodes, rollout, payoff_matrix)
+    data = run_experiment(runs, episodes, rollout, criterion, communicate, payoff_matrix, opt_init, rand_prob)
+    payoffs_log1, payoffs_log2, act_hist_log, state_dist_log = data
 
     # Writing the data to disk.
-    save_data()
-    communicator = -1
-    message = 0
-    num_objectives = 2
-    num_agents = 2
-    num_actions = payoff_matrix.shape[0]
-    num_states = num_actions ** num_agents  # Number of possible joint action messages
-    agents = []
-    selected_actions = [-1, -1]
-    payoffs = [-1, -1]
-    current_states = [0, 0]
-    alpha = 0.05
-    alpha_start = 0.05
-    alpha_decay = 1
-    epsilon = 0.1
-    epsilon_start = 0.1
-    epsilon_decay = 0.999
-    gamma = 0.0  # this should always be zero as a MONFG is a stateless one shot decision problem
-    payoff_log = []
-
-    payoff_episode_log1 = []
-    payoff_episode_log2 = []
-    state_distribution_log = np.zeros((num_actions, num_actions))
-    action_hist = [[], []]
-    act_hist_log = [[], []]
-    window = 100
-    final_policy_log = [[], []]
-
-
+    path = create_data_dir(criterion, game, communicate)
+    save_data(path, payoffs_log1, payoffs_log2, act_hist_log, state_dist_log, runs, episodes, communicate)
