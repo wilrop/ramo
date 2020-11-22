@@ -8,55 +8,36 @@ class QLearnerSER:
     This class represents an agent that uses the SER optimisation criterion.
     """
 
-    def __init__(self, agent_id, alpha, gamma, epsilon, num_states, num_actions, num_objectives, opt=False,
+    def __init__(self, utility, alpha, gamma, epsilon, num_actions, num_objectives, opt=False,
                  rand_prob=False):
-        self.agent_id = agent_id
+        self.utility = utility
         self.alpha = alpha
         self.gamma = gamma
         self.epsilon = epsilon
-        self.num_states = num_states
         self.num_actions = num_actions
         self.num_objectives = num_objectives
         self.joint_table = np.zeros((num_actions, num_actions))
         # optimistic initialization of Q-table
         if opt:
-            self.q_table = np.ones((num_states, num_actions, num_objectives)) * 20
+            self.q_table = np.ones((num_actions, num_objectives)) * 20
         else:
-            self.q_table = np.zeros((num_states, num_actions, num_objectives))
-        self.current_state = -1
+            self.q_table = np.zeros((num_actions, num_objectives))
         self.rand_prob = rand_prob
+        self.strategy = np.full(num_actions, 1 / num_actions)
 
-    def update_q_table(self, prev_state, action, reward):
+    def update(self, action_dist, reward):
+        self.update_q_table(action_dist, reward)
+        self.strategy = self.calc_mixed_strategy_nonlinear()
+
+    def update_q_table(self, action_dist, reward):
         """
         This method will update the Q-table based on the message, chosen actions and the obtained reward.
-        :param prev_state: The message.
         :param action: The chosen action by this agent.
         :param reward: The reward obtained by this agent.
         :return: /
         """
-        old_q = self.q_table[prev_state][action]
-        new_q = np.zeros(self.num_objectives)
-        for o in range(self.num_objectives):
-            new_q[o] = old_q[o] + self.alpha * (reward[o] - old_q[o])
-            self.q_table[prev_state][action][o] = new_q[o]
-
-    def update_joint_table(self, actions, payoffs):
-        """
-        Log the payoff vector of a joint action in the joint table.
-        :param actions: The joint action.
-        :param payoffs: The multi-objective payoff vector.
-        :return: /
-        """
-        coords = tuple(actions)
-        ser = calc_ser(self.agent_id, payoffs)
-        self.joint_table[coords] = ser
-
-    def pref_joint_action(self):
-        """
-        This method will calculate the preferred joint-action for an agent based on the payoffs of joint actions.
-        :return: The joint action that will result in the highest utility for the agent.
-        """
-        return np.argmax(self.joint_table)
+        for idx in range(self.num_actions):
+            self.q_table[idx] += self.alpha * (reward * action_dist[idx] - self.q_table[idx])
 
     def select_random_action(self):
         """
@@ -66,31 +47,24 @@ class QLearnerSER:
         random_action = np.random.randint(self.num_actions)
         return random_action
 
-    def select_action_mixed_nonlinear(self, state):
+    def select_action_mixed_nonlinear(self):
         """
         This method will perform epsilon greedy search based on nonlinear optimiser mixed strategy.
         :param state: The message from an agent in the form of their preferred joint action.
         :return: The selected action.
         """
-        self.current_state = state
         if random.uniform(0.0, 1.0) < self.epsilon:
             return self.select_random_action()
         else:
-            return self.select_action_greedy_mixed_nonlinear(state)
+            return self.select_action_greedy_mixed_nonlinear()
 
-    def select_action_greedy_mixed_nonlinear(self, state):
+    def select_action_greedy_mixed_nonlinear(self):
         """
         This method will perform greedy action selection based on nonlinear optimiser mixed strategy search.
         :param state: The preferred joint action.
         :return: The selected action.
         """
-        strategy = self.calc_mixed_strategy_nonlinear()
-        if isinstance(strategy, int) or isinstance(strategy, np.int64):
-            return strategy
-        else:
-            if np.sum(strategy) != 1:
-                strategy = strategy / np.sum(strategy)
-            return np.random.choice(range(self.num_actions), p=strategy)
+        return np.random.choice(range(self.num_actions), p=self.strategy)
 
     def calc_mixed_strategy_nonlinear(self):
         """
@@ -111,6 +85,8 @@ class QLearnerSER:
         solution = minimize(self.objective, s0, bounds=bnds, constraints=cons)
         strategy = solution.x
 
+        if np.sum(strategy) != 1:
+            strategy = strategy / np.sum(strategy)
         return strategy
 
     def objective(self, strategy):
@@ -129,39 +105,17 @@ class QLearnerSER:
         :param strategy: The mixed strategy.
         :return: The SER.
         """
-        expected_vec = self.calc_expected_vec(self.current_state, strategy)
-        ser = calc_ser(self.agent_id, expected_vec)
+        expected_vec = self.calc_expected_vec(strategy)
+        ser = self.utility(expected_vec)
         return ser
 
     # Calculates the expected payoff vector for a given strategy using the agent's own Q values
-    def calc_expected_vec(self, state, strategy):
+    def calc_expected_vec(self, strategy):
         """
         This method calculates the expected payoff vector for a given strategy using the agent's own Q values.
         :param state: The preferred joint action.
         :param strategy: The mixed strategy.
         :return: The expected results for all objectives.
         """
-        expected_vec = np.zeros(self.num_objectives)
-        for o in range(self.num_objectives):
-            expected_vec[o] = np.dot(self.q_table[state, :, o], np.array(strategy))
+        expected_vec = strategy @ self.q_table
         return expected_vec
-
-
-def calc_ser(agent, vector):
-    """
-    This function will calculate the SER for an agent and their expected results vector.
-    :param agent: The agent id.
-    :param vector: Their expected results for the objectives.
-    :return: The SER.
-    """
-    ser = 0
-    if agent == 0:
-        ser = vector[0] ** 2 + vector[1] ** 2  # Utility function for agent 1
-    elif agent == 1:
-        ser = vector[0] * vector[1]  # Utility function for agent 2
-    return ser
-
-
-def softmax(q):
-    soft_q = np.exp(q - np.max(q))
-    return soft_q / soft_q.sum(axis=0)

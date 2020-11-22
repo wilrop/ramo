@@ -85,3 +85,10 @@ def get_payoff_matrix(game):
         raise Exception("The provided game does not exist.")
 
     return payoff_matrix
+
+
+def get_u_and_du(agent):
+    if agent == 1:
+        return u1, gradient_u1
+    else:
+        return u2, gradient_u2
