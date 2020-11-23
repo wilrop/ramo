@@ -33,17 +33,19 @@ def calc_returns(payoffs, criterion):
     if criterion == 'SER':
         payoffs1 = payoffs[0]
         payoffs2 = payoffs[1]
-        returns1 = u1(np.mean(payoffs1, axis=0))
-        returns2 = u2(np.mean(payoffs2, axis=0))
+        expected_returns1 = np.mean(payoffs1, axis=0)
+        expected_returns2 = np.mean(payoffs2, axis=0)
+        returns1 = u1(expected_returns1)
+        returns2 = u2(expected_returns2)
 
-        return [returns1, returns2]
+        return [expected_returns1, expected_returns2], [returns1, returns2]
     else:
         payoffs1 = payoffs[0]
         payoffs2 = payoffs[1]
         returns1 = np.mean([u1(payoff) for payoff in payoffs1])
         returns2 = np.mean([u2(payoff) for payoff in payoffs2])
 
-        return [returns1, returns2]
+        return [returns1, returns2], [returns1, returns2]
 
 
 def decay_params(agents, alpha_decay, epsilon_decay):
@@ -56,13 +58,13 @@ def decay_params(agents, alpha_decay, epsilon_decay):
         agent.epsilon *= epsilon_decay
 
 
-def update(agents, selected_actions, returns):
+def update(agents, action_probs, returns):
     """
     This function gets called after every episode to update the Q-tables.
     :return: /
     """
     for idx, agent in enumerate(agents):
-        agent.update(selected_actions[idx], returns[idx])
+        agent.update(action_probs[idx], returns[idx])
 
 
 def do_rollout(agents, payoff_matrix):
@@ -82,9 +84,9 @@ def reset(num_agents, num_actions, num_objectives, alpha, epsilon, opt=False, ra
     for ag in range(num_agents):
         u, du = get_u_and_du(ag)
         if criterion == 'SER':
-            new_agent = QLearnerSER(u, alpha, 0, epsilon, num_actions, num_objectives, opt, rand_prob)
+            new_agent = QLearnerSER(u, alpha, epsilon, num_actions, num_objectives, opt, rand_prob)
         else:
-            new_agent = QLearnerESR(u, alpha, 0, epsilon, num_actions, num_objectives, opt, rand_prob)
+            new_agent = QLearnerESR(u, alpha, epsilon, num_actions, num_objectives, opt, rand_prob)
         agents.append(new_agent)
     return agents
 
@@ -137,8 +139,8 @@ def run_experiment(runs, episodes, rollout, criterion, payoff_matrix, opt_init, 
             probs_1 = action_hist1 / rollout
             probs_2 = action_hist2 / rollout
 
-            returns = calc_returns(episode_payoffs, criterion)  # Calculate the SER or ESR of the current strategy
-            update(agents, [action_hist1, action_hist2], returns)  # Update the current strategy based on the returns.
+            expected, returns = calc_returns(episode_payoffs, criterion)  # Calculate the SER/ESR of the payoffs.
+            update(agents, [probs_1, probs_2], expected)  # Update the current strategy based on the returns.
             decay_params(agents, alpha_decay, epsilon_decay)  # Decay the parameters after the rollout period.
 
             # Append the returns under the criterion and the action probabilities to the logs.
@@ -177,7 +179,7 @@ def create_data_dir(criterion, game, opt_init, rand_prob):
     return path
 
 
-def save_data(path, name, payoffs_log1, payoffs_log2, act_hist_log, state_dist_log, runs, episodes):
+def save_data(path, name, payoffs_log1, payoffs_log2, act_hist_log, state_dist_log, runs, episodes, rollout):
     print("Saving data to disk")
     columns = ['Episode', 'Trial', 'Payoff']
     df1 = pd.DataFrame(payoffs_log1, columns=columns)
@@ -193,7 +195,7 @@ def save_data(path, name, payoffs_log1, payoffs_log2, act_hist_log, state_dist_l
     df1.to_csv(f'{path}/agent1_probs_{name}.csv', index=False)
     df2.to_csv(f'{path}/agent2_probs_{name}.csv', index=False)
 
-    state_dist_log /= runs * (0.1 * episodes)
+    state_dist_log /= runs * (0.1 * episodes) * rollout
     df = pd.DataFrame(state_dist_log)
     df.to_csv(f'{path}/states_{name}.csv', index=False, header=False)
     print("Finished saving data to disk")
@@ -235,4 +237,4 @@ if __name__ == "__main__":
 
     # Writing the data to disk.
     path = create_data_dir(criterion, game, opt_init, rand_prob)
-    save_data(path, name, payoffs_log1, payoffs_log2, act_hist_log, state_dist_log, runs, episodes)
+    save_data(path, name, payoffs_log1, payoffs_log2, act_hist_log, state_dist_log, runs, episodes, rollout)

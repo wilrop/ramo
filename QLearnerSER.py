@@ -8,11 +8,9 @@ class QLearnerSER:
     This class represents an agent that uses the SER optimisation criterion.
     """
 
-    def __init__(self, utility, alpha, gamma, epsilon, num_actions, num_objectives, opt=False,
-                 rand_prob=False):
+    def __init__(self, utility, alpha, epsilon, num_actions, num_objectives, opt=False, rand_prob=False):
         self.utility = utility
         self.alpha = alpha
-        self.gamma = gamma
         self.epsilon = epsilon
         self.num_actions = num_actions
         self.num_objectives = num_objectives

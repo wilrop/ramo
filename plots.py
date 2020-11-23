@@ -14,10 +14,10 @@ sns.set_context("paper", rc={"font.size": 18, "axes.labelsize": 18, "xtick.label
 sns.set_style('white', {'axes.edgecolor': "0.5", "pdf.fonttype": 42})
 plt.gcf().subplots_adjust(bottom=0.15)
 
-provide_comms = True
-criterion = 'ESR'
+provide_comms = False
+criterion = 'SER'
 rand_prob = False
-episodes = 10000
+episodes = 5000
 
 for game in ['game1', 'game2', 'game3', 'game4', 'game5']:
     for opt_init in [False]:  # [True, False]:
@@ -41,12 +41,10 @@ for game in ['game1', 'game2', 'game3', 'game4', 'game5']:
         print("Creating plot path: " + repr(path_plots))
         mkdir_p(path_plots)
 
-        info = 'NE_'
-
         if provide_comms:
-            info += 'comm'
+            info = 'comms'
         else:
-            info += 'no_comm'
+            info = 'no_comms'
 
         df1 = pd.read_csv(f'{path_data}/agent1_{info}.csv')
         df2 = pd.read_csv(f'{path_data}/agent2_{info}.csv')
