@@ -134,7 +134,7 @@ def run_experiment(runs, episodes, criterion, payoff_matrix, opt_init, rand_prob
     num_agents = 2
     num_actions = payoff_matrix.shape[0]
     num_objectives = 2
-    epsilon = 0.9
+    epsilon = 0.1
     epsilon_decay = 0.999
     alpha = 0.05
     alpha_decay = 1

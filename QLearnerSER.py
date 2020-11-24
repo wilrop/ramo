@@ -31,7 +31,6 @@ class QLearnerSER:
         """
         self.update_q_table(action, reward)
         self.strategy = self.calc_mixed_strategy_nonlinear()
-        print(self.q_table)
 
     def update_q_table(self, action, reward):
         """
@@ -75,13 +74,12 @@ class QLearnerSER:
             s0 = np.random.random(self.num_actions)
             s0 /= np.sum(s0)
         else:
-            s0 = np.full(self.num_actions, 1.0 / self.num_actions)  # initial guess set to equal prob over all actions
+            s0 = np.full(self.num_actions, 1.0 / self.num_actions)  # initial guess set to equal prob over all actions.
 
         b = (0.0, 1.0)
-        bnds = (b,) * self.num_actions  # Each pair in x will have this b as min, max
+        bounds = (b,) * self.num_actions  # Each pair in x will have this b as min, max
         con1 = {'type': 'eq', 'fun': lambda x: np.sum(x) - 1}
-        cons = ([con1])
-        solution = minimize(self.objective, s0, bounds=bnds, constraints=cons)
+        solution = minimize(self.objective, s0, bounds=bounds, constraints=con1)
         strategy = solution.x
 
         if np.sum(strategy) != 1:
