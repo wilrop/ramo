@@ -18,6 +18,31 @@ def mkdir_p(path):
             raise
 
 
+def create_game_path(content, criterion, game, opt_init, rand_prob):
+    """
+    This function will create a new directory based on the given parameters.
+    :param content: The type of content this directory will hold.
+    :param criterion: The multi-objective optimisation criterion.
+    :param game: The current game that is being played.
+    :param opt_init: A boolean that decides on optimistic initialization of the Q-tables.
+    :param rand_prob: A boolean that decides on random initialization for the mixed strategy.
+    :return: The path that was created.
+    """
+    path = f'{content}/{criterion}/{game}'
+
+    if opt_init:
+        path += '/opt_init'
+    else:
+        path += '/zero_init'
+
+    if rand_prob:
+        path += '/opt_rand'
+    else:
+        path += '/opt_eq'
+
+    return path
+
+
 def softmax(q):
     """
     Calculates the softmax function over an input array.

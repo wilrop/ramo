@@ -175,7 +175,7 @@ def run_experiment(runs, episodes, criterion, payoff_matrix, opt_init, rand_prob
                 act_hist_log[0].append([episode, run, probs1[0], probs1[1], probs1[2]])
                 act_hist_log[1].append([episode, run, probs2[0], probs2[1], probs2[2]])
             else:
-                Exception("This number of actions is not yet supported")
+                raise Exception("This number of actions is not yet supported")
 
             # If we are in the last 10% of episodes we build up a state distribution log.
             if episode >= 0.9 * episodes:
@@ -186,33 +186,6 @@ def run_experiment(runs, episodes, criterion, payoff_matrix, opt_init, rand_prob
     print("Minutes elapsed: " + str(elapsed_mins))
 
     return payoffs_log1, payoffs_log2, act_hist_log, state_dist_log
-
-
-def create_data_dir(criterion, game, opt_init, rand_prob):
-    """
-    This function will create a new directory based on the given parameters.
-    :param criterion: The multi-objective optimisation criterion.
-    :param game: The current game that is being played.
-    :param opt_init: A boolean that decides on optimistic initialization of the Q-tables.
-    :param rand_prob: A boolean that decides on random initialization for the mixed strategy.
-    :return: The path that was created.
-    """
-    path = f'data/{criterion}/{game}'
-
-    if opt_init:
-        path += '/opt_init'
-    else:
-        path += '/zero_init'
-
-    if rand_prob:
-        path += '/opt_rand'
-    else:
-        path += '/opt_eq'
-
-    print("Creating data path: " + repr(path))
-    mkdir_p(path)
-
-    return path
 
 
 def save_data(path, name, payoffs_log1, payoffs_log2, act_hist_log, state_dist_log, runs, episodes):
@@ -282,5 +255,6 @@ if __name__ == "__main__":
     payoffs_log1, payoffs_log2, act_hist_log, state_dist_log = data
 
     # Writing the data to disk.
-    path = create_data_dir(criterion, game, opt_init, rand_prob)
+    path = create_game_path('data', criterion, game, opt_init, rand_prob)
+    mkdir_p(path)
     save_data(path, name, payoffs_log1, payoffs_log2, act_hist_log, state_dist_log, runs, episodes)
