@@ -31,6 +31,7 @@ class QLearnerSER:
         """
         self.update_q_table(action, reward)
         self.strategy = self.calc_mixed_strategy_nonlinear()
+        print(self.q_table)
 
     def update_q_table(self, action, reward):
         """
@@ -80,7 +81,6 @@ class QLearnerSER:
         bnds = (b,) * self.num_actions  # Each pair in x will have this b as min, max
         con1 = {'type': 'eq', 'fun': lambda x: np.sum(x) - 1}
         cons = ([con1])
-        print("HERE")
         solution = minimize(self.objective, s0, bounds=bnds, constraints=cons)
         strategy = solution.x
 
