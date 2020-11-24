@@ -17,6 +17,17 @@ plt.gcf().subplots_adjust(bottom=0.15)
 
 
 def plot_returns(path_plots, game, criterion, name, ag1_data, ag2_data):
+    """
+    This function will plot the returns obtained by both agents in one graph.
+    :param path_plots: The path to which we save the plot.
+    :param game: The game that was played.
+    :param criterion: The multi-objective optimisation criterion that was used.
+    :param name: The name of the experiment.
+    :param ag1_data: The data for agent 1.
+    :param ag2_data: The data for agent 2.
+    :return: /
+    """
+    print("Plotting expected returns under: " + repr(criterion))
     ax = sns.lineplot(x='Episode', y='Payoff', linewidth=2.0, data=ag1_data, ci='sd', label='Agent 1')
     ax = sns.lineplot(x='Episode', y='Payoff', linewidth=2.0, data=ag2_data, ci='sd', label='Agent 2')
     if criterion == 'SER':
@@ -31,9 +42,20 @@ def plot_returns(path_plots, game, criterion, name, ag1_data, ag2_data):
 
     plt.savefig(plot_name + ".pdf")
     plt.clf()
+    print("Finished plotting expected returns under: " + repr(criterion))
 
 
 def plot_action_probabilities(path_plots, game, episodes, agent, data):
+    """
+    This function will plot the action probabilities for a given agent.
+    :param path_plots: The path to which we save the plot.
+    :param game: The game that was played.
+    :param episodes: The number of episodes that was ran.
+    :param agent: The agent that is being plotted.
+    :param data: The data for this agent.
+    :return:
+    """
+    print("Plotting action probabilities for agent: " + repr(agent))
     if game == 'game2':
         label2 = 'R'
     else:
@@ -52,9 +74,18 @@ def plot_action_probabilities(path_plots, game, episodes, agent, data):
 
     plt.savefig(plot_name + ".pdf")
     plt.clf()
+    print("Finished plotting action probabilities for agent: " + repr(agent))
 
 
 def plot_state_distribution(path_plots, game, data):
+    """
+    This function will plot the state distribution as a heatmap.
+    :param path_plots: The path to which we save the plot.
+    :param game: The game that was played.
+    :param data: The state distribution data.
+    :return: /
+    """
+    print("Plotting the state distribution.")
     if game == 'game2':
         x_axis_labels = ["L", "R"]
         y_axis_labels = ["L", "R"]
@@ -73,10 +104,23 @@ def plot_state_distribution(path_plots, game, data):
 
     plt.savefig(plot_name + ".pdf")
     plt.clf()
+    print("Finished plotting the state distribution.")
 
 
 def plot_results(games, criterion, name, episodes, opt_init, rand_prob):
+    """
+    This function will call the different plotting functions that we need for each requested game.
+    :param games: The games we want to plot the results for.
+    :param criterion: The multi-objective optimisation criterion that was used.
+    :param name: The name of the experiment.
+    :param episodes: The amount of episodes that was ran.
+    :param opt_init: Whether optimistic initialization was used
+    :param rand_prob: Whether rand init for optimization prob was used.
+    :return:
+    """
     for game in games:
+        print("Generating plots for: " + repr(game))
+        # Get all the paths in order.
         path_data = create_game_path('data', criterion, game, opt_init, rand_prob)
         path_plots = create_game_path('plots', criterion, game, opt_init, rand_prob)
         mkdir_p(path_plots)
@@ -99,6 +143,8 @@ def plot_results(games, criterion, name, episodes, opt_init, rand_prob):
         # Plot the state distribution.
         df = pd.read_csv(f'{path_data}/states_{name}.csv', header=None)
         plot_state_distribution(path_plots, game, df)
+        print("Finished generating plots for: " + repr(game))
+        print("------------------------------------------------")
 
 
 if __name__ == "__main__":
@@ -113,7 +159,7 @@ if __name__ == "__main__":
     parser.add_argument('-episodes', type=int, default=5000, help="The number of episodes that were ran.")
 
     # Optimistic initialization can encourage exploration.
-    parser.add_argument('-opt_init', action='store_true', help="Whether optimistic initialization was used;")
+    parser.add_argument('-opt_init', action='store_true', help="Whether optimistic initialization was used.")
     parser.add_argument('-rand_prob', action='store_true', help="Whether rand init for optimization prob was used.")
 
     args = parser.parse_args()
