@@ -9,48 +9,74 @@ from QLearnerSER import QLearnerSER
 
 def select_actions(agents):
     """
-    This function will select actions from the starting message for each agent
-    :return: The actions that were selected.
+    This function selects an action from each agent's policy.
+    :param agents: The list of agents.
+    :return: A list of selected actions.
     """
     selected = []
     for agent in agents:
-        selected.append(agent.select_action_mixed_nonlinear())
+        selected.append(agent.select_action())
     return selected
 
 
-def calc_payoffs(agents, selected_actions, payoff_matrix):
+def calc_payoffs(agents, actions, payoff_matrix):
     """
     This function will calculate the payoffs of the agents.
-    :return: /
+    :param agents: The list of agents.
+    :param actions: The action that each agent chose.
+    :param payoff_matrix: The payoff matrix.
+    :return: A list of received payoffs.
     """
     payoffs = []
     for agent in agents:
-        payoffs.append(payoff_matrix[selected_actions[0]][selected_actions[1]])  # Append the payoffs from the actions.
+        payoffs.append(payoff_matrix[actions[0]][actions[1]])  # Append the payoffs from the actions.
     return payoffs
 
 
-def calc_returns(payoffs, criterion):
+def calc_returns(action_probs, criterion, payoff_matrix):
+    """
+    This function will calculate the expected returns under the given criterion.
+    :param action_probs: The current action probabilities of the agents.
+    :param criterion: The multi-objective criterion. Either SER or ESR.
+    :param payoff_matrix: The payoff matrix.
+    :return: A list of expected returns.
+    """
+    policy1 = action_probs[0]
+    policy2 = action_probs[1]
+
     if criterion == 'SER':
-        payoffs1 = payoffs[0]
-        payoffs2 = payoffs[1]
-        expected_returns1 = np.mean(payoffs1, axis=0)
-        expected_returns2 = np.mean(payoffs2, axis=0)
-        returns1 = u1(expected_returns1)
-        returns2 = u2(expected_returns2)
+        expected_returns = policy2 @ (policy1 @ payoff_matrix)  # Calculate the expected returns.
+        ser1 = u1(expected_returns)  # Scalarise the expected returns.
+        ser2 = u2(expected_returns)
 
-        return [expected_returns1, expected_returns2], [returns1, returns2]
+        return [ser1, ser2]
     else:
-        payoffs1 = payoffs[0]
-        payoffs2 = payoffs[1]
-        returns1 = np.mean([u1(payoff) for payoff in payoffs1])
-        returns2 = np.mean([u2(payoff) for payoff in payoffs2])
+        scalarised_returns1 = scalarise_matrix(payoff_matrix, u1)  # Scalarise the possible returns.
+        scalarised_returns2 = scalarise_matrix(payoff_matrix, u2)
+        esr1 = policy2 @ (policy1 @ scalarised_returns1)  # Take the expected value over them.
+        esr2 = policy2 @ (policy1 @ scalarised_returns2)
 
-        return [returns1, returns2], [returns1, returns2]
+        return [esr1, esr2]
+
+
+def get_action_probs(agents):
+    """
+    This function gets the current action probabilities from each agent.
+    :param agents: A list of agents.
+    :return: A list of their action probabilities.
+    """
+    action_probs = []
+    for agent in agents:
+        action_probs.append(agent.strategy)
+    return action_probs
 
 
 def decay_params(agents, alpha_decay, epsilon_decay):
     """
-    Decay the parameters of the Q-learning algorithm.
+    This function decays the parameters of the Q-learning algorithm used in each agent.
+    :param agents: A list of agents.
+    :param alpha_decay: The factor by which to decay alpha.
+    :param epsilon_decay: The factor by which to decay epsilon.
     :return: /
     """
     for agent in agents:
@@ -58,31 +84,33 @@ def decay_params(agents, alpha_decay, epsilon_decay):
         agent.epsilon *= epsilon_decay
 
 
-def update(agents, action_probs, returns):
+def update(agents, actions, payoffs):
     """
-    This function gets called after every episode to update the Q-tables.
-    :return: /
+    This function gets called after every episode to update the policy of every agent.
+    :param agents: A list of agents.
+    :param actions: A list of each action that was chosen, indexed by agent.
+    :param payoffs: A list of each payoff that was received, indexed by agent.
+    :return:
     """
     for idx, agent in enumerate(agents):
-        agent.update(action_probs[idx], returns[idx])
-
-
-def do_rollout(agents, payoff_matrix):
-    selected_actions = select_actions(agents)
-    payoffs = calc_payoffs(agents, selected_actions, payoff_matrix)
-    return selected_actions, payoffs
+        agent.update(actions[idx], payoffs[idx])
 
 
 def reset(num_agents, num_actions, num_objectives, alpha, epsilon, opt=False, rand_prob=False):
     """
-    This function will reset all variables for the new episode.
-    :param opt: Boolean that decides on optimistic initialization of the Q-tables.
-    :param rand_prob: Boolean that decides on random initialization for the mixed  strategy.
-    :return: A list of agents.
+    Ths function will create fresh agents that can be used in a new trial.
+    :param num_agents: The number of agents to create.
+    :param num_actions: The number of actions each agent can take.
+    :param num_objectives: The number of objectives they have.
+    :param alpha: The learning rate.
+    :param epsilon: The epsilon used in their epsilon-greedy strategy.
+    :param opt: A boolean that decides on optimistic initialization of the Q-tables.
+    :param rand_prob: A boolean that decides on random initialization for the mixed strategy.
+    :return:
     """
     agents = []
     for ag in range(num_agents):
-        u, du = get_u_and_du(ag)
+        u, du = get_u_and_du(ag + 1)  # The utility function and derivative of the utility function for this agent.
         if criterion == 'SER':
             new_agent = QLearnerSER(u, alpha, epsilon, num_actions, num_objectives, opt, rand_prob)
         else:
@@ -91,14 +119,17 @@ def reset(num_agents, num_actions, num_objectives, alpha, epsilon, opt=False, ra
     return agents
 
 
-def update_state_dist(state_dist_log, actions):
-    actions1, actions2 = actions
-    for action1, action2 in zip(actions1, actions2):
-        state_dist_log[action1, action2] += 1
-    return state_dist_log
-
-
-def run_experiment(runs, episodes, rollout, criterion, payoff_matrix, opt_init, rand_prob):
+def run_experiment(runs, episodes, criterion, payoff_matrix, opt_init, rand_prob):
+    """
+    This function will run the requested experiment.
+    :param runs: The number of different runs.
+    :param episodes: The number of episodes in each run.
+    :param criterion: The multi-objective optimisation criterion to use.
+    :param payoff_matrix: The payoff matrix for the game.
+    :param opt_init: A boolean that decides on optimistic initialization of the Q-tables.
+    :param rand_prob: A boolean that decides on random initialization for the mixed strategy.
+    :return: A log of payoffs, a log for action probabilities for both agents and a log of the state distribution.
+    """
     # Setting hyperparameters.
     num_agents = 2
     num_actions = payoff_matrix.shape[0]
@@ -121,37 +152,34 @@ def run_experiment(runs, episodes, rollout, criterion, payoff_matrix, opt_init, 
         agents = reset(num_agents, num_actions, num_objectives, alpha, epsilon, opt_init, rand_prob)
 
         for episode in range(episodes):
-            episode_payoffs = [[], []]
-            episode_actions = [[], []]
-            action_hist1 = np.array([0, 0, 0])
-            action_hist2 = np.array([0, 0, 0])
+            # Run one episode.
+            actions = select_actions(agents)
+            payoffs = calc_payoffs(agents, actions, payoff_matrix)
+            update(agents, actions, payoffs)  # Update the current strategy based on the returns.
+            decay_params(agents, alpha_decay, epsilon_decay)  # Decay the parameters after the episode is finished.
 
-            for r in range(rollout):
-                actions, payoffs = do_rollout(agents, payoff_matrix)
-                episode_payoffs[0].append(payoffs[0])
-                episode_payoffs[1].append(payoffs[1])
-                episode_actions[0].append(actions[0])
-                episode_actions[1].append(actions[1])
-                action_hist1[actions[0]] += 1
-                action_hist2[actions[1]] += 1
-
-            # Transform the action history for this episode to probabilities.
-            probs_1 = action_hist1 / rollout
-            probs_2 = action_hist2 / rollout
-
-            expected, returns = calc_returns(episode_payoffs, criterion)  # Calculate the SER/ESR of the payoffs.
-            update(agents, [probs_1, probs_2], expected)  # Update the current strategy based on the returns.
-            decay_params(agents, alpha_decay, epsilon_decay)  # Decay the parameters after the rollout period.
+            # Get the necessary results from this episode.
+            probs = get_action_probs(agents)  # Get the current action probabilities of the agents.
+            returns = calc_returns(probs, criterion, payoff_matrix)  # Calculate the SER/ESR of the current strategies.
 
             # Append the returns under the criterion and the action probabilities to the logs.
-            payoffs_log1.append([episode, run, returns[0]])
-            payoffs_log2.append([episode, run, returns[1]])
-            act_hist_log[0].append([episode, run, probs_1[0], probs_1[1], probs_1[2]])
-            act_hist_log[1].append([episode, run, probs_2[0], probs_2[1], probs_2[2]])
+            returns1, returns2 = returns
+            probs1, probs2 = probs
+            payoffs_log1.append([episode, run, returns1])
+            payoffs_log2.append([episode, run, returns2])
+
+            if num_actions == 2:
+                act_hist_log[0].append([episode, run, probs1[0], probs1[1], 0])
+                act_hist_log[1].append([episode, run, probs2[0], probs2[1], 0])
+            elif num_actions == 3:
+                act_hist_log[0].append([episode, run, probs1[0], probs1[1], probs1[2]])
+                act_hist_log[1].append([episode, run, probs2[0], probs2[1], probs2[2]])
+            else:
+                Exception("This number of actions is not yet supported")
 
             # If we are in the last 10% of episodes we build up a state distribution log.
             if episode >= 0.9 * episodes:
-                state_dist_log = update_state_dist(state_dist_log, episode_actions)
+                state_dist_log[actions[0], actions[1]] += 1
 
     end = time.time()
     elapsed_mins = (end - start) / 60.0
@@ -161,6 +189,14 @@ def run_experiment(runs, episodes, rollout, criterion, payoff_matrix, opt_init, 
 
 
 def create_data_dir(criterion, game, opt_init, rand_prob):
+    """
+    This function will create a new directory based on the given parameters.
+    :param criterion: The multi-objective optimisation criterion.
+    :param game: The current game that is being played.
+    :param opt_init: A boolean that decides on optimistic initialization of the Q-tables.
+    :param rand_prob: A boolean that decides on random initialization for the mixed strategy.
+    :return: The path that was created.
+    """
     path = f'data/{criterion}/{game}'
 
     if opt_init:
@@ -179,7 +215,19 @@ def create_data_dir(criterion, game, opt_init, rand_prob):
     return path
 
 
-def save_data(path, name, payoffs_log1, payoffs_log2, act_hist_log, state_dist_log, runs, episodes, rollout):
+def save_data(path, name, payoffs_log1, payoffs_log2, act_hist_log, state_dist_log, runs, episodes):
+    """
+    This function will save all of the results to disk in CSV format for later analysis.
+    :param path: The path to the directory in which all files will be saved.
+    :param name: The name of the experiment.
+    :param payoffs_log1: The payoff logs for agent 1.
+    :param payoffs_log2: The payoff logs for agent 2.
+    :param act_hist_log: The action logs for both agents.
+    :param state_dist_log: The state distribution log in the last 10% of episodes.
+    :param runs: The number of trials that were ran.
+    :param episodes: The number of episodes in each run.
+    :return: /
+    """
     print("Saving data to disk")
     columns = ['Episode', 'Trial', 'Payoff']
     df1 = pd.DataFrame(payoffs_log1, columns=columns)
@@ -195,7 +243,7 @@ def save_data(path, name, payoffs_log1, payoffs_log2, act_hist_log, state_dist_l
     df1.to_csv(f'{path}/agent1_probs_{name}.csv', index=False)
     df2.to_csv(f'{path}/agent2_probs_{name}.csv', index=False)
 
-    state_dist_log /= runs * (0.1 * episodes) * rollout
+    state_dist_log /= runs * (0.1 * episodes)
     df = pd.DataFrame(state_dist_log)
     df.to_csv(f'{path}/states_{name}.csv', index=False, header=False)
     print("Finished saving data to disk")
@@ -212,7 +260,6 @@ if __name__ == "__main__":
     parser.add_argument('-name', type=str, default='no_comms', help='The name under which to save the results')
     parser.add_argument('-runs', type=int, default=100, help="number of trials")
     parser.add_argument('-episodes', type=int, default=5000, help="number of episodes")
-    parser.add_argument('-rollout', type=int, default=100, help="Rollout period to test the current strategies")
 
     # Optimistic initialization can encourage exploration.
     parser.add_argument('-opt_init', action='store_true', help="optimistic initialization")
@@ -226,15 +273,14 @@ if __name__ == "__main__":
     name = args.name
     runs = args.runs
     episodes = args.episodes
-    rollout = args.rollout
     opt_init = args.opt_init
     rand_prob = args.rand_prob
 
     # Starting the experiments.
     payoff_matrix = get_payoff_matrix(game)
-    data = run_experiment(runs, episodes, rollout, criterion, payoff_matrix, opt_init, rand_prob)
+    data = run_experiment(runs, episodes, criterion, payoff_matrix, opt_init, rand_prob)
     payoffs_log1, payoffs_log2, act_hist_log, state_dist_log = data
 
     # Writing the data to disk.
     path = create_data_dir(criterion, game, opt_init, rand_prob)
-    save_data(path, name, payoffs_log1, payoffs_log2, act_hist_log, state_dist_log, runs, episodes, rollout)
+    save_data(path, name, payoffs_log1, payoffs_log2, act_hist_log, state_dist_log, runs, episodes)

@@ -19,7 +19,7 @@ criterion = 'SER'
 rand_prob = False
 episodes = 5000
 
-for game in ['game1', 'game2', 'game3', 'game4', 'game5']:
+for game in ['game2', 'game5']:
     for opt_init in [False]:  # [True, False]:
         path_data = f'data/{criterion}/{game}'
         path_plots = f'plots/{criterion}/{game}'

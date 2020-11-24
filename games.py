@@ -92,3 +92,12 @@ def get_u_and_du(agent):
         return u1, gradient_u1
     else:
         return u2, gradient_u2
+
+
+def scalarise_matrix(payoff_matrix, u):
+    scalarised_matrix = np.zeros((payoff_matrix.shape[0], payoff_matrix.shape[1]))
+    for i in range(scalarised_matrix.shape[0]):
+        for j in range(scalarised_matrix.shape[1]):
+            utility = u(payoff_matrix[i, j])
+            scalarised_matrix[i, j] = utility
+    return scalarised_matrix
