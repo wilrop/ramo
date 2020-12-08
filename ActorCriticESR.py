@@ -3,7 +3,7 @@ import numpy as np
 from scipy.optimize import minimize
 
 
-class QLearnerESR:
+class ActorCriticESR:
     """
     This class represents an agent that uses the ESR optimisation criterion.
     """

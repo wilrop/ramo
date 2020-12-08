@@ -3,8 +3,8 @@ import argparse
 import pandas as pd
 from utils import *
 from games import *
-from QLearnerESR import QLearnerESR
-from QLearnerSER import QLearnerSER
+from ActorCriticSER import ActorCriticSER
+from ActorCriticESR import ActorCriticESR
 
 
 def select_actions(agents):
@@ -67,21 +67,20 @@ def get_action_probs(agents):
     """
     action_probs = []
     for agent in agents:
-        action_probs.append(agent.strategy)
+        action_probs.append(agent.policy)
     return action_probs
 
 
-def decay_params(agents, alpha_decay, epsilon_decay):
+def decay_params(agents, alpha_decay):
     """
     This function decays the parameters of the Q-learning algorithm used in each agent.
     :param agents: A list of agents.
-    :param alpha_decay: The factor by which to decay alpha.
-    :param epsilon_decay: The factor by which to decay epsilon.
+    :param alpha_decay: The factor by which to decay the alpha for Q and theta.
     :return: /
     """
     for agent in agents:
-        agent.alpha *= alpha_decay
-        agent.epsilon *= epsilon_decay
+        agent.alpha_q *= alpha_decay
+        agent.alpha_theta *= alpha_decay
 
 
 def update(agents, actions, payoffs):
@@ -96,25 +95,24 @@ def update(agents, actions, payoffs):
         agent.update(actions[idx], payoffs[idx])
 
 
-def reset(num_agents, num_actions, num_objectives, alpha, epsilon, opt=False, rand_prob=False):
+def reset(num_agents, num_actions, num_objectives, alpha_q, alpha_theta, opt=False):
     """
     Ths function will create fresh agents that can be used in a new trial.
     :param num_agents: The number of agents to create.
     :param num_actions: The number of actions each agent can take.
     :param num_objectives: The number of objectives they have.
-    :param alpha: The learning rate.
-    :param epsilon: The epsilon used in their epsilon-greedy strategy.
+    :param alpha_q: The learning rate for the Q values.
+    :param alpha_q: The learning rate for theta.
     :param opt: A boolean that decides on optimistic initialization of the Q-tables.
-    :param rand_prob: A boolean that decides on random initialization for the mixed strategy.
     :return:
     """
     agents = []
     for ag in range(num_agents):
         u, du = get_u_and_du(ag + 1)  # The utility function and derivative of the utility function for this agent.
         if criterion == 'SER':
-            new_agent = QLearnerSER(u, alpha, epsilon, num_actions, num_objectives, opt, rand_prob)
+            new_agent = ActorCriticSER(ag, u, du, alpha_q, alpha_theta, num_actions, num_objectives, opt)
         else:
-            new_agent = QLearnerESR(u, alpha, epsilon, num_actions, num_objectives, opt, rand_prob)
+            new_agent = ActorCriticSER(ag, u, du, alpha_q, alpha_theta, num_actions, num_objectives, opt)
         agents.append(new_agent)
     return agents
 
@@ -134,9 +132,8 @@ def run_experiment(runs, episodes, criterion, payoff_matrix, opt_init, rand_prob
     num_agents = 2
     num_actions = payoff_matrix.shape[0]
     num_objectives = 2
-    epsilon = 0.1
-    epsilon_decay = 0.999
-    alpha = 0.05
+    alpha_q = 0.05
+    alpha_theta = 0.05
     alpha_decay = 1
 
     # Setting up lists containing the results.
@@ -149,14 +146,14 @@ def run_experiment(runs, episodes, criterion, payoff_matrix, opt_init, rand_prob
 
     for run in range(runs):
         print("Starting run: ", run)
-        agents = reset(num_agents, num_actions, num_objectives, alpha, epsilon, opt_init, rand_prob)
+        agents = reset(num_agents, num_actions, num_objectives, alpha_q, alpha_theta, opt_init)
 
         for episode in range(episodes):
             # Run one episode.
             actions = select_actions(agents)
             payoffs = calc_payoffs(agents, actions, payoff_matrix)
             update(agents, actions, payoffs)  # Update the current strategy based on the returns.
-            decay_params(agents, alpha_decay, epsilon_decay)  # Decay the parameters after the episode is finished.
+            decay_params(agents, alpha_decay)  # Decay the parameters after the episode is finished.
 
             # Get the necessary results from this episode.
             probs = get_action_probs(agents)  # Get the current action probabilities of the agents.
