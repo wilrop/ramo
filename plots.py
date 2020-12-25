@@ -39,7 +39,7 @@ def plot_returns(path_plots, game, criterion, name, ag1_data, ag2_data):
     ax.set_xlim(0, episodes)
 
     plot_name = f"{path_plots}/{game}_{criterion}_{name}"
-
+    plt.tight_layout()
     plt.savefig(plot_name + ".pdf")
     plt.clf()
     print("Finished plotting expected returns under: " + repr(criterion))
@@ -71,7 +71,7 @@ def plot_action_probabilities(path_plots, game, episodes, agent, data):
     ax.set_ylim(-0.05, 1.05)
     ax.set_xlim(0, episodes)
     plot_name = f"{path_plots}/{game}_{criterion}_{agent}_{name}"
-
+    plt.tight_layout()
     plt.savefig(plot_name + ".pdf")
     plt.clf()
     print("Finished plotting action probabilities for agent: " + repr(agent))
@@ -101,7 +101,7 @@ def plot_state_distribution(path_plots, game, data):
     ax = sns.heatmap(data, annot=True, cmap="YlGnBu", vmin=0, vmax=1, xticklabels=x_axis_labels,
                      yticklabels=y_axis_labels)
     plot_name = f"{path_plots}/{game}_{criterion}_states_{name}"
-
+    plt.tight_layout()
     plt.savefig(plot_name + ".pdf")
     plt.clf()
     print("Finished plotting the state distribution.")
