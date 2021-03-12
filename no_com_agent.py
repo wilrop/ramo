@@ -3,7 +3,7 @@ import numpy as np
 from utils import *
 
 
-class ActorCriticSER:
+class NoComAgent:
     """
     This class represents an agent that uses the SER multi-objective optimisation criterion.
     """

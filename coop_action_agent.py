@@ -4,7 +4,7 @@ from utils import *
 from scipy.optimize import minimize
 
 
-class ActorCriticSER:
+class CoopActionAgent:
     """
     This class represents an agent that uses the SER optimisation criterion.
     """
