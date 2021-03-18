@@ -1,4 +1,3 @@
-import random
 import numpy as np
 from utils import *
 
@@ -8,12 +7,13 @@ class CompActionAgent:
     This class represents an agent that uses the SER multi-objective optimisation criterion.
     """
 
-    def __init__(self, id, utility_function, derivative, alpha_q, alpha_theta, num_actions, num_objectives, opt=False):
+    def __init__(self, id, u, du, alpha_q, alpha_theta, alpha_decay, num_actions, num_objectives, opt=False):
         self.id = id
-        self.utility_function = utility_function
-        self.derivative = derivative
+        self.u = u
+        self.du = du
         self.alpha_q = alpha_q
         self.alpha_theta = alpha_theta
+        self.alpha_decay = alpha_decay
         self.num_actions = num_actions
         self.num_objectives = num_objectives
         # optimistic initialization of Q-table
@@ -27,11 +27,11 @@ class CompActionAgent:
         self.counter_thetas = np.zeros((num_actions, num_actions))
         self.counter_policies = np.full((num_actions, num_actions), 1 / num_actions)
         self.communicating = False
-        self.latest_message = 0
 
-    def update(self, actions, reward):
+    def update(self, message, actions, reward):
         """
-        This method will update the Q-table and strategy of the agent.
+        This method will update the Q-table, strategy and internal parameters of the agent.
+        :param message: The message that was sent.
         :param actions: The actions selected in the previous episode.
         :param reward: The reward that was obtained by the agent.
         :return: /
@@ -45,15 +45,17 @@ class CompActionAgent:
             self.msg_policy = policy
             self.communicating = False
         else:
-            policy = self.counter_policies[self.latest_message]
-            theta = self.counter_thetas[self.latest_message]
+            policy = self.counter_policies[message]
+            theta = self.counter_thetas[message]
             if self.id == 0:
-                expected_q = self.payoffs_table.transpose((1, 0, 2))[self.latest_message]
+                expected_q = self.payoffs_table.transpose((1, 0, 2))[message]
             else:
-                expected_q = self.payoffs_table[self.latest_message]
+                expected_q = self.payoffs_table[message]
             theta, policy = self.update_policy(policy, theta, expected_q)
-            self.counter_thetas[self.latest_message] = theta
-            self.counter_policies[self.latest_message] = policy
+            self.counter_thetas[message] = theta
+            self.counter_policies[message] = policy
+
+        self.update_parameters()
 
     def update_msg_q_table(self, action, reward):
         """
@@ -72,24 +74,34 @@ class CompActionAgent:
         :return: /
         """
         self.payoffs_table[actions[0], actions[1]] += self.alpha_q * (
-                    reward - self.payoffs_table[actions[0], actions[1]])
+                reward - self.payoffs_table[actions[0], actions[1]])
 
     def update_policy(self, policy, theta, expected_q):
         """
-        This method will update the parameters theta of the policy.
+        This method will update the given theta parameters and policy.
         :param policy: The policy we want to update.
         :param theta: The current theta parameters for this policy.
         :param expected_q: The Q-values for this policy.
         :return: Updated theta parameters and policy.
         """
+        policy = np.copy(policy)  # This avoids some weird numpy bugs where the policy/theta is referenced by pointer.
+        theta = np.copy(theta)
         expected_u = policy @ expected_q
         # We apply the chain rule to calculate the gradient.
-        grad_u = self.derivative(expected_u)  # The gradient of u
+        grad_u = self.du(expected_u)  # The gradient of u
         grad_pg = softmax_grad(policy).T @ expected_q  # The gradient of the softmax function
         grad_theta = grad_u @ grad_pg.T  # The gradient of the complete function J(theta).
         theta += self.alpha_theta * grad_theta
         policy = softmax(theta)
         return theta, policy
+
+    def update_parameters(self):
+        """
+        This method will update the internal parameters of the agent.
+        :return: /
+        """
+        self.alpha_q *= self.alpha_decay
+        self.alpha_theta *= self.alpha_decay
 
     def select_action(self, message):
         """
@@ -102,7 +114,7 @@ class CompActionAgent:
         else:
             return self.select_counter_action(message)  # Otherwise select a counter action.
 
-    def select_commit_action(self):
+    def get_message(self):
         """
         This method will determine what action this agent will publish.
         :return: The action that will maximise this agent's SER, given that the other agent also maximises its response.
@@ -112,11 +124,10 @@ class CompActionAgent:
 
     def select_counter_action(self, state):
         """
-        This method will perform epsilon greedy action selection.
-        :param state: The message from an agent in the form of their preferred joint action.
+        This method will select the best counter policy and choose an action using this policy.
+        :param state: The message from an agent in the form of their next action.
         :return: The selected action.
         """
-        self.latest_message = state
         policy = self.counter_policies[state]
         return np.random.choice(range(self.num_actions), p=policy)
 
