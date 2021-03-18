@@ -1,4 +1,4 @@
-# Communication in multi-objective normal-form games
+# Communication in Multi-Objective Normal-Form Games
 This repo consists of five different types of agents that we have used in our study of communication in multi-objective normal-form games. The settings that involve communication do this following a leader-follower model as seen in Stackelberg games. 
 In such settings, agents switch in a round-robin fashion between being the leader and communicating something and being the follower and observing the communication.
 
