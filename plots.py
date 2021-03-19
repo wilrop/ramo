@@ -118,8 +118,8 @@ def plot_com_probabilities(path_plots, game, name, episodes, agent, data):
     """
     print("Plotting message probabilities for agent: " + repr(agent))
 
-    ax = sns.lineplot(x='Episode', y='No communication', linewidth=2.0, data=data, ci='sd', label='Not Communicate')
-    ax = sns.lineplot(x='Episode', y='Communication', linewidth=2.0, data=data, ci='sd', label='Communicate')
+    ax = sns.lineplot(x='Episode', y='No communication', linewidth=2.0, data=data, ci='sd', label='No Communication')
+    ax = sns.lineplot(x='Episode', y='Communication', linewidth=2.0, data=data, ci='sd', label='Communication')
 
     ax.set(ylabel='Communication probability')
     ax.set_ylim(-0.05, 1.05)
