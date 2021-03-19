@@ -264,7 +264,7 @@ def save_data(path, name, returns_log, action_probs_log, com_probs_log, state_di
     returns_columns = ['Trial', 'Episode', 'Payoff']
     action_columns = [f'Action {a + 1}' for a in range(num_actions)]
     action_columns = ['Trial', 'Episode'] + action_columns
-    com_columns = ['Trial', 'Episode', 'No communication', 'Communication']
+    com_columns = ['Trial', 'Episode', 'Communication', 'No communication']
 
     for idx in range(num_agents):
         df_r = pd.DataFrame(returns_log[idx], columns=returns_columns)
@@ -288,7 +288,7 @@ if __name__ == "__main__":
 
     parser.add_argument('--game', type=str, default='game2', choices=['game1', 'game2', 'game3', 'game4', 'game5'],
                         help="which MONFG game to play")
-    parser.add_argument('--experiment', type=str, default='opt_coop_policy',
+    parser.add_argument('--experiment', type=str, default='opt_comp_action',
                         choices=['no_com', 'comp_action', 'coop_action', 'coop_policy', 'opt_comp_action',
                                  'opt_coop_action', 'opt_coop_policy'],
                         help='The experiment to run.')
