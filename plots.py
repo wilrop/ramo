@@ -97,7 +97,7 @@ def plot_state_distribution(path_plots, game, name, data):
         raise Exception("The provided game does not exist.")
 
     ax = sns.heatmap(data, annot=True, cmap="YlGnBu", vmin=0, vmax=1, xticklabels=x_axis_labels,
-                     yticklabels=y_axis_labels)
+                     yticklabels=y_axis_labels, cbar=False)
     plot_name = f"{path_plots}/{name}_{game}_states"
     plt.tight_layout()
     plt.savefig(plot_name + ".pdf")
