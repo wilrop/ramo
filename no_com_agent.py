@@ -24,9 +24,10 @@ class NoComAgent:
         else:
             self.q_table = np.zeros((num_actions, num_objectives))
 
-    def update(self, message, actions, reward):
+    def update(self, communicator, message, actions, reward):
         """
         This method will update the Q-table, strategy and internal parameters of the agent.
+        :param communicator: The id of the communicating agent.
         :param message: The message that was sent. Unused by this agent.
         :param actions: The actions that were executed.
         :param reward: The reward that was obtained by the agent.

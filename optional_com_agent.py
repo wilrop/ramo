@@ -28,10 +28,11 @@ class OptionalComAgent:
             self.q_table = np.zeros((self.num_messages, num_objectives))
         self.communicator = False
 
-    def update(self, message, actions, reward):
+    def update(self, communicator, message, actions, reward):
         """
         This method will update the Q-table, strategy and internal parameters of the agent, as well as the secondary
         agent that played in this round.
+        :param communicator: The id of the communicating agent.
         :param actions: The actions taken by the agents.
         :param reward: The reward obtained in this episode.
         :return: /
@@ -41,9 +42,9 @@ class OptionalComAgent:
         self.theta = theta
         self.policy = policy
         if message is None:
-            self.no_com_agent.update(message, actions, reward)
+            self.no_com_agent.update(communicator, message, actions, reward)
         else:
-            self.com_agent.update(message, actions, reward)
+            self.com_agent.update(communicator, message, actions, reward)
         self.update_parameters()
 
     def update_q_table(self, message, reward):

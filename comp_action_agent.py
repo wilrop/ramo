@@ -28,9 +28,10 @@ class CompActionAgent:
         self.counter_policies = np.full((num_actions, num_actions), 1 / num_actions)
         self.communicating = False
 
-    def update(self, message, actions, reward):
+    def update(self, communicator, message, actions, reward):
         """
         This method will update the Q-table, strategy and internal parameters of the agent.
+        :param communicator: The id of the communicating agent.
         :param message: The message that was sent.
         :param actions: The actions selected in the previous episode.
         :param reward: The reward that was obtained by the agent.
@@ -38,12 +39,11 @@ class CompActionAgent:
         """
         self.update_payoffs_table(actions, reward)
         own_action = actions[self.id]
-        if self.communicating:
+        if communicator == self.id:
             self.update_msg_q_table(own_action, reward)
             theta, policy = self.update_policy(self.msg_policy, self.msg_theta, self.msg_q_table)
             self.msg_theta = theta
             self.msg_policy = policy
-            self.communicating = False
         else:
             policy = self.counter_policies[message]
             theta = self.counter_thetas[message]
@@ -110,6 +110,7 @@ class CompActionAgent:
         :return: The selected action.
         """
         if self.communicating:
+            self.communicating = False
             return self.select_published_action(message)  # If this agent is committing, they must follow through.
         else:
             return self.select_counter_action(message)  # Otherwise select a counter action.

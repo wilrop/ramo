@@ -10,18 +10,6 @@ from coop_policy_agent import CoopPolicyAgent
 from optional_com_agent import OptionalComAgent
 
 
-def get_message(agents, episode):
-    """
-    This function gets the message from the communicating agent.
-    :param agents: The list of agents.
-    :param episode: The current episode.
-    :return: The selected message.
-    """
-    communicator = episode % len(agents)  # Select the communicator in round-robin fashion.
-    message = agents[communicator].get_message()
-    return communicator, message
-
-
 def select_actions(agents, message):
     """
     This function selects an action from each agent's policy.
@@ -100,17 +88,18 @@ def calc_com_probs(messages, rollouts):
     return [com/rollouts, no_com/rollouts]
 
 
-def update(agents, message, actions, payoffs):
+def update(agents, communicator, message, actions, payoffs):
     """
     This function gets called after every episode so that agents can update their internal mechanisms.
-    :param message: The message that was sent.
     :param agents: A list of agents.
+    :param communicator: The id of the communicating agent.
+    :param message: The message that was sent.
     :param actions: A list of each action that was chosen, indexed by agent.
     :param payoffs: A list of each payoff that was received, indexed by agent.
     :return:
     """
     for idx, agent in enumerate(agents):
-        agent.update(message, actions, payoffs[idx])
+        agent.update(communicator, message, actions, payoffs[idx])
 
 
 def reset(experiment, num_agents, num_actions, num_objectives, alpha_q, alpha_theta, alpha_msg, alpha_decay, opt=False):
@@ -198,8 +187,12 @@ def run_experiment(experiment, runs, episodes, rollouts, payoff_matrix, opt_init
             ep_payoffs = [[] for _ in range(num_agents)]
             ep_messages = []
 
+            # Select the communicator in round-robin fashion.
+            communicator = episode % len(agents)
+            communicating_agent = agents[communicator]
+
             for rollout in range(rollouts):  # Required to evaluate the SER and action probabilities.
-                communicator, message = get_message(agents, episode)
+                message = communicating_agent.get_message()
                 actions = select_actions(agents, message)
                 payoffs = calc_payoffs(agents, actions, payoff_matrix)
 
@@ -215,7 +208,7 @@ def run_experiment(experiment, runs, episodes, rollouts, payoff_matrix, opt_init
             last_actions = np.array(ep_actions)[:, -1]
             last_payoffs = np.array(ep_payoffs)[:, -1]
             last_message = ep_messages[-1]
-            update(agents, last_message, last_actions, last_payoffs)  # Update the agents.
+            update(agents, communicator, last_message, last_actions, last_payoffs)  # Update the agents.
 
             # Get the necessary results from this episode.
             action_probs = calc_action_probs(ep_actions, num_actions, rollouts)
@@ -286,7 +279,7 @@ def save_data(path, name, returns_log, action_probs_log, com_probs_log, state_di
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--game', type=str, default='game2', choices=['game1', 'game2', 'game3', 'game4', 'game5'],
+    parser.add_argument('--game', type=str, default='game5', choices=['game1', 'game2', 'game3', 'game4', 'game5'],
                         help="which MONFG game to play")
     parser.add_argument('--experiment', type=str, default='opt_comp_action',
                         choices=['no_com', 'comp_action', 'coop_action', 'coop_policy', 'opt_comp_action',
