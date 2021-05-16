@@ -226,9 +226,10 @@ def run_experiment(experiment, runs, episodes, rollouts, payoff_matrix, opt_init
             # If we are in the last 10% of episodes we build up a state distribution log.
             # This code is specific to two player games.
             if episode >= 0.9 * episodes:
-                probs1 = action_probs[0]
-                probs2 = action_probs[1]
-                state_dist = np.outer(probs1, probs2)
+                state_dist = np.zeros((num_actions, num_actions))
+                for a1, a2 in zip(ep_actions[0], ep_actions[1]):
+                    state_dist[a1, a2] += 1
+                state_dist /= rollouts
                 state_dist_log += state_dist
 
     end = time.time()
@@ -279,9 +280,9 @@ def save_data(path, name, returns_log, action_probs_log, com_probs_log, state_di
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--game', type=str, default='game5', choices=['game1', 'game2', 'game3', 'game4', 'game5'],
+    parser.add_argument('--game', type=str, default='game1', choices=['game1', 'game2', 'game3', 'game4', 'game5'],
                         help="which MONFG game to play")
-    parser.add_argument('--experiment', type=str, default='opt_comp_action',
+    parser.add_argument('--experiment', type=str, default='comp_action',
                         choices=['no_com', 'comp_action', 'coop_action', 'coop_policy', 'opt_comp_action',
                                  'opt_coop_action', 'opt_coop_policy'],
                         help='The experiment to run.')
