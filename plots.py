@@ -32,7 +32,10 @@ def plot_returns(path_plots, game, name, ag1_data, ag2_data):
     ax.set(ylabel='Scalarised Expected Returns')
 
     ax.set_ylim(1, 18)
-    ax.set_xlim(0, episodes)
+    if game in ['game1', 'game2']:
+        ax.set_xlim(0, 1000)
+    else:
+        ax.set_xlim(0, 1500)
 
     plot_name = f"{path_plots}/{name}_{game}_returns"
     plt.tight_layout()
@@ -66,7 +69,10 @@ def plot_action_probabilities(path_plots, game, name, episodes, agent, data):
 
     ax.set(ylabel='Action probability')
     ax.set_ylim(-0.05, 1.05)
-    ax.set_xlim(0, episodes)
+    if game in ['game1', 'game2']:
+        ax.set_xlim(0, 1000)
+    else:
+        ax.set_xlim(0, 1500)
     plot_name = f"{path_plots}/{name}_{game}_{agent}_probs"
     plt.tight_layout()
     plt.savefig(plot_name + ".pdf")
@@ -96,8 +102,13 @@ def plot_state_distribution(path_plots, game, name, data):
     else:
         raise Exception("The provided game does not exist.")
 
-    ax = sns.heatmap(data, annot=True, cmap="YlGnBu", vmin=0, vmax=1, xticklabels=x_axis_labels,
-                     yticklabels=y_axis_labels, cbar=False)
+    if game == 'game5':
+        ax = sns.heatmap(data, annot=True, cmap="YlGnBu", vmin=0, vmax=1, xticklabels=x_axis_labels,
+                         yticklabels=y_axis_labels, cbar=True)
+    else:
+        ax = sns.heatmap(data, annot=True, cmap="YlGnBu", vmin=0, vmax=1, xticklabels=x_axis_labels,
+                         yticklabels=y_axis_labels, cbar=False)
+
     plot_name = f"{path_plots}/{name}_{game}_states"
     plt.tight_layout()
     plt.savefig(plot_name + ".pdf")
@@ -123,7 +134,10 @@ def plot_com_probabilities(path_plots, game, name, episodes, agent, data):
 
     ax.set(ylabel='Communication probability')
     ax.set_ylim(-0.05, 1.05)
-    ax.set_xlim(0, episodes)
+    if game in ['game1', 'game2']:
+        ax.set_xlim(0, 1000)
+    else:
+        ax.set_xlim(0, 1500)
     plot_name = f"{path_plots}/{name}_{game}_{agent}_com"
     plt.tight_layout()
     plt.savefig(plot_name + ".pdf")
@@ -184,7 +198,7 @@ if __name__ == "__main__":
 
     parser.add_argument('-games', type=str, default=['game1', 'game2', 'game3', 'game4', 'game5'], nargs='+',
                         help="Which games to plot results for.")
-    parser.add_argument('--experiment', type=str, default='opt_coop_policy',
+    parser.add_argument('--experiment', type=str, default='comp_action',
                         choices=['no_com', 'comp_action', 'coop_action', 'coop_policy', 'opt_comp_action',
                                  'opt_coop_action', 'opt_coop_policy'],
                         help='The experiment that was ran.')
