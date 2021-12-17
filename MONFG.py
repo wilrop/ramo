@@ -163,8 +163,8 @@ def run_experiment(experiment, runs, episodes, rollouts, payoff_matrix, opt_init
     num_agents = 2
     num_actions = payoff_matrix.shape[0]
     num_objectives = 2
-    alpha_q = 0.05
-    alpha_theta = 0.05
+    alpha_q = 0.01
+    alpha_theta = 0.01
     alpha_msg = 0.01
     alpha_decay = 1
 
@@ -282,7 +282,7 @@ if __name__ == "__main__":
 
     parser.add_argument('--game', type=str, default='game1', choices=['game1', 'game2', 'game3', 'game4', 'game5'],
                         help="which MONFG game to play")
-    parser.add_argument('--experiment', type=str, default='comp_action',
+    parser.add_argument('--experiment', type=str, default='no_com',
                         choices=['no_com', 'comp_action', 'coop_action', 'coop_policy', 'opt_comp_action',
                                  'opt_coop_action', 'opt_coop_policy'],
                         help='The experiment to run.')
