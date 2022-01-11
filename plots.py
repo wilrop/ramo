@@ -48,7 +48,7 @@ def plot_returns(path_plots, filetype, game, name, ag1_data, ag2_data):
     ax = sns.lineplot(x='Episode', y='Payoff', linewidth=2.0, data=ag2_data, ci='sd', label='Agent 2')
     ax.set(ylabel='Scalarised Expected Returns')
 
-    ax.set_ylim(1, 18)
+    # ax.set_ylim(1, 40)
     if game in ['game1', 'game2']:
         ax.set_xlim(0, 1000)
     else:
@@ -74,12 +74,17 @@ def plot_action_probabilities(path_plots, filetype, game, name, episodes, agent,
     :return:
     """
     print("Plotting action probabilities for agent: " + repr(agent))
-    if game == 'game2':
+    if game == 'game7':
+        label1 = "Dare"
+        label2 = "Chicken"
+    elif game == 'game2':
+        label1 = 'L'
         label2 = 'R'
     else:
+        label1 = 'L'
         label2 = 'M'
 
-    ax = sns.lineplot(x='Episode', y='Action 1', linewidth=2.0, data=data, ci='sd', label='L')
+    ax = sns.lineplot(x='Episode', y='Action 1', linewidth=2.0, data=data, ci='sd', label=label1)
     ax = sns.lineplot(x='Episode', y='Action 2', linewidth=2.0, data=data, ci='sd', label=label2)
 
     if game in ['game1', 'game5']:
@@ -109,7 +114,7 @@ def plot_state_distribution(path_plots, game, name, data):
     :return: /
     """
     print("Plotting the state distribution.")
-    if game == 'game2':
+    if game in ['game2', 'game6', 'game8', 'game9']:
         x_axis_labels = ["L", "R"]
         y_axis_labels = ["L", "R"]
     elif game in ['game3', 'game4']:
@@ -118,6 +123,9 @@ def plot_state_distribution(path_plots, game, name, data):
     elif game in ['game1', 'game5']:
         x_axis_labels = ["L", "M", "R"]
         y_axis_labels = ["L", "M", "R"]
+    elif game in ['game7']:
+        x_axis_labels = ["Dare", "Chicken"]
+        y_axis_labels = ["Dare", "Chicken"]
     else:
         raise Exception("The provided game does not exist.")
 
@@ -218,11 +226,11 @@ def plot_results(games, name, episodes, filetype, opt_init):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-games', type=str, default=['game1', 'game2', 'game3', 'game4', 'game5'], nargs='+',
+    parser.add_argument('-games', type=str, default=['game8'], nargs='+',
                         help="Which games to plot results for.")
-    parser.add_argument('--experiment', type=str, default='no_com',
+    parser.add_argument('--experiment', type=str, default='best_response',
                         choices=['no_com', 'comp_action', 'coop_action', 'coop_policy', 'opt_comp_action',
-                                 'opt_coop_action', 'opt_coop_policy'],
+                                 'opt_coop_action', 'opt_coop_policy', 'best_response'],
                         help='The experiment that was ran.')
     parser.add_argument('-episodes', type=int, default=5000, help="The number of episodes that were ran.")
     parser.add_argument('-filetype', type=str, default='pdf', help="The filetype to save the plots under.")

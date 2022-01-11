@@ -1,6 +1,9 @@
 import time
 import argparse
+
+import numpy as np
 import pandas as pd
+
 from utils import *
 from games import *
 from no_com_agent import NoComAgent
@@ -8,6 +11,23 @@ from comp_action_agent import CompActionAgent
 from coop_action_agent import CoopActionAgent
 from coop_policy_agent import CoopPolicyAgent
 from optional_com_agent import OptionalComAgent
+from best_response_agent import BestResponseAgent
+
+
+def get_communicator(episode, agents, alternate=False):
+    """
+    This function selects the communicator.
+    :param episode: The current episode.
+    :param agents: The agents in the game.
+    :param alternate: Alternate the leader or always the same.
+    :return: The id of the communicating agent and the communicating agent itself.
+    """
+    if alternate:
+        communicator = episode % len(agents)
+    else:
+        communicator = 0
+    communicating_agent = agents[communicator]
+    return communicator, communicating_agent
 
 
 def select_actions(agents, message):
@@ -23,16 +43,16 @@ def select_actions(agents, message):
     return selected
 
 
-def calc_payoffs(agents, actions, payoff_matrix):
+def calc_payoffs(agents, actions, payoff_matrices):
     """
     This function will calculate the payoffs of the agents.
     :param agents: The list of agents.
     :param actions: The action that each agent chose.
-    :param payoff_matrix: The payoff matrix.
+    :param payoff_matrices: The payoff matrices.
     :return: A list of received payoffs.
     """
     payoffs = []
-    for _ in agents:
+    for payoff_matrix in payoff_matrices:
         payoffs.append(payoff_matrix[actions[0]][actions[1]])  # Append the payoffs from the actions.
     return payoffs
 
@@ -102,11 +122,12 @@ def update(agents, communicator, message, actions, payoffs):
         agent.update(communicator, message, actions, payoffs[idx])
 
 
-def reset(experiment, num_agents, num_actions, num_objectives, alpha_q, alpha_theta, alpha_msg, alpha_decay, opt=False):
+def reset(experiment, num_agents, u_lst, num_actions, num_objectives, alpha_q, alpha_theta, alpha_msg, alpha_decay, opt=False):
     """
     This function will create new agents that can be used in a new trial.
     :param experiment: The type of experiments we are running.
     :param num_agents: The number of agents to create.
+    :param u_lst: A list of utility functions to use per agent.
     :param num_actions: The number of actions each agent can take.
     :param num_objectives: The number of objectives they have.
     :param alpha_q: The learning rate for the Q values.
@@ -117,12 +138,14 @@ def reset(experiment, num_agents, num_actions, num_objectives, alpha_q, alpha_th
     :return:
     """
     agents = []
-    for ag in range(num_agents):
-        u, du = get_u_and_du(ag + 1)  # The utility function and derivative of the utility function for this agent.
+    for ag, u_str in zip(range(num_agents), u_lst):
+        u, du = get_u_and_du(u_str)  # The utility function and derivative of the utility function for this agent.
         if experiment == 'no_com':
             new_agent = NoComAgent(ag, u, du, alpha_q, alpha_theta, alpha_decay, num_actions, num_objectives, opt)
         elif experiment == 'comp_action':
             new_agent = CompActionAgent(ag, u, du, alpha_q, alpha_theta, alpha_decay, num_actions, num_objectives, opt)
+        elif experiment == 'best_response':
+            new_agent = BestResponseAgent(ag, u, du, alpha_q, alpha_theta, alpha_decay, num_actions, num_objectives, opt)
         elif experiment == 'coop_action':
             new_agent = CoopActionAgent(ag, u, du, alpha_q, alpha_theta, alpha_decay, num_actions, num_objectives, opt)
         elif experiment == 'coop_policy':
@@ -148,24 +171,25 @@ def reset(experiment, num_agents, num_actions, num_objectives, alpha_q, alpha_th
     return agents
 
 
-def run_experiment(experiment, runs, episodes, rollouts, payoff_matrix, opt_init):
+def run_experiment(experiment, runs, episodes, rollouts, payoff_matrices, u, opt_init):
     """
     This function will run the requested experiment.
     :param experiment: The type of experiment we are running.
     :param runs: The number of different runs.
     :param episodes: The number of episodes in each run.
     :param rollouts: The rollout period for the policies.
-    :param payoff_matrix: The payoff matrix for the game.
+    :param payoff_matrices: The payoff matrices for the game.
+    :param u: A list of utility functions to use for the agents.
     :param opt_init: A boolean that decides on optimistic initialization of the Q-tables.
     :return: A log of payoffs, a log for action probabilities for both agents and a log of the state distribution.
     """
     # Setting hyperparameters.
     num_agents = 2
-    num_actions = payoff_matrix.shape[0]
+    num_actions = payoff_matrices[0].shape[0]
     num_objectives = 2
-    alpha_q = 0.01
-    alpha_theta = 0.01
-    alpha_msg = 0.01
+    alpha_q = 0.2
+    alpha_theta = 0.005
+    alpha_msg = 0.005
     alpha_decay = 1
 
     # Setting up lists containing the results.
@@ -178,7 +202,7 @@ def run_experiment(experiment, runs, episodes, rollouts, payoff_matrix, opt_init
 
     for run in range(runs):
         print("Starting run: ", run)
-        agents = reset(experiment, num_agents, num_actions, num_objectives, alpha_q, alpha_theta, alpha_msg,
+        agents = reset(experiment, num_agents, u, num_actions, num_objectives, alpha_q, alpha_theta, alpha_msg,
                        alpha_decay, opt_init)
 
         for episode in range(episodes):
@@ -187,14 +211,12 @@ def run_experiment(experiment, runs, episodes, rollouts, payoff_matrix, opt_init
             ep_payoffs = [[] for _ in range(num_agents)]
             ep_messages = []
 
-            # Select the communicator in round-robin fashion.
-            communicator = episode % len(agents)
-            communicating_agent = agents[communicator]
+            communicator, communicating_agent = get_communicator(episode, agents)
 
             for rollout in range(rollouts):  # Required to evaluate the SER and action probabilities.
                 message = communicating_agent.get_message()
                 actions = select_actions(agents, message)
-                payoffs = calc_payoffs(agents, actions, payoff_matrix)
+                payoffs = calc_payoffs(agents, actions, payoff_matrices)
 
                 # Log the results of this roll
                 for idx in range(num_agents):
@@ -221,7 +243,7 @@ def run_experiment(experiment, runs, episodes, rollouts, payoff_matrix, opt_init
                 prob_log = [run, episode] + action_probs[idx].tolist()
                 action_probs_log[idx].append(prob_log)
             com_log = [run, episode] + com_probs
-            com_probs_log[episode % num_agents].append(com_log)
+            com_probs_log[communicator].append(com_log)
 
             # If we are in the last 10% of episodes we build up a state distribution log.
             # This code is specific to two player games.
@@ -280,14 +302,14 @@ def save_data(path, name, returns_log, action_probs_log, com_probs_log, state_di
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--game', type=str, default='game1', choices=['game1', 'game2', 'game3', 'game4', 'game5'],
-                        help="which MONFG game to play")
-    parser.add_argument('--experiment', type=str, default='no_com',
+    parser.add_argument('--game', type=str, default='game8', help="which MONFG game to play")
+    parser.add_argument('--u', type=str, default=['u3', 'u4'], choices=['u1', 'u2', 'u3', 'u4'], nargs='+',
+                        help="Which utility functions to use per player")
+    parser.add_argument('--experiment', type=str, default='best_response',
                         choices=['no_com', 'comp_action', 'coop_action', 'coop_policy', 'opt_comp_action',
-                                 'opt_coop_action', 'opt_coop_policy'],
+                                 'opt_coop_action', 'opt_coop_policy', 'best_response'],
                         help='The experiment to run.')
-
-    parser.add_argument('--runs', type=int, default=100, help="number of trials")
+    parser.add_argument('--runs', type=int, default=10, help="number of trials")
     parser.add_argument('--episodes', type=int, default=5000, help="number of episodes")
     parser.add_argument('--rollouts', type=int, default=100, help="Rollout period for the policies")
 
@@ -298,6 +320,7 @@ if __name__ == "__main__":
 
     # Extracting the arguments.
     game = args.game
+    u = args.u
     experiment = args.experiment
     runs = args.runs
     episodes = args.episodes
@@ -305,8 +328,8 @@ if __name__ == "__main__":
     opt_init = args.opt_init
 
     # Starting the experiments.
-    payoff_matrix = get_payoff_matrix(game)
-    data = run_experiment(experiment, runs, episodes, rollouts, payoff_matrix, opt_init)
+    payoff_matrices = get_monfg(game)
+    data = run_experiment(experiment, runs, episodes, rollouts, payoff_matrices, u, opt_init)
     returns_log, action_probs_log, com_probs_log, state_dist_log = data
 
     # Writing the data to disk.
