@@ -1,3 +1,4 @@
+import os
 import argparse
 import matplotlib
 import matplotlib.pyplot as plt
@@ -44,8 +45,8 @@ def plot_returns(path_plots, filetype, game, name, ag1_data, ag2_data):
     :return: /
     """
     print("Plotting scalarised expected returns")
-    ax = sns.lineplot(x='Episode', y='Payoff', linewidth=2.0, data=ag1_data, ci='sd', label='Agent 1')
-    ax = sns.lineplot(x='Episode', y='Payoff', linewidth=2.0, data=ag2_data, ci='sd', label='Agent 2')
+    ax = sns.lineplot(x='Episode', y='Payoff', linewidth=2.0, data=ag1_data, ci='sd', label='Leader')
+    ax = sns.lineplot(x='Episode', y='Payoff', linewidth=2.0, data=ag2_data, ci='sd', label='Follower')
     ax.set(ylabel='Scalarised Expected Returns')
 
     # ax.set_ylim(1, 40)
@@ -114,7 +115,7 @@ def plot_state_distribution(path_plots, game, name, data):
     :return: /
     """
     print("Plotting the state distribution.")
-    if game in ['game2', 'game6', 'game8', 'game9']:
+    if game in ['game2', 'game6', 'game8', 'game9', 'game10', 'game11']:
         x_axis_labels = ["L", "R"]
         y_axis_labels = ["L", "R"]
     elif game in ['game3', 'game4']:
