@@ -1,5 +1,8 @@
 import numpy as np
-from utils import *
+import jax.numpy as jnp
+
+from jax import grad, jit
+from jax.nn import softmax
 
 
 class CompActionAgent:
@@ -10,7 +13,7 @@ class CompActionAgent:
     def __init__(self, id, u, du, alpha_q, alpha_theta, alpha_decay, num_actions, num_objectives, opt=False):
         self.id = id
         self.u = u
-        self.du = du
+        self.grad_obj_func = jit(grad(self.objective_function))
         self.alpha_q = alpha_q
         self.alpha_theta = alpha_theta
         self.alpha_decay = alpha_decay
@@ -41,20 +44,15 @@ class CompActionAgent:
         own_action = actions[self.id]
         if communicator == self.id:
             self.update_msg_q_table(own_action, reward)
-            theta, policy = self.update_policy(self.msg_policy, self.msg_theta, self.msg_q_table)
-            self.msg_theta = theta
-            self.msg_policy = policy
+            self.msg_theta += self.alpha_theta * self.grad_obj_func(self.msg_theta, self.msg_q_table)
+            self.msg_policy = self.update_policy(self.msg_theta)
         else:
-            policy = self.counter_policies[message]
-            theta = self.counter_thetas[message]
             if self.id == 0:
                 expected_q = self.payoffs_table.transpose((1, 0, 2))[message]
             else:
                 expected_q = self.payoffs_table[message]
-            theta, policy = self.update_policy(policy, theta, expected_q)
-            self.counter_thetas[message] = theta
-            self.counter_policies[message] = policy
-
+            self.counter_thetas[message] += self.alpha_theta * self.grad_obj_func(self.counter_thetas[message], expected_q)
+            self.counter_policies[message] = self.update_policy(self.counter_thetas[message])
         self.update_parameters()
 
     def update_msg_q_table(self, action, reward):
@@ -76,24 +74,27 @@ class CompActionAgent:
         self.payoffs_table[actions[0], actions[1]] += self.alpha_q * (
                 reward - self.payoffs_table[actions[0], actions[1]])
 
-    def update_policy(self, policy, theta, expected_q):
+    def update_policy(self, theta):
         """
         This method will update the given theta parameters and policy.
-        :param policy: The policy we want to update.
-        :param theta: The current theta parameters for this policy.
-        :param expected_q: The Q-values for this policy.
-        :return: Updated theta parameters and policy.
+        :param theta: The updated theta parameters.
+        :return: The updated policy.
         """
-        policy = np.copy(policy)  # This avoids some weird numpy bugs where the policy/theta is referenced by pointer.
-        theta = np.copy(theta)
-        expected_u = policy @ expected_q
-        # We apply the chain rule to calculate the gradient.
-        grad_u = self.du(expected_u)  # The gradient of u
-        grad_pg = softmax_grad(policy).T @ expected_q  # The gradient of the softmax function
-        grad_theta = grad_u @ grad_pg.T  # The gradient of the complete function J(theta).
-        theta += self.alpha_theta * grad_theta
+        policy = np.asarray(softmax(theta), dtype=float)
+        policy = policy / np.sum(policy)
+        return policy
+
+    def objective_function(self, theta, q_values):
+        """
+        The objective function.
+        :param theta: The parameters for a policy.
+        :param q_values: The Q-values relating to this policy.
+        :return: The utility from the current policy strategy.
+        """
         policy = softmax(theta)
-        return theta, policy
+        expected_returns = jnp.matmul(policy, q_values)
+        utility = self.u(expected_returns)
+        return utility
 
     def update_parameters(self):
         """
