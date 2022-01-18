@@ -13,7 +13,7 @@ def objective(strategy, expected_returns, u):
     :return: A best response policy.
     """
     expected_vec = strategy @ expected_returns  # The expected vector of the strategy applied to the expected returns.
-    objective = u(expected_vec)  # The negative utility.
+    objective = - u(expected_vec)  # The negative utility.
     return objective
 
 
@@ -50,12 +50,22 @@ def best_response(u, player, payoff_matrix, joint_strategy):
 
     expected_returns = expected_returns.reshape(num_actions, num_objectives)  # Cast the result to a correct shape.
 
-    unif_strategy = np.full(num_actions, 1 / num_actions)  # A uniform strategy as first guess for the optimiser.
-    bounds = [(0, 1)] * num_actions  # Constrain probabilities to 0 and 1.
-    constraints = {'type': 'eq', 'fun': lambda x: np.sum(x) - 1}  # Equality constraint is equal to zero by default.
-    res = minimize(lambda x: objective(x, expected_returns, u), unif_strategy, bounds=bounds,
-                   constraints=constraints)
-    best_response = res['x'] / np.sum(res['x'])  # In case of floating point errors.
+    init_guesses = [np.full(num_actions, 1 / num_actions)]  # A uniform strategy as first guess for the optimiser.
+    for i in range(num_actions):
+        pure_strat = np.zeros(num_actions)
+        pure_strat[i] = 1
+        init_guesses.append(pure_strat)  # A pure strategy as first guess for the optimiser.
+
+    best_response = None
+    best_utility = float('inf')
+    for init_guess in init_guesses:
+        bounds = [(0, 1)] * num_actions  # Constrain probabilities to 0 and 1.
+        constraints = {'type': 'eq', 'fun': lambda x: np.sum(x) - 1}  # Equality constraint is equal to zero by default.
+        res = minimize(lambda x: objective(x, expected_returns, u), init_guess, bounds=bounds, constraints=constraints)
+
+        if res['fun'] < best_utility:
+            best_utility = res['fun']
+            best_response = res['x'] / np.sum(res['x'])  # In case of floating point errors.
 
     return best_response
 
@@ -65,7 +75,7 @@ class BestResponseAgent:
     This class represents an agent that uses the SER multi-objective optimisation criterion.
     """
 
-    def __init__(self, id, u, du, alpha_q, alpha_theta, alpha_decay, num_actions, num_objectives, opt=False):
+    def __init__(self, id, u, du, alpha_q, alpha_theta, alpha_decay, num_actions, num_objectives, opt=False, epsilon=1, epsilon_decay=0.995):
         self.id = id
         self.u = u
         self.du = du
@@ -85,6 +95,8 @@ class BestResponseAgent:
         self.best_response_policy = np.full(num_actions, 1 / num_actions)
         self.communicating = False
         self.calculated = False
+        self.epsilon = epsilon
+        self.epsilon_decay = epsilon_decay
 
     def update(self, communicator, message, actions, reward):
         """
@@ -103,6 +115,8 @@ class BestResponseAgent:
             theta, policy = self.update_policy(self.msg_policy, self.msg_theta, self.msg_q_table)
             self.msg_theta = theta
             self.msg_policy = policy
+        else:
+            self.epsilon = min(0.1, self.epsilon * self.epsilon_decay)
 
         self.update_parameters()
         self.calculated = False
@@ -186,11 +200,14 @@ class BestResponseAgent:
             if optimistic:
                 self.best_response_policy = best_response(self.u, self.id, self.payoffs_table, joint_strategy)
             else:
-                proxy_u = games.u3
+                proxy_u = lambda x: - games.u3(x)
                 self.best_response_policy = best_response(proxy_u, self.id, self.payoffs_table, joint_strategy)
             self.calculated = True
-        action = np.random.choice(range(self.num_actions), p=self.best_response_policy)
-        return action
+
+        if np.random.uniform(0, 1) < self.epsilon:
+            return np.random.randint(self.num_actions)
+        else:
+            return np.random.choice(range(self.num_actions), p=self.best_response_policy)
 
     def select_committed(self):
         """
