@@ -34,28 +34,42 @@ monfg5 = [np.array([[(4, 1), (1, 2), (2, 1)],
                     [(3, 1), (3, 2), (1, 2)],
                     [(1, 2), (2, 1), (1, 3)]], dtype=float)]
 
-# Game 6: A two action game. There are two NE when both agents use utility function u2 under SER: (L,L) and  (R, R).
-# The cyclic equilibrium is to mix uniformly over these.
-monfg6 = [np.array([[(10, 2), (0, 0)],
-                    [(0, 0), (2, 10)]], dtype=float),
-          np.array([[(10, 2), (0, 0)],
-                    [(0, 0), (2, 10)]], dtype=float)]
-
-# Game 7: A multi-objectivised version of the game of chicken. We use the utility function u2 for both players.
+# Game 6: A multi-objectivised version of the game of chicken. We use the utility function u2 for both players.
 # The cyclic equilibrium is to go 2/3 your own, 1/3 other action uniformly over these.
-monfg7 = [np.array([[(0, 0), (7, 2)],
+monfg6 = [np.array([[(0, 0), (7, 2)],
                     [(2, 7), (6, 2.32502)]], dtype=float),
           np.array([[(0, 0), (2, 7)],
                     [(7, 2), (6, 2.32502)]], dtype=float)]
 
-monfg8 = [np.array([[(-1, -1), (-1, 1)],
+# Game 7: An example of a game where commitment may be exploited.
+monfg7 = [np.array([[(-1, -1), (-1, 1)],
                     [(1, -1), (1, 1)]], dtype=float),
           np.array([[(-1, -1), (-1, 1)],
                     [(1, -1), (1, 1)]], dtype=float)]
 
-monfg9 = [np.array([[(2, 0), (1, 0)],
+# Game 8: A two action game. There are two NE when both agents use utility function u2 under SER: (L,L) and  (R, R).
+# The cyclic equilibrium is to mix uniformly over these.
+monfg8 = [np.array([[(10, 2), (0, 0)],
+                    [(0, 0), (2, 10)]], dtype=float),
+          np.array([[(10, 2), (0, 0)],
+                    [(0, 0), (2, 10)]], dtype=float)]
+
+# Game 9: A noisy version of game 8.
+monfg9 = [np.array([[(10, 2), (2, 3)],
+                    [(4, 2), (6, 3)]], dtype=float),
+          np.array([[(10, 2), (2, 3)],
+                    [(4, 2), (6, 3)]], dtype=float)]
+
+# Game 10: A game without Nash equilibria that still has a cyclic Nash equilibrium.
+monfg10 = [np.array([[(2, 0), (1, 0)],
                     [(0, 1), (0, 2)]], dtype=float),
-          np.array([[(2, 0), (1, 1)],
+           np.array([[(2, 0), (1, 1)],
+                    [(1, 1), (0, 2)]], dtype=float)]
+
+# Game 11: The same game as game 10 but intended to be used with the utility functions reversed.
+monfg11 = [np.array([[(2, 0), (1, 0)],
+                    [(0, 1), (0, 2)]], dtype=float),
+           np.array([[(2, 0), (1, 1)],
                     [(1, 1), (0, 2)]], dtype=float)]
 
 
@@ -167,6 +181,10 @@ def get_monfg(game):
         monfg = monfg8
     elif game == 'game9':
         monfg = monfg9
+    elif game == 'game10':
+        monfg = monfg10
+    elif game == 'game11':
+        monfg = monfg11
     else:
         raise Exception("The provided game does not exist.")
 
