@@ -1,5 +1,4 @@
 import os
-import errno
 import numpy as np
 
 
@@ -9,13 +8,7 @@ def mkdir_p(path):
     :param path: The path to the new directory.
     :return:
     """
-    try:
-        os.makedirs(path)
-    except OSError as exc:
-        if exc.errno == errno.EEXIST and os.path.isdir(path):
-            pass
-        else:
-            raise
+    os.makedirs(path, exist_ok=True)
 
 
 def create_game_path(content, experiment, game, opt_init):
