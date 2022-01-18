@@ -166,12 +166,12 @@ def reset(experiment, num_agents, u_lst, num_actions, num_objectives, alpha_q, a
             new_agent = OptionalComAgent(no_com_agent, com_agent, ag, u, du, alpha_q, alpha_msg, alpha_decay,
                                          num_objectives, opt)
         else:
-            raise Exception('Something went wrong!')
+            raise Exception(f'No experiment of type {experiment} exists')
         agents.append(new_agent)
     return agents
 
 
-def run_experiment(experiment, runs, episodes, rollouts, payoff_matrices, u, opt_init):
+def run_experiment(experiment, runs, episodes, rollouts, payoff_matrices, u, alternate, opt_init):
     """
     This function will run the requested experiment.
     :param experiment: The type of experiment we are running.
@@ -180,6 +180,7 @@ def run_experiment(experiment, runs, episodes, rollouts, payoff_matrices, u, opt
     :param rollouts: The rollout period for the policies.
     :param payoff_matrices: The payoff matrices for the game.
     :param u: A list of utility functions to use for the agents.
+    :param alternate: Alternate commitment between players.
     :param opt_init: A boolean that decides on optimistic initialization of the Q-tables.
     :return: A log of payoffs, a log for action probabilities for both agents and a log of the state distribution.
     """
@@ -211,7 +212,7 @@ def run_experiment(experiment, runs, episodes, rollouts, payoff_matrices, u, opt
             ep_payoffs = [[] for _ in range(num_agents)]
             ep_messages = []
 
-            communicator, communicating_agent = get_communicator(episode, agents)
+            communicator, communicating_agent = get_communicator(episode, agents, alternate)
 
             for rollout in range(rollouts):  # Required to evaluate the SER and action probabilities.
                 message = communicating_agent.get_message()
@@ -302,14 +303,12 @@ def save_data(path, name, returns_log, action_probs_log, com_probs_log, state_di
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--game', type=str, default='game8', help="which MONFG game to play")
-    parser.add_argument('--u', type=str, default=['u3', 'u4'], choices=['u1', 'u2', 'u3', 'u4'], nargs='+',
+    parser.add_argument('--game', type=str, default='game9', help="which MONFG game to play")
+    parser.add_argument('--u', type=str, default=['u1', 'u2'], nargs='+',
                         help="Which utility functions to use per player")
-    parser.add_argument('--experiment', type=str, default='best_response',
-                        choices=['no_com', 'comp_action', 'coop_action', 'coop_policy', 'opt_comp_action',
-                                 'opt_coop_action', 'opt_coop_policy', 'best_response'],
-                        help='The experiment to run.')
-    parser.add_argument('--runs', type=int, default=10, help="number of trials")
+    parser.add_argument('--experiment', type=str, default='comp_action', help='The experiment to run.')
+    parser.add_argument('--alternate', type=bool, default=False, help="Alternate commitment between players.")
+    parser.add_argument('--runs', type=int, default=100, help="number of trials")
     parser.add_argument('--episodes', type=int, default=5000, help="number of episodes")
     parser.add_argument('--rollouts', type=int, default=100, help="Rollout period for the policies")
 
@@ -322,6 +321,7 @@ if __name__ == "__main__":
     game = args.game
     u = args.u
     experiment = args.experiment
+    alternate = args.alternate
     runs = args.runs
     episodes = args.episodes
     rollouts = args.rollouts
@@ -329,7 +329,7 @@ if __name__ == "__main__":
 
     # Starting the experiments.
     payoff_matrices = get_monfg(game)
-    data = run_experiment(experiment, runs, episodes, rollouts, payoff_matrices, u, opt_init)
+    data = run_experiment(experiment, runs, episodes, rollouts, payoff_matrices, u, alternate, opt_init)
     returns_log, action_probs_log, com_probs_log, state_dist_log = data
 
     # Writing the data to disk.
