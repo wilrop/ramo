@@ -227,12 +227,8 @@ def plot_results(games, name, episodes, filetype, opt_init):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-games', type=str, default=['game8'], nargs='+',
-                        help="Which games to plot results for.")
-    parser.add_argument('--experiment', type=str, default='best_response',
-                        choices=['no_com', 'comp_action', 'coop_action', 'coop_policy', 'opt_comp_action',
-                                 'opt_coop_action', 'opt_coop_policy', 'best_response'],
-                        help='The experiment that was ran.')
+    parser.add_argument('-games', type=str, default=['game1'], nargs='+', help="Which games to plot results for.")
+    parser.add_argument('--experiment', type=str, default='comp_action', help='The experiment to generate plots for.')
     parser.add_argument('-episodes', type=int, default=5000, help="The number of episodes that were ran.")
     parser.add_argument('-filetype', type=str, default='pdf', help="The filetype to save the plots under.")
     parser.add_argument('-opt_init', action='store_true', help="Whether optimistic initialization was used.")
