@@ -47,6 +47,11 @@ def plot_returns(path_plots, filetype, game, name, ag1_data, ag2_data):
     print("Plotting scalarised expected returns")
     ax = sns.lineplot(x='Episode', y='Payoff', linewidth=2.0, data=ag1_data, ci='sd', label='Leader')
     ax = sns.lineplot(x='Episode', y='Payoff', linewidth=2.0, data=ag2_data, ci='sd', label='Follower')
+    if game == 'game7':
+        x_data = np.arange(0, 5000, 5)
+        y_constant = np.full(len(x_data), 0)
+        ax = sns.lineplot(x=x_data, y=y_constant, linewidth=2.0, linestyle='--', label='Lower bound', color='grey')
+
     ax.set(ylabel='Scalarised Expected Returns')
 
     # ax.set_ylim(1, 40)
