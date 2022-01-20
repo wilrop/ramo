@@ -75,7 +75,7 @@ def plot_action_probabilities(path_plots, filetype, game, name, episodes, agent,
     :return:
     """
     print("Plotting action probabilities for agent: " + repr(agent))
-    if game == 'game7':
+    if game == 'game6':
         label1 = "Dare"
         label2 = "Chicken"
     elif game == 'game2':
