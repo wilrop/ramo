@@ -67,10 +67,10 @@ monfg10 = [np.array([[(2, 0), (1, 0)],
                     [(1, 1), (0, 2)]], dtype=float)]
 
 # Game 11: The same game as game 10 but intended to be used with the utility functions reversed.
-monfg11 = [np.array([[(2, 0), (1, 0)],
-                    [(0, 1), (0, 2)]], dtype=float),
-           np.array([[(2, 0), (1, 1)],
-                    [(1, 1), (0, 2)]], dtype=float)]
+monfg11 = [np.array([[(2, 0), (1, 1)],
+                    [(1, 1), (0, 2)]], dtype=float),
+           np.array([[(2, 0), (1, 0)],
+                     [(0, 1), (0, 2)]], dtype=float)]
 
 
 def u1(vector):
