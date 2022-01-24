@@ -30,6 +30,7 @@ class NonStationaryAgent:
         self.msg_policy = np.full(num_actions, 1 / num_actions)
         self.counter_thetas = np.zeros((num_actions, num_actions))
         self.counter_policies = np.full((num_actions, num_actions), 1 / num_actions)
+        self.opponent_policy = np.ones(num_actions)
         self.communicating = False
 
     def update(self, communicator, message, actions, reward):
@@ -42,17 +43,20 @@ class NonStationaryAgent:
         :return: /
         """
         self.update_payoffs_table(actions, reward)
+
         own_action = actions[self.id]
         if communicator == self.id:
             self.update_msg_q_table(own_action, reward)
             self.msg_theta += self.alpha_theta * self.grad_obj_func_leader(self.msg_theta, self.msg_q_table)
             self.msg_policy = self.update_policy(self.msg_theta)
         else:
+            self.update_opponent_policy(message)
             if self.id == 0:
                 expected_q = self.payoffs_table.transpose((1, 0, 2))
             else:
                 expected_q = self.payoffs_table
-            self.counter_thetas += self.alpha_theta * self.grad_obj_func_follower(self.counter_thetas, expected_q, message)
+            opponent_policy = self.opponent_policy / np.sum(self.opponent_policy)
+            self.counter_thetas += self.alpha_theta * self.grad_obj_func_follower(self.counter_thetas, expected_q, opponent_policy)
             for idx, theta in enumerate(self.counter_thetas):
                 self.counter_policies[idx] = self.update_policy(theta)
 
@@ -117,13 +121,6 @@ class NonStationaryAgent:
         utility = self.u(expected_returns)
         return utility
 
-    def update_non_stationary_policy(self):
-        new_thetas = np.zeros((self.num_actions, self.num_actions))
-        new_policies = np.zeros((self.num_actions, self.num_actions))
-        for policy in range(self.num_actions):  # A policy per committed action.
-            pass
-        return new_thetas, new_policies
-
     def update_parameters(self):
         """
         This method will update the internal parameters of the agent.
@@ -131,6 +128,13 @@ class NonStationaryAgent:
         """
         self.alpha_q *= self.alpha_decay
         self.alpha_theta *= self.alpha_decay
+
+    def update_opponent_policy(self, message):
+        """
+        This function updates an opponent policy.
+        :return: /
+        """
+        self.opponent_policy[message] += 1
 
     def select_action(self, message):
         """
