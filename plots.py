@@ -33,13 +33,14 @@ def save_plot(plot_name, filetype, dpi=300):
     plt.clf()
 
 
-def plot_returns(path_plots, filetype, game, name, ag1_data, ag2_data):
+def plot_returns(path_plots, filetype, game, name, episodes, ag1_data, ag2_data):
     """
     This function will plot the returns obtained by both agents in one graph.
     :param path_plots: The path to which we save the plot.
     :param filetype: The filetype to save the file under.
     :param game: The game that was played.
     :param name: The name of the experiment.
+    :param episodes: The number of episodes that was ran.
     :param ag1_data: The data for agent 1.
     :param ag2_data: The data for agent 2.
     :return: /
@@ -52,7 +53,11 @@ def plot_returns(path_plots, filetype, game, name, ag1_data, ag2_data):
         y_constant = np.full(len(x_data), 0)
         ax = sns.lineplot(x=x_data, y=y_constant, linewidth=2.0, linestyle='--', label='Lower bound', color='grey')
 
-    ax.set(ylabel='Scalarised Expected Returns')
+    if episodes > 5000:
+        scale = 'log'
+    else:
+        scale = 'linear'
+    ax.set(ylabel='Scalarised Expected Returns', xscale=scale)
 
     # ax.set_ylim(1, 40)
     if game in ['game1', 'game2']:
@@ -202,7 +207,7 @@ def plot_results(games, name, episodes, filetype, opt_init):
         df2 = pd.read_csv(f'{path_data}/{name}_{game}_A2_returns.csv')
         df1 = df1.iloc[::5, :]
         df2 = df2.iloc[::5, :]
-        plot_returns(path_plots, filetype, game, name, df1, df2)
+        plot_returns(path_plots, filetype, game, name, episodes, df1, df2)
 
         # Plot the action probabilities for both agents in a separate plot.
         df1 = pd.read_csv(f'{path_data}/{name}_{game}_A1_probs.csv')
