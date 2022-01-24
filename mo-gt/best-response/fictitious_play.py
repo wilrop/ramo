@@ -20,6 +20,7 @@ def fictitious_play(u_tpl, player_actions, monfg, max_iter=1000, init_joint_stra
     :param variant: The variant to use. This is either simultaneous or alternating.
     :return: Whether or not we reached a Nash equilibrium and the final joint strategy.
     """
+
     def simultaneous_variant():
         """
         This function will execute one iteration of the simultaneous fictitious play variant.

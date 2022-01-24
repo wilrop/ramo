@@ -42,4 +42,3 @@ In the example MONFG, it successfully finds the PSNE (A, A). This leads to a uti
 ## Cite
 Please use the following citation if you use these algorithms in your work.
 CITATION
->>>>>>> Nash-equilibria-monfg/main

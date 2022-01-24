@@ -1,6 +1,5 @@
 import numpy as np
 
-
 # Game 1: A 3-action 2-player game with team rewards.
 # This game has two PSNE using u1 and u2: [0, 0], [2, 2]
 # Checked for correctness using Gambit.
@@ -123,7 +122,6 @@ monfg9 = [
               [[(0, 1), (1, 0), (0, 0)],
                [(1, 1), (2, 1), (1, 1)]]])
 ]
-
 
 monfg10 = [
     np.array([[(2, 2), (0, 0)],
@@ -267,7 +265,7 @@ def generate_identity_game(player_actions=(2, 2)):
 
     payoffs.append(payoff_matrix)
 
-    for _ in range(len(player_actions)-1):  # We already have the first payoff matrix, so copy the rest now.
+    for _ in range(len(player_actions) - 1):  # We already have the first payoff matrix, so copy the rest now.
         payoff_copy = np.copy(payoff_matrix)
         payoffs.append(payoff_copy)
 

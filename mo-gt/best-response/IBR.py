@@ -7,7 +7,8 @@ import util
 from Player import IBRPlayer
 
 
-def iterated_best_response(u_tpl, player_actions, monfg, max_iter=1000, init_joint_strategy=None, variant='simultaneous'):
+def iterated_best_response(u_tpl, player_actions, monfg, max_iter=1000, init_joint_strategy=None,
+                           variant='simultaneous'):
     """
     This function executes the iterated best response algorithm on a given MONFG with accompanied utility functions.
     Note that the simultaneous and alternating variants are not equivalent in general. In the simultaneous variant, all
@@ -40,10 +41,12 @@ def iterated_best_response(u_tpl, player_actions, monfg, max_iter=1000, init_joi
     new_joint_strategy = copy.deepcopy(joint_strategy)
     if variant == 'simultaneous':
         # We hide the strategy updates of other players until everyone is finished. This makes it a simultaneous update.
-        def update_strategy(): return joint_strategy
+        def update_strategy():
+            return joint_strategy
     else:
         # We show the strategy updates of other players. This makes it an alternating update.
-        def update_strategy(): return new_joint_strategy
+        def update_strategy():
+            return new_joint_strategy
 
     for i in range(max_iter):
         print(f'Performing iteration {i}')

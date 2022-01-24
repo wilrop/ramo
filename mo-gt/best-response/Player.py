@@ -6,6 +6,7 @@ class IBRPlayer:
     """
     A class implementing a player that learns using the iterated best response algorithm.
     """
+
     def __init__(self, id, u, num_actions, payoff_matrix, init_strategy=None):
         self.id = id
         self.u = u
@@ -36,6 +37,7 @@ class FPPlayer:
     """
     A class implementing a player that learns using fictitious play.
     """
+
     def __init__(self, id, u, player_actions, payoff_matrix, init_strategy=None):
         self.id = id
         self.u = u
