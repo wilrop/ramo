@@ -6,12 +6,16 @@ import util
 
 
 def scalarise_matrix(payoff_matrix, u, player_actions):
-    """
-    This function will scalarise a matrix according to a given utility function.
-    :param payoff_matrix: The input payoffs.
-    :param u: A utility function.
-    :param player_actions: A tuple with the number of actions for each player.
-    :return: The scalarised game.
+    """This function will scalarise a matrix according to a given utility function.
+
+    Args:
+      payoff_matrix: The input payoffs.
+      u: A utility function.
+      player_actions: A tuple with the number of actions for each player.
+
+    Returns:
+      The scalarised game.
+
     """
     scalarised_matrix = np.zeros(player_actions)
     num_strategies = np.prod(player_actions)
@@ -25,12 +29,16 @@ def scalarise_matrix(payoff_matrix, u, player_actions):
 
 
 def reduce_monfg(monfg, player_actions, u_tpl):
-    """
-    This function will reduce the MONFG to an NFG as a list of payoff matrices.
-    :param monfg: The input MONFG.
-    :param player_actions: A tuple of the amount of actions per player.
-    :param u_tpl: A tuple of utility functions.
-    :return: An NFG.
+    """This function will reduce the MONFG to an NFG as a list of payoff matrices.
+
+    Args:
+      monfg: The input MONFG.
+      player_actions: A tuple of the amount of actions per player.
+      u_tpl: A tuple of utility functions.
+
+    Returns:
+      An NFG.
+
     """
     nfg = []  # Collect the payoff matrices.
     for player, u in enumerate(u_tpl):
@@ -40,11 +48,15 @@ def reduce_monfg(monfg, player_actions, u_tpl):
 
 
 def calc_nfg_psne(nfg, player_actions):
-    """
-    This function will calculate the PSNE from the scalarised game.
-    :param nfg: The scalarised MONFG.
-    :param player_actions: A tuple of the amount of actions per player.
-    :return: A list of PSNE.
+    """This function will calculate the PSNE from the scalarised game.
+
+    Args:
+      nfg: The scalarised MONFG.
+      player_actions: A tuple of the amount of actions per player.
+
+    Returns:
+      A list of PSNE.
+
     """
     best_responses = []  # Collect the best response matrices.
     num_strategies = np.prod(player_actions)  # The number of possible pure strategies.
@@ -73,12 +85,16 @@ def calc_nfg_psne(nfg, player_actions):
 
 
 def find_all_psne(monfg, player_actions, u_tpl):
-    """
-    This function will find all Pure Strategy Nash Equilibria (PSNE).
-    :param monfg: An input MONFG.
-    :param player_actions: A tuple of the amount of actions per player.
-    :param u_tpl: A tuple of utility functions.
-    :return: A list of PSNE.
+    """This function will find all Pure Strategy Nash Equilibria (PSNE).
+
+    Args:
+      monfg: An input MONFG.
+      player_actions: A tuple of the amount of actions per player.
+      u_tpl: A tuple of utility functions.
+
+    Returns:
+      A list of PSNE.
+
     """
     nfg = reduce_monfg(monfg, player_actions, u_tpl)  # Reduce the MONFG to an NFG.
     psne_lst = calc_nfg_psne(nfg, player_actions)  # Calculate the PSNE from these payoff matrices.

@@ -3,9 +3,7 @@ from utils_learn import *
 
 
 class CoopPolicyAgent:
-    """
-    This class represents an agent that uses the SER optimisation criterion.
-    """
+    """This class represents an agent that uses the SER optimisation criterion."""
 
     def __init__(self, id, u, du, alpha_q, alpha_theta, alpha_decay, num_actions, num_objectives, opt=False):
         self.id = id
@@ -29,13 +27,16 @@ class CoopPolicyAgent:
         self.communicating = False
 
     def update(self, communicator, message, actions, reward):
-        """
-        This method will update the Q-table, strategy and internal parameters of the agent.
-        :param communicator: The id of the communicating agent.
-        :param message: The message that was sent. Unused by this agent.
-        :param actions: The actions taken by the agents.
-        :param reward: The reward obtained in this episode.
-        :return: /
+        """This method will update the Q-table, strategy and internal parameters of the agent.
+
+        Args:
+          communicator: The id of the communicating agent.
+          message: The message that was sent. Unused by this agent.
+          actions: The actions taken by the agents.
+          reward: The reward obtained in this episode.
+
+        Returns:
+
         """
         self.update_q_table(actions, reward)
         if self.id == 0:
@@ -51,21 +52,31 @@ class CoopPolicyAgent:
         self.update_parameters()
 
     def update_q_table(self, actions, reward):
-        """
-        This method will update the Q-table based on the message, chosen actions and the obtained reward.
-        :param actions: The actions taken by the agents.
-        :param reward: The reward obtained by this agent.
-        :return: /
+        """This method will update the Q-table based on the message, chosen actions and the obtained reward.
+
+        Args:
+          actions: The actions taken by the agents.
+          reward: The reward obtained by this agent.
+
+        Returns:
+
         """
         self.q_table[actions[0], actions[1]] += self.alpha_q * (reward - self.q_table[actions[0], actions[1]])
 
     def update_policy(self, policy, theta, expected_q):
-        """
-        This method will update the given theta parameters and policy.
+        """This method will update the given theta parameters and policy.
         :policy: The policy we want to update
         :theta: The current parameters for this policy.
         :expected_q: The Q-values for this policy.
-        :return: Updated theta parameters and policy.
+
+        Args:
+          policy: param theta:
+          expected_q: 
+          theta: 
+
+        Returns:
+          Updated theta parameters and policy.
+
         """
         policy = np.copy(policy)  # This avoids some weird numpy bugs where the policy/theta is referenced by pointer.
         theta = np.copy(theta)
@@ -79,26 +90,38 @@ class CoopPolicyAgent:
         return theta, policy
 
     def update_parameters(self):
-        """
-        This method will update the internal parameters of the agent.
+        """This method will update the internal parameters of the agent.
         :return: /
+
+        Args:
+
+        Returns:
+
         """
         self.alpha_q *= self.alpha_decay
         self.alpha_theta *= self.alpha_decay
 
     def get_message(self):
-        """
-        This method will send the current policy of the agent as a message.
+        """This method will send the current policy of the agent as a message.
         :return: The current learned policy.
+
+        Args:
+
+        Returns:
+
         """
         self.communicating = True
         return self.policy
 
     def select_action(self, message):
-        """
-        This method will select an action based on the message that was sent.
-        :param message: The message that was sent.
-        :return: The selected action.
+        """This method will select an action based on the message that was sent.
+
+        Args:
+          message: The message that was sent.
+
+        Returns:
+          The selected action.
+
         """
         if self.communicating:
             self.communicating = False
@@ -107,10 +130,14 @@ class CoopPolicyAgent:
             return self.select_counter_action(message)
 
     def select_counter_action(self, op_policy):
-        """
-        This method will calculate a best-response policy to the received message and select an action from this policy.
-        :param op_policy: The policy committed to by the opponent.
-        :return: The selected action.
+        """This method will calculate a best-response policy to the received message and select an action from this policy.
+
+        Args:
+          op_policy: The policy committed to by the opponent.
+
+        Returns:
+          The selected action.
+
         """
         self.op_policy = op_policy
         if self.id == 0:
@@ -124,8 +151,12 @@ class CoopPolicyAgent:
         return np.random.choice(range(self.num_actions), p=self.best_response_policy)
 
     def select_committed_action(self):
-        """
-        This method uses the committed policy to select the action that will be played.
+        """This method uses the committed policy to select the action that will be played.
         :return: An action that was selected using the current policy.
+
+        Args:
+
+        Returns:
+
         """
         return np.random.choice(range(self.num_actions), p=self.policy)

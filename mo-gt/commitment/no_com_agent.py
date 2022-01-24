@@ -3,9 +3,7 @@ from utils_learn import *
 
 
 class NoComAgent:
-    """
-    This class represents an agent that uses the SER multi-objective optimisation criterion.
-    """
+    """This class represents an agent that uses the SER multi-objective optimisation criterion."""
 
     def __init__(self, id, u, du, alpha_q, alpha_theta, alpha_decay, num_actions, num_objectives, opt=False):
         self.id = id
@@ -25,13 +23,16 @@ class NoComAgent:
             self.q_table = np.zeros((num_actions, num_objectives))
 
     def update(self, communicator, message, actions, reward):
-        """
-        This method will update the Q-table, strategy and internal parameters of the agent.
-        :param communicator: The id of the communicating agent.
-        :param message: The message that was sent. Unused by this agent.
-        :param actions: The actions that were executed.
-        :param reward: The reward that was obtained by the agent.
-        :return: /
+        """This method will update the Q-table, strategy and internal parameters of the agent.
+
+        Args:
+          communicator: The id of the communicating agent.
+          message: The message that was sent. Unused by this agent.
+          actions: The actions that were executed.
+          reward: The reward that was obtained by the agent.
+
+        Returns:
+
         """
         action = actions[self.id]
         self.update_q_table(action, reward)
@@ -39,18 +40,25 @@ class NoComAgent:
         self.update_parameters()
 
     def update_q_table(self, action, reward):
-        """
-        This method will update the Q-table based on the chosen actions and the obtained reward.
-        :param action: The action chosen by this agent.
-        :param reward: The reward obtained by this agent.
-        :return: /
+        """This method will update the Q-table based on the chosen actions and the obtained reward.
+
+        Args:
+          action: The action chosen by this agent.
+          reward: The reward obtained by this agent.
+
+        Returns:
+
         """
         self.q_table[action] += self.alpha_q * (reward - self.q_table[action])
 
     def update_policy(self):
-        """
-        This method will update the given theta parameters and policy.
+        """This method will update the given theta parameters and policy.
         :return: /
+
+        Args:
+
+        Returns:
+
         """
         expected_u = self.policy @ self.q_table
         # We apply the chain rule to calculate the gradient.
@@ -61,25 +69,37 @@ class NoComAgent:
         self.policy = softmax(self.theta)
 
     def update_parameters(self):
-        """
-        This method will update the internal parameters of the agent.
+        """This method will update the internal parameters of the agent.
         :return: /
+
+        Args:
+
+        Returns:
+
         """
         self.alpha_q *= self.alpha_decay
         self.alpha_theta *= self.alpha_decay
 
     @staticmethod
     def get_message():
-        """
-        This method will get a message from this agent.
+        """This method will get a message from this agent.
         :return: This agent doesn't communicate so it always returns None.
+
+        Args:
+
+        Returns:
+
         """
         return None
 
     def select_action(self, message):
-        """
-        This method will select an action according to the agent's policy.
-        :param message: The communication from this episode (unused by this agent).
-        :return: The selected action.
+        """This method will select an action according to the agent's policy.
+
+        Args:
+          message: The communication from this episode (unused by this agent).
+
+        Returns:
+          The selected action.
+
         """
         return np.random.choice(range(self.num_actions), p=self.policy)

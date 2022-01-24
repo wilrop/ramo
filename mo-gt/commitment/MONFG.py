@@ -16,12 +16,16 @@ from non_stationary_agent import NonStationaryAgent
 
 
 def get_communicator(episode, agents, alternate=False):
-    """
-    This function selects the communicator.
-    :param episode: The current episode.
-    :param agents: The agents in the game.
-    :param alternate: Alternate the leader or always the same.
-    :return: The id of the communicating agent and the communicating agent itself.
+    """This function selects the communicator.
+
+    Args:
+      episode: The current episode.
+      agents: The agents in the game.
+      alternate: Alternate the leader or always the same. (Default value = False)
+
+    Returns:
+      The id of the communicating agent and the communicating agent itself.
+
     """
     if alternate:
         communicator = episode % len(agents)
@@ -32,11 +36,15 @@ def get_communicator(episode, agents, alternate=False):
 
 
 def select_actions(agents, message):
-    """
-    This function selects an action from each agent's policy.
-    :param agents: The list of agents.
-    :param message: The message from the leader.
-    :return: A list of selected actions.
+    """This function selects an action from each agent's policy.
+
+    Args:
+      agents: The list of agents.
+      message: The message from the leader.
+
+    Returns:
+      A list of selected actions.
+
     """
     selected = []
     for agent in agents:
@@ -45,12 +53,16 @@ def select_actions(agents, message):
 
 
 def calc_payoffs(agents, actions, payoff_matrices):
-    """
-    This function will calculate the payoffs of the agents.
-    :param agents: The list of agents.
-    :param actions: The action that each agent chose.
-    :param payoff_matrices: The payoff matrices.
-    :return: A list of received payoffs.
+    """This function will calculate the payoffs of the agents.
+
+    Args:
+      agents: The list of agents.
+      actions: The action that each agent chose.
+      payoff_matrices: The payoff matrices.
+
+    Returns:
+      A list of received payoffs.
+
     """
     payoffs = []
     for payoff_matrix in payoff_matrices:
@@ -59,12 +71,16 @@ def calc_payoffs(agents, actions, payoff_matrices):
 
 
 def calc_returns(payoffs, agents, rollouts):
-    """
-    This function will calculate the scalarised expected returns for each agent.
-    :param payoffs: The payoffs obtained by the agents.
-    :param agents: The agents in this experiment
-    :param rollouts: The amount of rollouts that were performed.
-    :return: A list of scalarised expected returns.
+    """This function will calculate the scalarised expected returns for each agent.
+
+    Args:
+      payoffs: The payoffs obtained by the agents.
+      agents: The agents in this experiment
+      rollouts: The amount of rollouts that were performed.
+
+    Returns:
+      A list of scalarised expected returns.
+
     """
     returns = []
     for idx, payoff_hist in enumerate(payoffs):
@@ -76,12 +92,16 @@ def calc_returns(payoffs, agents, rollouts):
 
 
 def calc_action_probs(actions, num_actions, rollouts):
-    """
-    This function will calculate the empirical action probabilities.
-    :param actions: The actions performed by each agent over the rollout period.
-    :param num_actions: The number of possible actions.
-    :param rollouts: The number of rollouts that were performed.
-    :return: The action probabilities for each agent.
+    """This function will calculate the empirical action probabilities.
+
+    Args:
+      actions: The actions performed by each agent over the rollout period.
+      num_actions: The number of possible actions.
+      rollouts: The number of rollouts that were performed.
+
+    Returns:
+      The action probabilities for each agent.
+
     """
     all_probs = []
 
@@ -98,11 +118,15 @@ def calc_action_probs(actions, num_actions, rollouts):
 
 
 def calc_com_probs(messages, rollouts):
-    """
-    This function will calculate the empirical communication probabilities.
-    :param messages: The messages that were sent.
-    :param rollouts: The number of rollouts that were performed.
-    :return: The communication probabilities for each agent.
+    """This function will calculate the empirical communication probabilities.
+
+    Args:
+      messages: The messages that were sent.
+      rollouts: The number of rollouts that were performed.
+
+    Returns:
+      The communication probabilities for each agent.
+
     """
     com = sum(message is not None for message in messages)
     no_com = (rollouts - com)
@@ -110,14 +134,17 @@ def calc_com_probs(messages, rollouts):
 
 
 def update(agents, communicator, message, actions, payoffs):
-    """
-    This function gets called after every episode so that agents can update their internal mechanisms.
-    :param agents: A list of agents.
-    :param communicator: The id of the communicating agent.
-    :param message: The message that was sent.
-    :param actions: A list of each action that was chosen, indexed by agent.
-    :param payoffs: A list of each payoff that was received, indexed by agent.
-    :return:
+    """This function gets called after every episode so that agents can update their internal mechanisms.
+
+    Args:
+      agents: A list of agents.
+      communicator: The id of the communicating agent.
+      message: The message that was sent.
+      actions: A list of each action that was chosen, indexed by agent.
+      payoffs: A list of each payoff that was received, indexed by agent.
+
+    Returns:
+
     """
     for idx, agent in enumerate(agents):
         agent.update(communicator, message, actions, payoffs[idx])
@@ -125,19 +152,22 @@ def update(agents, communicator, message, actions, payoffs):
 
 def reset(experiment, num_agents, u_lst, num_actions, num_objectives, alpha_q, alpha_theta, alpha_msg, alpha_decay,
           opt=False):
-    """
-    This function will create new agents that can be used in a new trial.
-    :param experiment: The type of experiments we are running.
-    :param num_agents: The number of agents to create.
-    :param u_lst: A list of utility functions to use per agent.
-    :param num_actions: The number of actions each agent can take.
-    :param num_objectives: The number of objectives they have.
-    :param alpha_q: The learning rate for the Q values.
-    :param alpha_theta: The learning rate for theta.
-    :param alpha_msg: The learning rate for learning a messaging strategy in the optional communication experiments.
-    :param alpha_decay: The learning rate decay.
-    :param opt: A boolean that decides on optimistic initialization of the Q-tables.
-    :return:
+    """This function will create new agents that can be used in a new trial.
+
+    Args:
+      experiment: The type of experiments we are running.
+      num_agents: The number of agents to create.
+      u_lst: A list of utility functions to use per agent.
+      num_actions: The number of actions each agent can take.
+      num_objectives: The number of objectives they have.
+      alpha_q: The learning rate for the Q values.
+      alpha_theta: The learning rate for theta.
+      alpha_msg: The learning rate for learning a messaging strategy in the optional communication experiments.
+      alpha_decay: The learning rate decay.
+      opt: A boolean that decides on optimistic initialization of the Q-tables. (Default value = False)
+
+    Returns:
+
     """
     agents = []
     for ag, u_str in zip(range(num_agents), u_lst):
@@ -178,17 +208,21 @@ def reset(experiment, num_agents, u_lst, num_actions, num_objectives, alpha_q, a
 
 
 def run_experiment(experiment, runs, episodes, rollouts, payoff_matrices, u, alternate, opt_init):
-    """
-    This function will run the requested experiment.
-    :param experiment: The type of experiment we are running.
-    :param runs: The number of different runs.
-    :param episodes: The number of episodes in each run.
-    :param rollouts: The rollout period for the policies.
-    :param payoff_matrices: The payoff matrices for the game.
-    :param u: A list of utility functions to use for the agents.
-    :param alternate: Alternate commitment between players.
-    :param opt_init: A boolean that decides on optimistic initialization of the Q-tables.
-    :return: A log of payoffs, a log for action probabilities for both agents and a log of the state distribution.
+    """This function will run the requested experiment.
+
+    Args:
+      experiment: The type of experiment we are running.
+      runs: The number of different runs.
+      episodes: The number of episodes in each run.
+      rollouts: The rollout period for the policies.
+      payoff_matrices: The payoff matrices for the game.
+      u: A list of utility functions to use for the agents.
+      alternate: Alternate commitment between players.
+      opt_init: A boolean that decides on optimistic initialization of the Q-tables.
+
+    Returns:
+      A log of payoffs, a log for action probabilities for both agents and a log of the state distribution.
+
     """
     # Setting hyperparameters.
     num_agents = 2
@@ -269,17 +303,21 @@ def run_experiment(experiment, runs, episodes, rollouts, payoff_matrices, u, alt
 
 
 def save_data(path, name, returns_log, action_probs_log, com_probs_log, state_dist_log, runs, episodes):
-    """
-    This function will save all of the results to disk in CSV format for later analysis.
-    :param path: The path to the directory in which all files will be saved.
-    :param name: The name of the experiment.
-    :param returns_log: The log for the returns.
-    :param action_probs_log: The log for the action probabilities.
-    :param action_probs_log: The log for the communication probabilities.
-    :param state_dist_log: The state distribution log in the last 10% of episodes.
-    :param runs: The number of trials that were ran.
-    :param episodes: The number of episodes in each run.
-    :return: /
+    """This function will save all of the results to disk in CSV format for later analysis.
+
+    Args:
+      path: The path to the directory in which all files will be saved.
+      name: The name of the experiment.
+      returns_log: The log for the returns.
+      action_probs_log: The log for the action probabilities.
+      action_probs_log: The log for the communication probabilities.
+      state_dist_log: The state distribution log in the last 10% of episodes.
+      runs: The number of trials that were ran.
+      episodes: The number of episodes in each run.
+      com_probs_log: 
+
+    Returns:
+
     """
     print("Saving data to disk")
     num_agents = len(returns_log)  # Extract the number of agents that were in the experiment.

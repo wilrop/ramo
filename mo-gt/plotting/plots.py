@@ -17,12 +17,15 @@ plt.gcf().subplots_adjust(bottom=0.15)
 
 
 def save_plot(plot_name, filetype, dpi=300):
-    """
-    This function saves a created plot with the requested name and filetype.
-    :param plot_name: The file to save the plot to.
-    :param filetype: The filetype for the figure.
-    :param dpi: The resolution for the final figure. Used when saving as png.
-    :return: /
+    """This function saves a created plot with the requested name and filetype.
+
+    Args:
+      plot_name: The file to save the plot to.
+      filetype: The filetype for the figure.
+      dpi: The resolution for the final figure. Used when saving as png. (Default value = 300)
+
+    Returns:
+
     """
     if filetype == 'png':
         plt.savefig(plot_name + ".png", dpi=dpi)
@@ -33,16 +36,19 @@ def save_plot(plot_name, filetype, dpi=300):
 
 
 def plot_returns(path_plots, filetype, game, name, episodes, ag1_data, ag2_data):
-    """
-    This function will plot the returns obtained by both agents in one graph.
-    :param path_plots: The path to which we save the plot.
-    :param filetype: The filetype to save the file under.
-    :param game: The game that was played.
-    :param name: The name of the experiment.
-    :param episodes: The number of episodes that was ran.
-    :param ag1_data: The data for agent 1.
-    :param ag2_data: The data for agent 2.
-    :return: /
+    """This function will plot the returns obtained by both agents in one graph.
+
+    Args:
+      path_plots: The path to which we save the plot.
+      filetype: The filetype to save the file under.
+      game: The game that was played.
+      name: The name of the experiment.
+      episodes: The number of episodes that was ran.
+      ag1_data: The data for agent 1.
+      ag2_data: The data for agent 2.
+
+    Returns:
+
     """
     print("Plotting scalarised expected returns")
     ax = sns.lineplot(x='Episode', y='Payoff', linewidth=2.0, data=ag1_data, ci='sd', label='Leader')
@@ -72,16 +78,19 @@ def plot_returns(path_plots, filetype, game, name, episodes, ag1_data, ag2_data)
 
 
 def plot_action_probabilities(path_plots, filetype, game, name, episodes, agent, data):
-    """
-    This function will plot the action probabilities for a given agent.
-    :param path_plots: The path to which we save the plot.
-    :param filetype: The filetype to save the file under.
-    :param game: The game that was played.
-    :param name: The name of the experiment that was ran.
-    :param episodes: The number of episodes that was ran.
-    :param agent: The agent that is being plotted.
-    :param data: The data for this agent.
-    :return:
+    """This function will plot the action probabilities for a given agent.
+
+    Args:
+      path_plots: The path to which we save the plot.
+      filetype: The filetype to save the file under.
+      game: The game that was played.
+      name: The name of the experiment that was ran.
+      episodes: The number of episodes that was ran.
+      agent: The agent that is being plotted.
+      data: The data for this agent.
+
+    Returns:
+
     """
     print("Plotting action probabilities for agent: " + repr(agent))
     if game == 'game6':
@@ -115,13 +124,16 @@ def plot_action_probabilities(path_plots, filetype, game, name, episodes, agent,
 
 
 def plot_state_distribution(path_plots, game, name, data):
-    """
-    This function will plot the state distribution as a heatmap.
-    :param path_plots: The path to which we save the plot.
-    :param game: The game that was played.
-    :param name: The name of the experiment that was ran.
-    :param data: The state distribution data.
-    :return: /
+    """This function will plot the state distribution as a heatmap.
+
+    Args:
+      path_plots: The path to which we save the plot.
+      game: The game that was played.
+      name: The name of the experiment that was ran.
+      data: The state distribution data.
+
+    Returns:
+
     """
     print("Plotting the state distribution.")
     if game in ['game2', 'game6', 'game8', 'game9', 'game10', 'game11']:
@@ -154,16 +166,19 @@ def plot_state_distribution(path_plots, game, name, data):
 
 
 def plot_com_probabilities(path_plots, filetype, game, name, episodes, agent, data):
-    """
-    This function will plot the message probabilities for a given agent.
-    :param path_plots: The path to which we save the plot.
-    :param filetype: The filetype to save the file under.
-    :param game: The game that was played.
-    :param name: The name of the experiment that was ran.
-    :param episodes: The number of episodes that was ran.
-    :param agent: The agent that is being plotted.
-    :param data: The data for this agent.
-    :return:
+    """This function will plot the message probabilities for a given agent.
+
+    Args:
+      path_plots: The path to which we save the plot.
+      filetype: The filetype to save the file under.
+      game: The game that was played.
+      name: The name of the experiment that was ran.
+      episodes: The number of episodes that was ran.
+      agent: The agent that is being plotted.
+      data: The data for this agent.
+
+    Returns:
+
     """
     print("Plotting message probabilities for agent: " + repr(agent))
 
@@ -185,14 +200,17 @@ def plot_com_probabilities(path_plots, filetype, game, name, episodes, agent, da
 
 
 def plot_results(games, name, episodes, filetype, opt_init):
-    """
-    This function will call the different plotting functions that we need for each requested game.
-    :param games: The games we want to plot the results for.
-    :param name: The name of the experiment.
-    :param episodes: The amount of episodes that was ran.
-    :param filetype: The filetype to save the file under.
-    :param opt_init: Whether optimistic initialization was used
-    :return:
+    """This function will call the different plotting functions that we need for each requested game.
+
+    Args:
+      games: The games we want to plot the results for.
+      name: The name of the experiment.
+      episodes: The amount of episodes that was ran.
+      filetype: The filetype to save the file under.
+      opt_init: Whether optimistic initialization was used
+
+    Returns:
+
     """
     for game in games:
         print("Generating plots for: " + repr(game))

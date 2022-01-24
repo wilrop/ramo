@@ -5,12 +5,16 @@ from scipy.optimize import minimize
 
 
 def objective(strategy, expected_returns, u):
-    """
-    The objective function to minimise for is the negative SER, as we want to maximise for the SER.
-    :param strategy: The current estimate for the best response strategy.
-    :param expected_returns: The expected returns given all other players' strategies.
-    :param u: The utility function of this agent.
-    :return: A best response policy.
+    """The objective function to minimise for is the negative SER, as we want to maximise for the SER.
+
+    Args:
+      strategy: The current estimate for the best response strategy.
+      expected_returns: The expected returns given all other players' strategies.
+      u: The utility function of this agent.
+
+    Returns:
+      A best response policy.
+
     """
     expected_vec = strategy @ expected_returns  # The expected vector of the strategy applied to the expected returns.
     objective = - u(expected_vec)  # The negative utility.
@@ -18,13 +22,17 @@ def objective(strategy, expected_returns, u):
 
 
 def best_response(u, player, payoff_matrix, joint_strategy):
-    """
-    This function calculates a best response for a given player.
-    :param u: The utility function for this player.
-    :param player: The player id.
-    :param payoff_matrix: The payoff matrix for this player.
-    :param joint_strategy: The joint strategy of all players.
-    :return: A best response strategy.
+    """This function calculates a best response for a given player.
+
+    Args:
+      u: The utility function for this player.
+      player: The player id.
+      payoff_matrix: The payoff matrix for this player.
+      joint_strategy: The joint strategy of all players.
+
+    Returns:
+      A best response strategy.
+
     """
     num_objectives = payoff_matrix.shape[-1]
     num_actions = len(joint_strategy[player])
@@ -71,9 +79,7 @@ def best_response(u, player, payoff_matrix, joint_strategy):
 
 
 class BestResponseAgent:
-    """
-    This class represents an agent that uses the SER multi-objective optimisation criterion.
-    """
+    """This class represents an agent that uses the SER multi-objective optimisation criterion."""
 
     def __init__(self, id, u, du, alpha_q, alpha_theta, alpha_decay, num_actions, num_objectives, opt=False, epsilon=1,
                  epsilon_decay=0.995):
@@ -100,13 +106,16 @@ class BestResponseAgent:
         self.epsilon_decay = epsilon_decay
 
     def update(self, communicator, message, actions, reward):
-        """
-        This method will update the Q-table, strategy and internal parameters of the agent.
-        :param communicator: The id of the communicating agent.
-        :param message: The message that was sent.
-        :param actions: The actions selected in the previous episode.
-        :param reward: The reward that was obtained by the agent.
-        :return: /
+        """This method will update the Q-table, strategy and internal parameters of the agent.
+
+        Args:
+          communicator: The id of the communicating agent.
+          message: The message that was sent.
+          actions: The actions selected in the previous episode.
+          reward: The reward that was obtained by the agent.
+
+        Returns:
+
         """
         self.update_payoffs_table(actions, reward)
         own_action = actions[self.id]
@@ -123,31 +132,41 @@ class BestResponseAgent:
         self.calculated = False
 
     def update_msg_q_table(self, action, reward):
-        """
-        This method will update the Q-table based on the chosen actions and the obtained reward.
-        :param action: The action chosen by this agent.
-        :param reward: The reward obtained by this agent.
-        :return: /
+        """This method will update the Q-table based on the chosen actions and the obtained reward.
+
+        Args:
+          action: The action chosen by this agent.
+          reward: The reward obtained by this agent.
+
+        Returns:
+
         """
         self.msg_q_table[action] += self.alpha_q * (reward - self.msg_q_table[action])
 
     def update_payoffs_table(self, actions, reward):
-        """
-        This method will update the payoffs table to learn the payoff vector of joint actions.
-        :param actions: The actions that were taken in the previous episode.
-        :param reward: The reward obtained by this joint action.
-        :return: /
+        """This method will update the payoffs table to learn the payoff vector of joint actions.
+
+        Args:
+          actions: The actions that were taken in the previous episode.
+          reward: The reward obtained by this joint action.
+
+        Returns:
+
         """
         self.payoffs_table[actions[0], actions[1]] += self.alpha_q * (
                 reward - self.payoffs_table[actions[0], actions[1]])
 
     def update_policy(self, policy, theta, expected_q):
-        """
-        This method will update the given theta parameters and policy.
-        :param policy: The policy we want to update.
-        :param theta: The current theta parameters for this policy.
-        :param expected_q: The Q-values for this policy.
-        :return: Updated theta parameters and policy.
+        """This method will update the given theta parameters and policy.
+
+        Args:
+          policy: The policy we want to update.
+          theta: The current theta parameters for this policy.
+          expected_q: The Q-values for this policy.
+
+        Returns:
+          Updated theta parameters and policy.
+
         """
         policy = np.copy(policy)  # This avoids some weird numpy bugs where the policy/theta is referenced by pointer.
         theta = np.copy(theta)
@@ -161,18 +180,26 @@ class BestResponseAgent:
         return theta, policy
 
     def update_parameters(self):
-        """
-        This method will update the internal parameters of the agent.
+        """This method will update the internal parameters of the agent.
         :return: /
+
+        Args:
+
+        Returns:
+
         """
         self.alpha_q *= self.alpha_decay
         self.alpha_theta *= self.alpha_decay
 
     def select_action(self, message):
-        """
-        This method will select an action based on the message that was sent.
-        :param message: The message that was sent.
-        :return: The selected action.
+        """This method will select an action based on the message that was sent.
+
+        Args:
+          message: The message that was sent.
+
+        Returns:
+          The selected action.
+
         """
         if self.communicating:
             self.communicating = False
@@ -181,19 +208,27 @@ class BestResponseAgent:
             return self.select_counter_action(message)  # Otherwise select a counter action.
 
     def get_message(self):
-        """
-        This method will determine what action this agent will publish.
+        """This method will determine what action this agent will publish.
         :return: The action that will maximise this agent's SER, given that the other agent also maximises its response.
+
+        Args:
+
+        Returns:
+
         """
         self.communicating = True
         return self.msg_policy
 
     def select_counter_action(self, op_policy, optimistic=False):
-        """
-        This method will select the best counter policy and choose an action using this policy.
-        :param op_policy: The message from an agent in the form of their current policy.
-        :param optimistic: Whether the agent is optimistic or pessimistic.
-        :return: The selected action.
+        """This method will select the best counter policy and choose an action using this policy.
+
+        Args:
+          op_policy: The message from an agent in the form of their current policy.
+          optimistic: Whether the agent is optimistic or pessimistic. (Default value = False)
+
+        Returns:
+          The selected action.
+
         """
         if not self.calculated:
             strategy = np.full(self.num_actions, 1 / self.num_actions)
@@ -211,8 +246,12 @@ class BestResponseAgent:
             return np.random.choice(range(self.num_actions), p=self.best_response_policy)
 
     def select_committed(self):
-        """
-        This method simply plays the action that it already published.
+        """This method simply plays the action that it already published.
         :return: The action it published.
+
+        Args:
+
+        Returns:
+
         """
         return np.random.choice(range(self.num_actions), p=self.msg_policy)

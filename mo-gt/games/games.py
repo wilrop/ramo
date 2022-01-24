@@ -132,50 +132,70 @@ monfg10 = [
 
 
 def u1(vector):
-    """
-    This function calculates the utility for agent 1.
-    :param vector: The reward vector.
-    :return: The utility for agent 1.
+    """This function calculates the utility for agent 1.
+
+    Args:
+      vector: The reward vector.
+
+    Returns:
+      The utility for agent 1.
+
     """
     utility = vector[0] ** 2 + vector[1] ** 2
     return utility
 
 
 def u2(vector):
-    """
-    This function calculates the utility for an agent.
-    :param vector: The reward vector.
-    :return: The utility for an agent.
+    """This function calculates the utility for an agent.
+
+    Args:
+      vector: The reward vector.
+
+    Returns:
+      The utility for an agent.
+
     """
     utility = vector[0] ** 2 + vector[0] * vector[1] + vector[1] ** 2
     return utility
 
 
 def u3(vector):
-    """
-    This function calculates the utility for an agent.
-    :param vector: The reward vector.
-    :return: The utility for an agent.
+    """This function calculates the utility for an agent.
+
+    Args:
+      vector: The reward vector.
+
+    Returns:
+      The utility for an agent.
+
     """
     utility = vector[0] ** 2 + vector[1]
     return utility
 
 
 def u4(vector):
-    """
-    This function calculates the utility for an agent.
-    :param vector: The reward vector.
-    :return: The utility for an agent.
+    """This function calculates the utility for an agent.
+
+    Args:
+      vector: The reward vector.
+
+    Returns:
+      The utility for an agent.
+
     """
     utility = vector[0] + vector[1] ** 2
     return utility
 
 
 def get_monfg(game):
-    """
-    This function will provide the correct multi-objective normal-form game based on the game that is requested.
-    :param game: The current game.
-    :return: A list of payoff matrices.
+    """This function will provide the correct multi-objective normal-form game based on the game that is requested.
+
+    Args:
+      game: The current game.
+
+    Returns:
+      A list of payoff matrices.
+
     """
     if game == 'game1':
         monfg = monfg1
@@ -204,10 +224,14 @@ def get_monfg(game):
 
 
 def get_u(u_str):
-    """
-    This function gets the correct utility function from its name.
-    :param u_str: The requested utility function.
-    :return: A utility function.
+    """This function gets the correct utility function from its name.
+
+    Args:
+      u_str: The requested utility function.
+
+    Returns:
+      A utility function.
+
     """
     if u_str == 'u1':
         u = u1
@@ -224,13 +248,19 @@ def get_u(u_str):
 
 
 def generate_random_monfg(player_actions=(2, 2), num_objectives=2, reward_min_bound=0, reward_max_bound=5):
-    """
-    This function will generate a random MONFG for testing purposes.
-    :param player_actions: A tuple of actions indexed by player.
-    :param num_objectives: The number of objectives in the game.
-    :param reward_min_bound: The minimum reward on an objective.
-    :param reward_max_bound: The maximum reward on an objective.
-    :return: A list of payoff matrices representing the MONFG.
+    """This function will generate a random MONFG for testing purposes.
+
+    Args:
+      player_actions: A tuple of actions indexed by player. (Default value = (2)
+      num_objectives: The number of objectives in the game. (Default value = 2)
+      reward_min_bound: The minimum reward on an objective. (Default value = 0)
+      reward_max_bound: The maximum reward on an objective. (Default value = 5)
+      2: returns: A list of payoff matrices representing the MONFG.
+      2): 
+
+    Returns:
+      A list of payoff matrices representing the MONFG.
+
     """
     payoffs = []
     payoffs_shape = player_actions + tuple([num_objectives])  # Define the shape of the payoff matrices.
@@ -243,10 +273,16 @@ def generate_random_monfg(player_actions=(2, 2), num_objectives=2, reward_min_bo
 
 
 def generate_identity_game(player_actions=(2, 2)):
-    """
-    This function generates an identity game.
-    :param player_actions: A tuple with at each index the number of actions for that player.
-    :return: A list of payoff matrices.
+    """This function generates an identity game.
+
+    Args:
+      player_actions: A tuple with at each index the number of actions for that player. (Default value = (2)
+      2: returns: A list of payoff matrices.
+      2): 
+
+    Returns:
+      A list of payoff matrices.
+
     """
     payoffs = []
     joint_strat_length = np.sum(player_actions)  # Description length of a joint strategy.

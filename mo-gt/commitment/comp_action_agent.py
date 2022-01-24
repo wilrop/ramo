@@ -6,9 +6,7 @@ from jax.nn import softmax
 
 
 class CompActionAgent:
-    """
-    This class represents an agent that uses the SER multi-objective optimisation criterion.
-    """
+    """This class represents an agent that uses the SER multi-objective optimisation criterion."""
 
     def __init__(self, id, u, du, alpha_q, alpha_theta, alpha_decay, num_actions, num_objectives, opt=False):
         self.id = id
@@ -32,13 +30,16 @@ class CompActionAgent:
         self.communicating = False
 
     def update(self, communicator, message, actions, reward):
-        """
-        This method will update the Q-table, strategy and internal parameters of the agent.
-        :param communicator: The id of the communicating agent.
-        :param message: The message that was sent.
-        :param actions: The actions selected in the previous episode.
-        :param reward: The reward that was obtained by the agent.
-        :return: /
+        """This method will update the Q-table, strategy and internal parameters of the agent.
+
+        Args:
+          communicator: The id of the communicating agent.
+          message: The message that was sent.
+          actions: The actions selected in the previous episode.
+          reward: The reward that was obtained by the agent.
+
+        Returns:
+
         """
         self.update_payoffs_table(actions, reward)
         own_action = actions[self.id]
@@ -57,40 +58,54 @@ class CompActionAgent:
         self.update_parameters()
 
     def update_msg_q_table(self, action, reward):
-        """
-        This method will update the Q-table based on the chosen actions and the obtained reward.
-        :param action: The action chosen by this agent.
-        :param reward: The reward obtained by this agent.
-        :return: /
+        """This method will update the Q-table based on the chosen actions and the obtained reward.
+
+        Args:
+          action: The action chosen by this agent.
+          reward: The reward obtained by this agent.
+
+        Returns:
+
         """
         self.msg_q_table[action] += self.alpha_q * (reward - self.msg_q_table[action])
 
     def update_payoffs_table(self, actions, reward):
-        """
-        This method will update the payoffs table to learn the payoff vector of joint actions.
-        :param actions: The actions that were taken in the previous episode.
-        :param reward: The reward obtained by this joint action.
-        :return: /
+        """This method will update the payoffs table to learn the payoff vector of joint actions.
+
+        Args:
+          actions: The actions that were taken in the previous episode.
+          reward: The reward obtained by this joint action.
+
+        Returns:
+
         """
         self.payoffs_table[actions[0], actions[1]] += self.alpha_q * (
                 reward - self.payoffs_table[actions[0], actions[1]])
 
     def update_policy(self, theta):
-        """
-        This method will update the given theta parameters and policy.
-        :param theta: The updated theta parameters.
-        :return: The updated policy.
+        """This method will update the given theta parameters and policy.
+
+        Args:
+          theta: The updated theta parameters.
+
+        Returns:
+          The updated policy.
+
         """
         policy = np.asarray(softmax(theta), dtype=float)
         policy = policy / np.sum(policy)
         return policy
 
     def objective_function(self, theta, q_values):
-        """
-        The objective function.
-        :param theta: The parameters for a policy.
-        :param q_values: The Q-values relating to this policy.
-        :return: The utility from the current policy strategy.
+        """The objective function.
+
+        Args:
+          theta: The parameters for a policy.
+          q_values: The Q-values relating to this policy.
+
+        Returns:
+          The utility from the current policy strategy.
+
         """
         policy = softmax(theta)
         expected_returns = jnp.matmul(policy, q_values)
@@ -98,18 +113,26 @@ class CompActionAgent:
         return utility
 
     def update_parameters(self):
-        """
-        This method will update the internal parameters of the agent.
+        """This method will update the internal parameters of the agent.
         :return: /
+
+        Args:
+
+        Returns:
+
         """
         self.alpha_q *= self.alpha_decay
         self.alpha_theta *= self.alpha_decay
 
     def select_action(self, message):
-        """
-        This method will select an action based on the message that was sent.
-        :param message: The message that was sent.
-        :return: The selected action.
+        """This method will select an action based on the message that was sent.
+
+        Args:
+          message: The message that was sent.
+
+        Returns:
+          The selected action.
+
         """
         if self.communicating:
             self.communicating = False
@@ -118,27 +141,39 @@ class CompActionAgent:
             return self.select_counter_action(message)  # Otherwise select a counter action.
 
     def get_message(self):
-        """
-        This method will determine what action this agent will publish.
+        """This method will determine what action this agent will publish.
         :return: The action that will maximise this agent's SER, given that the other agent also maximises its response.
+
+        Args:
+
+        Returns:
+
         """
         self.communicating = True
         return np.random.choice(range(self.num_actions), p=self.msg_policy)
 
     def select_counter_action(self, state):
-        """
-        This method will select the best counter policy and choose an action using this policy.
-        :param state: The message from an agent in the form of their next action.
-        :return: The selected action.
+        """This method will select the best counter policy and choose an action using this policy.
+
+        Args:
+          state: The message from an agent in the form of their next action.
+
+        Returns:
+          The selected action.
+
         """
         policy = self.counter_policies[state]
         return np.random.choice(range(self.num_actions), p=policy)
 
     @staticmethod
     def select_published_action(state):
-        """
-        This method simply plays the action that it already published.
-        :param state: The action it published.
-        :return: The action it published.
+        """This method simply plays the action that it already published.
+
+        Args:
+          state: The action it published.
+
+        Returns:
+          The action it published.
+
         """
         return state

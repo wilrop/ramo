@@ -9,18 +9,22 @@ from Player import IBRPlayer
 
 def iterated_best_response(u_tpl, player_actions, monfg, max_iter=1000, init_joint_strategy=None,
                            variant='simultaneous'):
-    """
-    This function executes the iterated best response algorithm on a given MONFG with accompanied utility functions.
+    """This function executes the iterated best response algorithm on a given MONFG with accompanied utility functions.
     Note that the simultaneous and alternating variants are not equivalent in general. In the simultaneous variant, all
     players calculate their best-response strategy simultaneously. The alternating variant does it by alternating.
     Note that at this point in time, this algorithm does not find cycles in the IBR dynamic.
-    :param u_tpl: A tuple of utility functions.
-    :param player_actions: A tuple of actions per player.
-    :param monfg: A list of payoff matrices representing the MONFG.
-    :param max_iter: The maximum amount of iterations to run IBR for.
-    :param init_joint_strategy: Initial guess for the joint strategy.
-    :param variant: The variant to use. This is either simultaneous or alternating.
-    :return: Whether or not we reached a Nash equilibrium and the final joint strategy.
+
+    Args:
+      u_tpl: A tuple of utility functions.
+      player_actions: A tuple of actions per player.
+      monfg: A list of payoff matrices representing the MONFG.
+      max_iter: The maximum amount of iterations to run IBR for. (Default value = 1000)
+      init_joint_strategy: Initial guess for the joint strategy. (Default value = None)
+      variant: The variant to use. This is either simultaneous or alternating. (Default value = 'simultaneous')
+
+    Returns:
+      Whether or not we reached a Nash equilibrium and the final joint strategy.
+
     """
     util.print_start('Iterated Best Response')
 
@@ -42,10 +46,12 @@ def iterated_best_response(u_tpl, player_actions, monfg, max_iter=1000, init_joi
     if variant == 'simultaneous':
         # We hide the strategy updates of other players until everyone is finished. This makes it a simultaneous update.
         def update_strategy():
+            """ """
             return joint_strategy
     else:
         # We show the strategy updates of other players. This makes it an alternating update.
         def update_strategy():
+            """ """
             return new_joint_strategy
 
     for i in range(max_iter):

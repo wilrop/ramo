@@ -11,10 +11,13 @@ from fictitious_play import fictitious_play
 
 
 def execute_algorithm(args):
-    """
-    This function executes the requested algorithm with the arguments provided by the user.
-    :param args: The provided arguments by the user.
-    :return: /
+    """This function executes the requested algorithm with the arguments provided by the user.
+
+    Args:
+      args: The provided arguments by the user.
+
+    Returns:
+
     """
     start = time.time()  # Start measuring the time.
 

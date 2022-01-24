@@ -74,20 +74,28 @@ monfg11 = [np.array([[(2, 0), (1, 1)],
 
 
 def u1(vector):
-    """
-    This function calculates the utility for agent 1.
-    :param vector: The reward vector.
-    :return: The utility for agent 1.
+    """This function calculates the utility for agent 1.
+
+    Args:
+      vector: The reward vector.
+
+    Returns:
+      The utility for agent 1.
+
     """
     utility = vector[0] ** 2 + vector[1] ** 2
     return utility
 
 
 def gradient_u1(vector):
-    """
-    This function returns the partial derivative for the two objectives for agent 1.
-    :param vector: The reward vector.
-    :return: An array of the two partial derivatives for agent 1.
+    """This function returns the partial derivative for the two objectives for agent 1.
+
+    Args:
+      vector: The reward vector.
+
+    Returns:
+      An array of the two partial derivatives for agent 1.
+
     """
     dx = 2 * vector[0]
     dy = 2 * vector[1]
@@ -95,20 +103,28 @@ def gradient_u1(vector):
 
 
 def u2(vector):
-    """
-    This function calculates the utility for agent 2.
-    :param vector: The reward vector.
-    :return: The utility for agent 2.
+    """This function calculates the utility for agent 2.
+
+    Args:
+      vector: The reward vector.
+
+    Returns:
+      The utility for agent 2.
+
     """
     utility = vector[0] * vector[1]
     return utility
 
 
 def gradient_u2(vector):
-    """
-    This function returns the partial derivative for the two objectives for agent 2.
-    :param vector: The reward vector.
-    :return: An array of the two partial derivatives for agent 2.
+    """This function returns the partial derivative for the two objectives for agent 2.
+
+    Args:
+      vector: The reward vector.
+
+    Returns:
+      An array of the two partial derivatives for agent 2.
+
     """
     dx = vector[1]
     dy = vector[0]
@@ -116,20 +132,28 @@ def gradient_u2(vector):
 
 
 def u3(vector):
-    """
-    This function calculates the utility from a vector.
-    :param vector: The reward vector.
-    :return: The utility from this vector.
+    """This function calculates the utility from a vector.
+
+    Args:
+      vector: The reward vector.
+
+    Returns:
+      The utility from this vector.
+
     """
     utility = vector[0] * vector[1] - vector[1] ** 2  # i.e. balanced
     return utility
 
 
 def gradient_u3(vector):
-    """
-    This function returns the partial derivative for the two objectives for utility function 3.
-    :param vector: The reward vector.
-    :return: An array of the two partial derivatives.
+    """This function returns the partial derivative for the two objectives for utility function 3.
+
+    Args:
+      vector: The reward vector.
+
+    Returns:
+      An array of the two partial derivatives.
+
     """
     dx = vector[1]  # = y
     dy = vector[0] - 2 * vector[1]  # = x - 2y
@@ -137,20 +161,28 @@ def gradient_u3(vector):
 
 
 def u4(vector):
-    """
-    A utility function that is a constant.
-    :param vector: The input payoff vector.
-    :return: A constant utility k.
+    """A utility function that is a constant.
+
+    Args:
+      vector: The input payoff vector.
+
+    Returns:
+      A constant utility k.
+
     """
     k = 2
     return k
 
 
 def gradient_u4(vector):
-    """
-    This function returns the partial derivative for the two objectives for utility function 4.
-    :param vector: The reward vector.
-    :return: An array of the two partial derivatives.
+    """This function returns the partial derivative for the two objectives for utility function 4.
+
+    Args:
+      vector: The reward vector.
+
+    Returns:
+      An array of the two partial derivatives.
+
     """
     dx = 0
     dy = 0
@@ -158,10 +190,14 @@ def gradient_u4(vector):
 
 
 def get_monfg(game):
-    """
-    This function will provide the correct payoffs based on the game we play.
-    :param game: The current game.
-    :return: A list of payoff matrices.
+    """This function will provide the correct payoffs based on the game we play.
+
+    Args:
+      game: The current game.
+
+    Returns:
+      A list of payoff matrices.
+
     """
     if game == 'game1':
         monfg = monfg1
@@ -192,10 +228,14 @@ def get_monfg(game):
 
 
 def get_u_and_du(u_str):
-    """
-    Get the utility function and derivative of the utility function.
-    :param u_str: The string of this utility function.
-    :return: A utility function and derivative.
+    """Get the utility function and derivative of the utility function.
+
+    Args:
+      u_str: The string of this utility function.
+
+    Returns:
+      A utility function and derivative.
+
     """
     if u_str == 'u1':
         return u1, gradient_u1
@@ -210,11 +250,15 @@ def get_u_and_du(u_str):
 
 
 def scalarise_matrix(payoff_matrix, u):
-    """
-    This function scalarises an input matrix using a provided utility function.
-    :param payoff_matrix: An input payoff matrix.
-    :param u: A utility function.
-    :return: The trade-off game.
+    """This function scalarises an input matrix using a provided utility function.
+
+    Args:
+      payoff_matrix: An input payoff matrix.
+      u: A utility function.
+
+    Returns:
+      The trade-off game.
+
     """
     scalarised_matrix = np.zeros((payoff_matrix.shape[0], payoff_matrix.shape[1]))
     for i in range(scalarised_matrix.shape[0]):

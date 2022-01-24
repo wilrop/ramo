@@ -3,9 +3,7 @@ from utils_learn import *
 
 
 class OptionalComAgent:
-    """
-    This class represents an agent that uses the SER optimisation criterion.
-    """
+    """This class represents an agent that uses the SER optimisation criterion."""
 
     def __init__(self, no_com_agent, com_agent, id, u, du, alpha_q, alpha_msg, alpha_decay, num_objectives, opt=False):
         self.no_com_agent = no_com_agent
@@ -29,13 +27,17 @@ class OptionalComAgent:
         self.communicator = False
 
     def update(self, communicator, message, actions, reward):
-        """
-        This method will update the Q-table, strategy and internal parameters of the agent, as well as the secondary
+        """This method will update the Q-table, strategy and internal parameters of the agent, as well as the secondary
         agent that played in this round.
-        :param communicator: The id of the communicating agent.
-        :param actions: The actions taken by the agents.
-        :param reward: The reward obtained in this episode.
-        :return: /
+
+        Args:
+          communicator: The id of the communicating agent.
+          actions: The actions taken by the agents.
+          reward: The reward obtained in this episode.
+          message: 
+
+        Returns:
+
         """
         self.update_q_table(message, reward)
         theta, policy = self.update_policy(self.policy, self.theta, self.alpha_msg, self.q_table)
@@ -48,11 +50,14 @@ class OptionalComAgent:
         self.update_parameters()
 
     def update_q_table(self, message, reward):
-        """
-        This method will update the Q-table based on the message and the obtained reward.
-        :param message: The message that was sent in the finished episode.
-        :param reward: The reward obtained by this agent.
-        :return: /
+        """This method will update the Q-table based on the message and the obtained reward.
+
+        Args:
+          message: The message that was sent in the finished episode.
+          reward: The reward obtained by this agent.
+
+        Returns:
+
         """
         if message is None:
             idx = 0
@@ -61,12 +66,20 @@ class OptionalComAgent:
         self.q_table[idx] += self.alpha_q * (reward - self.q_table[idx])
 
     def update_policy(self, policy, theta, alpha, expected_q):
-        """
-        This method will update the given theta parameters and policy.
+        """This method will update the given theta parameters and policy.
         :policy: The policy we want to update
         :theta: The current parameters for this policy.
         :expected_q: The Q-values for this policy.
-        :return: Updated theta parameters and policy.
+
+        Args:
+          policy: param theta:
+          alpha: param expected_q:
+          theta: 
+          expected_q: 
+
+        Returns:
+          Updated theta parameters and policy.
+
         """
         policy = np.copy(policy)  # This avoids some weird numpy bugs where the policy/theta is referenced by pointer.
         theta = np.copy(theta)
@@ -80,17 +93,25 @@ class OptionalComAgent:
         return theta, policy
 
     def update_parameters(self):
-        """
-        This method will update the internal parameters of the agent.
+        """This method will update the internal parameters of the agent.
         :return: /
+
+        Args:
+
+        Returns:
+
         """
         self.alpha_q *= self.alpha_decay
         self.alpha_msg *= self.alpha_decay
 
     def get_message(self):
-        """
-        This method will choose what message is sent to the other agent.
+        """This method will choose what message is sent to the other agent.
         :return: Either None if opting to not communicate or the current policy if opting to communicate.
+
+        Args:
+
+        Returns:
+
         """
         message = np.random.choice(range(self.num_messages), p=self.policy)
         if message == 0:  # Don't communicate
@@ -100,10 +121,14 @@ class OptionalComAgent:
             return self.com_agent.get_message()
 
     def select_action(self, message):
-        """
-        This method will select an action based on the message that was sent.
-        :param message: The message that was sent.
-        :return: The selected action.
+        """This method will select an action based on the message that was sent.
+
+        Args:
+          message: The message that was sent.
+
+        Returns:
+          The selected action.
+
         """
         if message is None:
             return self.no_com_agent.select_action(message)

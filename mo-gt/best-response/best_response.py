@@ -4,12 +4,16 @@ from scipy.optimize import minimize
 
 
 def objective(strategy, expected_returns, u):
-    """
-    The objective function to minimise for is the negative SER, as we want to maximise for the SER.
-    :param strategy: The current estimate for the best response strategy.
-    :param expected_returns: The expected returns given all other players' strategies.
-    :param u: The utility function of this agent.
-    :return: A best response policy.
+    """The objective function to minimise for is the negative SER, as we want to maximise for the SER.
+
+    Args:
+      strategy: The current estimate for the best response strategy.
+      expected_returns: The expected returns given all other players' strategies.
+      u: The utility function of this agent.
+
+    Returns:
+      A best response policy.
+
     """
     expected_vec = strategy @ expected_returns  # The expected vector of the strategy applied to the expected returns.
     objective = - u(expected_vec)  # The negative utility.
@@ -17,13 +21,17 @@ def objective(strategy, expected_returns, u):
 
 
 def best_response(u, player, payoff_matrix, joint_strategy):
-    """
-    This function calculates a best response for a given player.
-    :param u: The utility function for this player.
-    :param player: The player id.
-    :param payoff_matrix: The payoff matrix for this player.
-    :param joint_strategy: The joint strategy of all players.
-    :return: A best response strategy.
+    """This function calculates a best response for a given player.
+
+    Args:
+      u: The utility function for this player.
+      player: The player id.
+      payoff_matrix: The payoff matrix for this player.
+      joint_strategy: The joint strategy of all players.
+
+    Returns:
+      A best response strategy.
+
     """
     num_objectives = payoff_matrix.shape[-1]
     num_actions = len(joint_strategy[player])

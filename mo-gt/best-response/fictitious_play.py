@@ -7,24 +7,32 @@ from Player import FPPlayer
 
 
 def fictitious_play(u_tpl, player_actions, monfg, max_iter=1000, init_joint_strategy=None, variant='simultaneous'):
-    """
-    This function executes the fictitious play algorithm on a given MONFG with accompanied utility functions.
+    """This function executes the fictitious play algorithm on a given MONFG with accompanied utility functions.
     Note that the simultaneous and alternating variants are not equivalent in general. In the simultaneous variant, all
     players calculate their best-response strategy simultaneously. The alternating variant does it by alternating.
     Note that at this point in time, this algorithm does not find cycles.
-    :param u_tpl: A tuple of utility functions.
-    :param player_actions: A tuple of actions per player.
-    :param monfg: A list of payoff matrices representing the MONFG.
-    :param max_iter: The maximum amount of iterations to run IBR for.
-    :param init_joint_strategy: Initial guess for the joint strategy.
-    :param variant: The variant to use. This is either simultaneous or alternating.
-    :return: Whether or not we reached a Nash equilibrium and the final joint strategy.
+
+    Args:
+      u_tpl: A tuple of utility functions.
+      player_actions: A tuple of actions per player.
+      monfg: A list of payoff matrices representing the MONFG.
+      max_iter: The maximum amount of iterations to run IBR for. (Default value = 1000)
+      init_joint_strategy: Initial guess for the joint strategy. (Default value = None)
+      variant: The variant to use. This is either simultaneous or alternating. (Default value = 'simultaneous')
+
+    Returns:
+      Whether or not we reached a Nash equilibrium and the final joint strategy.
+
     """
 
     def simultaneous_variant():
-        """
-        This function will execute one iteration of the simultaneous fictitious play variant.
+        """This function will execute one iteration of the simultaneous fictitious play variant.
         :return: Whether the policies have converged and the new joint strategy.
+
+        Args:
+
+        Returns:
+
         """
         converged = True
         actions = []
@@ -44,9 +52,13 @@ def fictitious_play(u_tpl, player_actions, monfg, max_iter=1000, init_joint_stra
         return converged, joint_strategy
 
     def alternating_variant():
-        """
-        This function will execute one iteration of the alternating fictitious play variant.
+        """This function will execute one iteration of the alternating fictitious play variant.
         :return: Whether the policies have converged and the new joint strategy.
+
+        Args:
+
+        Returns:
+
         """
         converged = True
 
