@@ -1,5 +1,5 @@
 def u1(vector):
-    """This function calculates the utility by doing x^2 + y^2. This is a convex function.
+    """Calculate the utility from: x^2 + y^2. This is a convex function.
 
     Args:
       vector (ndarray): A payoff vector.
@@ -13,7 +13,7 @@ def u1(vector):
 
 
 def u2(vector):
-    """This function calculates the utility by doing x*y. This prefers the most balanced payoff vector.
+    """Calculate the utility from: x*y. This prefers the most balanced payoff vector.
 
     Args:
       vector (ndarray): A payoff vector.
@@ -27,7 +27,7 @@ def u2(vector):
 
 
 def u3(vector):
-    """This function calculates the utility by doing x*y - y^2.
+    """Calculate the utility from: x*y - y^2.
 
     Args:
       vector (ndarray): A payoff vector.
@@ -41,7 +41,7 @@ def u3(vector):
 
 
 def u4(vector):
-    """A utility function that is a constant.
+    """Calculate a constant utility. The constant is currently set to 2.
 
     Args:
       vector (ndarray): A payoff vector.
@@ -55,7 +55,7 @@ def u4(vector):
 
 
 def u5(vector):
-    """This function calculates the utility by doing x^2 + x*y + y^2. This is a convex function.
+    """Calculate the utility from: x^2 + x*y + y^2. This is a convex function.
 
     Args:
       vector (ndarray): A payoff vector.
@@ -69,7 +69,7 @@ def u5(vector):
 
 
 def u6(vector):
-    """This function calculates the utility by doing x^2 + y. This is a convex function.
+    """Calculate the utility from: x^2 + y. This is a convex function.
 
     Args:
       vector (ndarray): A payoff vector.
@@ -83,7 +83,7 @@ def u6(vector):
 
 
 def u7(vector):
-    """This function calculates the utility by doing x + y^2. This is a convex function.
+    """Calculate the utility from: x + y^2. This is a convex function.
 
     Args:
       vector (ndarray): A payoff vector.
