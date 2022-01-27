@@ -62,7 +62,7 @@ def calc_expected_returns(player, payoff_matrix, joint_strategy):
     return expected_returns
 
 
-def best_response(u, player, payoff_matrix, joint_strategy):
+def calculate_best_response(u, player, payoff_matrix, joint_strategy):
     """Calculate a best response for a given player to a joint strategy.
 
     Args:
