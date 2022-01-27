@@ -18,7 +18,7 @@ def print_psne(game, psne_lst):
     for idx, psne in enumerate(psne_lst):
         print(f'PSNE {idx} indexes: {psne}')
 
-    if len(psne_lst[0]) == 2:
+    if len(game.shape) == 2:
         player_actions = game.shape[:-1]
         table = Table(title="MONFG", show_header=False, show_lines=True, box=box.HEAVY)
 
