@@ -1,5 +1,5 @@
 import numpy as np
-from best_response import best_response
+from mo_gt.best_response.best_response import calculate_best_response
 
 
 class IBRPlayer:
