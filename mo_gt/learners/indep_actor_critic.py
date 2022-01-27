@@ -72,7 +72,8 @@ class IndependentActorCriticAgent:
         Args:
           theta (ndarray): The policy parameters.
 
-        Returns: The utility from the current policy and Q-values.
+        Returns:
+            float: The utility from the current policy and Q-values.
 
         """
         policy = softmax(theta)
@@ -83,7 +84,8 @@ class IndependentActorCriticAgent:
     def select_action(self):
         """Select an action according to the agent's policy.
 
-        Returns: The selected action.
+        Returns:
+            int: The selected action.
 
         """
         return np.random.choice(range(self.num_actions), p=self.policy)
