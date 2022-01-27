@@ -3,6 +3,30 @@ from rich.console import Console
 from rich.table import Table
 
 
+def print_monfg(game_str, game):
+    """Print an MONFG as a matrix.
+
+    Args:
+        game_str (str): The name of the game.
+        game (List[ndarray]): The payoffs of the game.
+
+    Returns:
+
+    """
+    console = Console()
+
+    if len(game) == 2:
+        table = Table(title=game_str, show_header=False, show_lines=True, box=box.HEAVY)
+        for row1, row2 in zip(game[0], game[1]):
+            row_data = []
+            for payoff1, payoff2 in zip(row1, row2):
+                row_data.append(f'{tuple(payoff1)}; {tuple(payoff2)}')
+            table.add_row(*row_data)
+        console.print(table)
+    else:
+        print(f'Printing games with more than two players is currently not supported')
+
+
 def print_psne(game, psne_lst):
     """Pretty print a list of PSNE.
 
