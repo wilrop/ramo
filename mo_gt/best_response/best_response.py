@@ -1,4 +1,3 @@
-import games
 import numpy as np
 from scipy.optimize import minimize
 
@@ -7,12 +6,12 @@ def objective(strategy, expected_returns, u):
     """The objective function to minimise for is the negative SER, as we want to maximise for the SER.
 
     Args:
-      strategy: The current estimate for the best response strategy.
-      expected_returns: The expected returns given all other players' strategies.
-      u: The utility function of this agent.
+      strategy (ndarray) The current estimate for the best response strategy.
+      expected_returns (ndarray): The expected returns given all other players' strategies.
+      u (callable): The utility function of this agent.
 
     Returns:
-      A best response policy.
+      float: The value on the objective with the provided arguments.
 
     """
     expected_vec = strategy @ expected_returns  # The expected vector of the strategy applied to the expected returns.
@@ -20,17 +19,16 @@ def objective(strategy, expected_returns, u):
     return objective
 
 
-def best_response(u, player, payoff_matrix, joint_strategy):
-    """This function calculates a best response for a given player.
+def calc_expected_returns(player, payoff_matrix, joint_strategy):
+    """Calculate the expected return for a player's actions with a given joint strategy.
 
     Args:
-      u: The utility function for this player.
-      player: The player id.
-      payoff_matrix: The payoff matrix for this player.
-      joint_strategy: The joint strategy of all players.
+        player (int): The player to caculate expected returns for.
+        payoff_matrix (ndarray): The payoff matrix for the given player.
+        joint_strategy (List[ndarray]): A list of each player's individual strategy.
 
     Returns:
-      A best response strategy.
+        ndarray: The expected returns for the given player's actions.
 
     """
     num_objectives = payoff_matrix.shape[-1]
@@ -57,20 +55,29 @@ def best_response(u, player, payoff_matrix, joint_strategy):
 
     expected_returns = expected_returns.reshape(num_actions, num_objectives)  # Cast the result to a correct shape.
 
+    return expected_returns
+
+
+def best_response(u, player, payoff_matrix, joint_strategy):
+    """This function calculates a best response for a given player to a joint strategy.
+
+    Args:
+      u (callable): The utility function for this player.
+      player (int): The player to caculate expected returns for.
+      payoff_matrix (ndarray): The payoff matrix for the given player.
+      joint_strategy (List[ndarray]): A list of each player's individual strategy.
+
+    Returns:
+      ndarray: A best response strategy.
+
+    """
+    expected_returns = calc_expected_returns(player, payoff_matrix, joint_strategy)
+    num_actions = len(joint_strategy[player])
+
     unif_strategy = np.full(num_actions, 1 / num_actions)  # A uniform strategy as first guess for the optimiser.
     bounds = [(0, 1)] * num_actions  # Constrain probabilities to 0 and 1.
     constraints = {'type': 'eq', 'fun': lambda x: np.sum(x) - 1}  # Equality constraint is equal to zero by default.
     res = minimize(lambda x: objective(x, expected_returns, u), unif_strategy, bounds=bounds, constraints=constraints)
-    best_response = res['x'] / np.sum(res['x'])  # In case of floating point errors.
 
-    return best_response
-
-
-if __name__ == '__main__':
-    u = games.u1
-    monfg = games.get_monfg('game9')
-    player_actions = monfg[0].shape[:-1]  # Get the number of actions available to each player.
-    player = 1
-    strategy = [np.array([0.5, 0.3, 0.2]), np.array([0.2, 0.8]), np.array([1., 0., 0.])]  # Necessary for NumPy.
-    br = best_response(u, player, monfg[player], strategy)
-    print(br)
+    br_strategy = res['x'] / np.sum(res['x'])  # In case of floating point errors.
+    return br_strategy
