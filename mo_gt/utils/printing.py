@@ -2,7 +2,7 @@ from rich import print
 
 
 def print_psne(psne_lst):
-    """This function pretty prints a list of PSNE.
+    """Pretty print a list of PSNE.
 
     Args:
       psne_lst (List[ndarray]): A list of PSNE.
@@ -16,7 +16,7 @@ def print_psne(psne_lst):
 
 
 def print_ne(ne, joint_strategy):
-    """This function pretty prints a Nash equilibrium
+    """Pretty print a Nash equilibrium
 
     Args:
       ne (bool): Whether the joint strategy is a Nash equilibrium.
@@ -32,7 +32,7 @@ def print_ne(ne, joint_strategy):
 
 
 def print_all_ne(ne_lst):
-    """This function pretty prints a list of Nash equilibria.
+    """Pretty print a list of Nash equilibria.
 
     Args:
       ne_lst (List[List[ndarray]]): A list of Nash equilibria.
@@ -46,7 +46,7 @@ def print_all_ne(ne_lst):
 
 
 def print_start(algorithm):
-    """This function pretty prints the introduction to an algorithm.
+    """Pretty print the introduction to an algorithm.
 
     Args:
       algorithm (str): The name of the algorithm.
