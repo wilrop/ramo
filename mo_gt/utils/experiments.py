@@ -2,7 +2,7 @@ import os
 
 
 def create_game_path(content, experiment, game, opt_init, mkdir=False):
-    """This function creates a new directory based on the given parameters.
+    """Create a new directory based on the given parameters.
 
     Args:
       content (str): The type of content this directory will hold. Most often this is either 'data' or 'plots'.
