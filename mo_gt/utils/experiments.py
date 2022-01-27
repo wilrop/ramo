@@ -1,7 +1,7 @@
 import os
 
 
-def create_game_path(content, experiment, game, opt_init):
+def create_game_path(content, experiment, game, opt_init, mkdir=False):
     """This function creates a new directory based on the given parameters.
 
     Args:
@@ -9,6 +9,7 @@ def create_game_path(content, experiment, game, opt_init):
       experiment (str): The name of the experiment that is being performed.
       game (str): The game that is experimented on.
       opt_init (bool): Whether the experiment involves optimistic initialisation.
+      mkdir (bool, optional): Whether to create the directory.
 
     Returns:
       str: The path that was created.
@@ -21,6 +22,7 @@ def create_game_path(content, experiment, game, opt_init):
     else:
         path += '/zero_init'
 
-    os.makedirs(path, exist_ok=True)
+    if mkdir:
+        os.makedirs(path, exist_ok=True)
 
     return path
