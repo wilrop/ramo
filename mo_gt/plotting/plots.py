@@ -1,9 +1,11 @@
 import argparse
 import matplotlib
-import matplotlib.pyplot as plt
-import pandas as pd
+
+import numpy as np
 import seaborn as sns
-from utils_learn import *
+import pandas as pd
+import matplotlib.pyplot as plt
+import mo_gt.utils.experiments as ue
 
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['ps.fonttype'] = 42
@@ -17,12 +19,12 @@ plt.gcf().subplots_adjust(bottom=0.15)
 
 
 def save_plot(plot_name, filetype, dpi=300):
-    """This function saves a created plot with the requested name and filetype.
+    """Save a generated plot with the requested name and filetype.
 
     Args:
-      plot_name: The file to save the plot to.
-      filetype: The filetype for the figure.
-      dpi: The resolution for the final figure. Used when saving as png. (Default value = 300)
+      plot_name (str): The file to save the plot to.
+      filetype (str): The filetype for the figure.
+      dpi (int, optional): The resolution for the final figure. Used when saving as png. (Default value = 300)
 
     Returns:
 
@@ -36,21 +38,21 @@ def save_plot(plot_name, filetype, dpi=300):
 
 
 def plot_returns(path_plots, filetype, game, name, episodes, ag1_data, ag2_data):
-    """This function will plot the returns obtained by both agents in one graph.
+    """Plot the returns obtained by both agents in one graph.
 
     Args:
-      path_plots: The path to which we save the plot.
-      filetype: The filetype to save the file under.
-      game: The game that was played.
-      name: The name of the experiment.
-      episodes: The number of episodes that was ran.
-      ag1_data: The data for agent 1.
-      ag2_data: The data for agent 2.
+      path_plots (str): The path for saving the plot.
+      filetype (str): The filetype to save the file under.
+      game (str): The game that was played.
+      name (str): The name of the experiment that was ran.
+      episodes (int): The number of episodes that the experiment was executed.
+      ag1_data (DataFrame): The data for agent 1.
+      ag2_data (DataFrame): The data for agent 2.
 
     Returns:
 
     """
-    print("Plotting scalarised expected returns")
+    print(f'Plotting scalarised expected returns')
     ax = sns.lineplot(x='Episode', y='Payoff', linewidth=2.0, data=ag1_data, ci='sd', label='Leader')
     ax = sns.lineplot(x='Episode', y='Payoff', linewidth=2.0, data=ag2_data, ci='sd', label='Follower')
     if game == 'game7':
@@ -74,25 +76,25 @@ def plot_returns(path_plots, filetype, game, name, episodes, ag1_data, ag2_data)
     plt.tight_layout()
     save_plot(plot_name, filetype)
 
-    print("Finished plotting scalarised expected returns")
+    print(f'Finished plotting scalarised expected returns')
 
 
 def plot_action_probabilities(path_plots, filetype, game, name, episodes, agent, data):
-    """This function will plot the action probabilities for a given agent.
+    """Plot the action probabilities for a given agent.
 
     Args:
-      path_plots: The path to which we save the plot.
-      filetype: The filetype to save the file under.
-      game: The game that was played.
-      name: The name of the experiment that was ran.
-      episodes: The number of episodes that was ran.
-      agent: The agent that is being plotted.
-      data: The data for this agent.
+      path_plots (str): The path for saving the plot.
+      filetype (str): The filetype to save the file under.
+      game (str): The game that was played.
+      name (str): The name of the experiment that was ran.
+      episodes (int): The number of episodes that the experiment was executed.
+      agent (str): The agent that is being plotted.
+      data (DataFrame): The data for this agent.
 
     Returns:
 
     """
-    print("Plotting action probabilities for agent: " + repr(agent))
+    print(f'Plotting action probabilities for agent: {agent}')
     if game == 'game6':
         label1 = "Dare"
         label2 = "Chicken"
@@ -120,22 +122,22 @@ def plot_action_probabilities(path_plots, filetype, game, name, episodes, agent,
     plt.tight_layout()
     save_plot(plot_name, filetype)
 
-    print("Finished plotting action probabilities for agent: " + repr(agent))
+    print(f'Finished plotting action probabilities for agent: {agent}')
 
 
-def plot_state_distribution(path_plots, game, name, data):
-    """This function will plot the state distribution as a heatmap.
+def plot_joint_action_distribution(path_plots, game, name, data):
+    """Plot a heatmap of the joint-action distribution.
 
     Args:
-      path_plots: The path to which we save the plot.
-      game: The game that was played.
-      name: The name of the experiment that was ran.
-      data: The state distribution data.
+      path_plots (str): The path for saving the plot.
+      game (str): The game that was played.
+      name (str): The name of the experiment that was ran.
+      data (DataFrame): The state distribution data.
 
     Returns:
 
     """
-    print("Plotting the state distribution.")
+    print(f'Plotting the state distribution')
     if game in ['game2', 'game6', 'game8', 'game9', 'game10', 'game11']:
         x_axis_labels = ["L", "R"]
         y_axis_labels = ["L", "R"]
@@ -162,25 +164,25 @@ def plot_state_distribution(path_plots, game, name, data):
     plt.tight_layout()
     save_plot(plot_name, filetype)
 
-    print("Finished plotting the state distribution.")
+    print(f'Finished plotting the state distribution')
 
 
 def plot_com_probabilities(path_plots, filetype, game, name, episodes, agent, data):
-    """This function will plot the message probabilities for a given agent.
+    """Plot the message probabilities for a given agent.
 
     Args:
-      path_plots: The path to which we save the plot.
-      filetype: The filetype to save the file under.
-      game: The game that was played.
-      name: The name of the experiment that was ran.
-      episodes: The number of episodes that was ran.
-      agent: The agent that is being plotted.
-      data: The data for this agent.
+      path_plots (str): The path for saving the plot.
+      filetype (str): The filetype to save the file under.
+      game (str): The game that was played.
+      name (str): The name of the experiment that was ran.
+      episodes (int): The number of episodes that the experiment was executed.
+      agent (str): The agent that is being plotted.
+      data (DataFrame): The data for this agent.
 
     Returns:
 
     """
-    print("Plotting message probabilities for agent: " + repr(agent))
+    print(f'Plotting message probabilities for agent: {agent}')
 
     ax = sns.lineplot(x='Episode', y='No communication', linewidth=2.0, data=data, ci='sd', label='No Communication')
     ax = sns.lineplot(x='Episode', y='Communication', linewidth=2.0, data=data, ci='sd', label='Communication')
@@ -196,32 +198,31 @@ def plot_com_probabilities(path_plots, filetype, game, name, episodes, agent, da
     plt.tight_layout()
     save_plot(plot_name, filetype)
 
-    print("Finished plotting message probabilities for agent: " + repr(agent))
+    print(f'Finished plotting message probabilities for agent: {agent}')
 
 
-def plot_results(games, name, episodes, filetype, opt_init):
-    """This function will call the different plotting functions that we need for each requested game.
+def plot_results(games, name, filetype, opt_init):
+    """Executes the different plotting functions needed for each requested game.
 
     Args:
-      games: The games we want to plot the results for.
-      name: The name of the experiment.
-      episodes: The amount of episodes that was ran.
-      filetype: The filetype to save the file under.
-      opt_init: Whether optimistic initialization was used
+      games (List[str]): The games to plot the results for.
+      name (str): The name of the experiment.
+      filetype (str): The filetype to save the file under.
+      opt_init (bool): Whether optimistic initialization was used
 
     Returns:
 
     """
     for game in games:
-        print("Generating plots for: " + repr(game))
+        print(f'Generating plots for: {game}')
         # Get all the paths in order.
-        path_data = create_game_path('data', name, game, opt_init)
-        path_plots = create_game_path('plots', name, game, opt_init)
-        mkdir_p(path_plots)
+        path_data = ue.create_game_path('data', name, game, opt_init, mkdir=False)
+        path_plots = ue.create_game_path('plots', name, game, opt_init, mkdir=True)
 
         # Plot the returns for both actions in one plot.
         df1 = pd.read_csv(f'{path_data}/{name}_{game}_A1_returns.csv')
         df2 = pd.read_csv(f'{path_data}/{name}_{game}_A2_returns.csv')
+        episodes = df1['Episode'].max() + 1  # Episodes start at 0
         df1 = df1.iloc[::5, :]
         df2 = df2.iloc[::5, :]
         plot_returns(path_plots, filetype, game, name, episodes, df1, df2)
@@ -236,7 +237,7 @@ def plot_results(games, name, episodes, filetype, opt_init):
 
         # Plot the state distribution.
         df = pd.read_csv(f'{path_data}/{name}_{game}_states.csv', header=None)
-        plot_state_distribution(path_plots, game, name, df)
+        plot_joint_action_distribution(path_plots, game, name, df)
 
         # Plot the message probabilities if applicable.
         if name in ['opt_comp_action', 'opt_coop_action', 'opt_coop_policy']:
@@ -247,27 +248,25 @@ def plot_results(games, name, episodes, filetype, opt_init):
             plot_com_probabilities(path_plots, filetype, game, name, episodes, 'A1', df1)
             plot_com_probabilities(path_plots, filetype, game, name, episodes, 'A2', df2)
 
-        print("Finished generating plots for: " + repr(game))
-        print("------------------------------------------------")
+        print(f'Finished generating plots for: {game}')
+        print('------------------------------------------------')
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-games', type=str, default=['game1'], nargs='+', help="Which games to plot results for.")
-    parser.add_argument('--experiment', type=str, default='comp_action', help='The experiment to generate plots for.')
-    parser.add_argument('-episodes', type=int, default=5000, help="The number of episodes that were ran.")
-    parser.add_argument('-filetype', type=str, default='pdf', help="The filetype to save the plots under.")
-    parser.add_argument('-opt_init', action='store_true', help="Whether optimistic initialization was used.")
+    parser.add_argument('--games', type=str, default=['game7'], nargs='+', help="Which games to plot results for.")
+    parser.add_argument('--experiment', type=str, default='best_response', help='The experiment to generate plots for.')
+    parser.add_argument('--filetype', type=str, default='pdf', help="The filetype to save the plots under.")
+    parser.add_argument('--opt_init', action='store_true', help="Whether optimistic initialization was used.")
 
     args = parser.parse_args()
 
     # Extracting the arguments.
     games = args.games
     experiment = args.experiment
-    episodes = args.episodes
     filetype = args.filetype
     opt_init = args.opt_init
 
     # Plotting the results for the requested games
-    plot_results(games, experiment, episodes, filetype, opt_init)
+    plot_results(games, experiment, filetype, opt_init)
