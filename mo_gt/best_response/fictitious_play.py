@@ -41,7 +41,7 @@ def fictitious_play(u_tpl, player_actions, monfg, max_iter=1000, init_joint_stra
             actions.append(player.select_action())
 
         for player in players:  # Update the empirical state distributions.
-            player.update_joint_states(actions)
+            player.update_empirical_strategies(actions)
 
         for id, player in enumerate(players):  # Update the policies simultaneously.
             done, br = player.update_strategy()
@@ -69,7 +69,7 @@ def fictitious_play(u_tpl, player_actions, monfg, max_iter=1000, init_joint_stra
                 actions.append(player.select_action())
 
             for player in players:  # Update the empirical state distributions.
-                player.update_joint_states(actions)
+                player.update_empirical_strategies(actions)
 
             done, br = player.update_strategy()  # Update the current player's policy.
             joint_strategy[id] = br  # Update the joint strategy.
