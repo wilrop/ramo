@@ -201,7 +201,7 @@ def get_monfg(game):
 
 
 def scalarise_matrix(payoff_matrix, u):
-    """This function scalarises a payoff matrix using a given utility function.
+    """Scalarise a payoff matrix using a given utility function.
 
     Args:
       payoff_matrix (ndarray): The input payoffs.
@@ -224,7 +224,7 @@ def scalarise_matrix(payoff_matrix, u):
 
 
 def generate_random_monfg(player_actions=(2, 2), num_objectives=2, reward_min_bound=0, reward_max_bound=5):
-    """This function will generate a random MONFG.
+    """Generate a random MONFG with payoffs from a discrete uniform distribution.
 
     Args:
       player_actions (Tuple[int], optional): A tuple of actions indexed by player. (Default value = (2, 2))
@@ -247,7 +247,7 @@ def generate_random_monfg(player_actions=(2, 2), num_objectives=2, reward_min_bo
 
 
 def generate_identity_game(player_actions=(2, 2)):
-    """This function generates an identity game.
+    """Generate an identity game.
 
     Args:
       player_actions (Tuple[int]): A tuple of actions indexed by player. (Default value = (2, 2))
