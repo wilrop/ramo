@@ -3,7 +3,11 @@ from scipy.optimize import minimize
 
 
 def objective(strategy, expected_returns, u):
-    """The objective function to minimise for is the negative SER, as we want to maximise for the SER.
+    """The objective function in an MONFG under SER.
+
+    Implements the objective function for a player in an MONFG under SER. In a best-response calculation, players aim to
+    maximise their utility. However, most often in optimisation we are given minimisers (e.g. SciPy's minimise).
+    The sign of the utility is flipped as the objective to minimise, which effectively maximises the utility.
 
     Args:
       strategy (ndarray) The current estimate for the best response strategy.
@@ -59,7 +63,7 @@ def calc_expected_returns(player, payoff_matrix, joint_strategy):
 
 
 def best_response(u, player, payoff_matrix, joint_strategy):
-    """This function calculates a best response for a given player to a joint strategy.
+    """Calculate a best response for a given player to a joint strategy.
 
     Args:
       u (callable): The utility function for this player.
