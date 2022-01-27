@@ -88,7 +88,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--game', type=str, default='game1', help="which MONFG to play")
-    parser.add_argument('-u', type=tuple, default=('u1', 'u5'), nargs='+', help="The utility functions to use.")
+    parser.add_argument('-u', type=str, default=['u1', 'u5'], nargs='+', help="The utility functions to use.")
     parser.add_argument('--player_actions', type=int, nargs='+', default=[3, 3],
                         help='The number of actions per agent')
     parser.add_argument('--num_objectives', type=int, default=2, help="The number of objectives for the random MONFG")
