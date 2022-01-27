@@ -49,7 +49,7 @@ class IndependentActorCriticAgent:
         self.q_table[action] += self.alpha_q * (reward - self.q_table[action])
 
     def update_policy(self):
-        """This method will update the given theta parameters and policy.
+        """Update the policy according according to the actor-critic method.
 
         Returns:
 
