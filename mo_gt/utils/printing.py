@@ -1,18 +1,42 @@
-from rich import print
+from rich import print, box
+from rich.console import Console
+from rich.table import Table
 
 
-def print_psne(psne_lst):
+def print_psne(game, psne_lst):
     """Pretty print a list of PSNE.
 
     Args:
+      game (ndarray): A payoff matrix.
       psne_lst (List[ndarray]): A list of PSNE.
 
     Returns:
 
     """
     print('There are a total of ' + repr(len(psne_lst)) + ' pure strategy Nash equilibria')
-    for psne in psne_lst:
-        print(psne)
+
+    for idx, psne in enumerate(psne_lst):
+        print(f'PSNE {idx} indexes: {psne}')
+
+    if len(psne_lst[0]) == 2:
+        player_actions = game.shape[:-1]
+        table = Table(title="MONFG", show_header=False, show_lines=True, box=box.HEAVY)
+
+        for i in range(player_actions[0]):
+            row_data = []
+
+            for j in range(player_actions[1]):
+                data = f'({i}, {j})'
+                for indexes in psne_lst:
+                    if indexes[0] == i and indexes[1] == j:
+                        data = f'[black on green]({i}, {j})'
+                        break
+
+                row_data.append(data)
+            table.add_row(*row_data)
+
+        console = Console()
+        console.print(table)
 
 
 def print_ne(ne, joint_strategy):
