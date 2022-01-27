@@ -1,61 +1,40 @@
 import time
 import argparse
+
 import numpy as np
-import games
-import util
+
+import mo_gt.games.games as games
+import mo_gt.games.utility_functions as uf
+import mo_gt.utils.printing as pt
 
 
-def scalarise_matrix(payoff_matrix, u, player_actions):
-    """This function will scalarise a matrix according to a given utility function.
-
-    Args:
-      payoff_matrix: The input payoffs.
-      u: A utility function.
-      player_actions: A tuple with the number of actions for each player.
-
-    Returns:
-      The scalarised game.
-
-    """
-    scalarised_matrix = np.zeros(player_actions)
-    num_strategies = np.prod(player_actions)
-
-    for i in range(num_strategies):  # Loop over all possible strategies.
-        idx = np.unravel_index(i, player_actions)  # Get the strategy from the flat index.
-        utility = u(payoff_matrix[idx])
-        scalarised_matrix[idx] = utility
-
-    return scalarised_matrix
-
-
-def reduce_monfg(monfg, player_actions, u_tpl):
-    """This function will reduce the MONFG to an NFG as a list of payoff matrices.
+def reduce_monfg(monfg, u_tpl):
+    """Reduce an MONFG to an NFG by scalarisation. This is also known as the trade-off game.
 
     Args:
-      monfg: The input MONFG.
-      player_actions: A tuple of the amount of actions per player.
-      u_tpl: A tuple of utility functions.
+      monfg (List[ndarray]): An MONFG as a list of payoff matrices.
+      u_tpl (Tuple[callable]): A tuple of utility functions.
 
     Returns:
-      An NFG.
+      List[ndarray]: The scalarised MONFG.
 
     """
-    nfg = []  # Collect the payoff matrices.
+    nfg = []  # Collect the payoff matrices for the NFG.
     for player, u in enumerate(u_tpl):
-        scalarised_payoff = scalarise_matrix(monfg[player], u, player_actions)  # Scalarise the MONFG.
+        scalarised_payoff = games.scalarise_matrix(monfg[player], u)  # Scalarise each payoff matrix.
         nfg.append(scalarised_payoff)
     return nfg
 
 
 def calc_nfg_psne(nfg, player_actions):
-    """This function will calculate the PSNE from the scalarised game.
+    """Calculate the PSNE for an NFG using the "underlining" method.
 
     Args:
-      nfg: The scalarised MONFG.
-      player_actions: A tuple of the amount of actions per player.
+      nfg (List[ndarray]): An NFG as a list of payoff matrices.
+      player_actions (Tuple[int]): A tuple of the amount of actions per player.
 
     Returns:
-      A list of PSNE.
+      ndarray: The pure joint-strategies that are a PSNE.
 
     """
     best_responses = []  # Collect the best response matrices.
@@ -84,19 +63,23 @@ def calc_nfg_psne(nfg, player_actions):
     return psne
 
 
-def find_all_psne(monfg, player_actions, u_tpl):
-    """This function will find all Pure Strategy Nash Equilibria (PSNE).
+def calc_all_psne(monfg, u_tpl):
+    """Calculate all Pure Strategy Nash Equilibria (PSNE) for a given MONFG with quasiconvex utility functions.
+
+    Notes
+    -----
+        This algorithm is only guaranteed to be correct when using quasiconvex utility functions.
 
     Args:
-      monfg: An input MONFG.
-      player_actions: A tuple of the amount of actions per player.
-      u_tpl: A tuple of utility functions.
+      monfg (List[ndarray]): An MONFG as a list of payoff matrices.
+      u_tpl (Tuple[callable]): A tuple of utility functions.
 
     Returns:
-      A list of PSNE.
+      ndarray: The pure joint-strategies that are a PSNE.
 
     """
-    nfg = reduce_monfg(monfg, player_actions, u_tpl)  # Reduce the MONFG to an NFG.
+    player_actions = monfg[0].shape[:-1]  # Get the number of actions available to each player.
+    nfg = reduce_monfg(monfg, u_tpl)  # Reduce the MONFG to an NFG.
     psne_lst = calc_nfg_psne(nfg, player_actions)  # Calculate the PSNE from these payoff matrices.
     return psne_lst
 
@@ -104,12 +87,8 @@ def find_all_psne(monfg, player_actions, u_tpl):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--game', type=str, default='game1',
-                        choices=['game1', 'game2', 'game3', 'game4', 'game5', 'game6', 'game7', 'game8', 'game9',
-                                 'random'],
-                        help="which MONFG to play")
-    parser.add_argument('-u', type=str, default=['u1', 'u2'], choices=['u1', 'u2', 'u3', 'u4'], nargs='+',
-                        help="Which utility functions to use per player.")
+    parser.add_argument('--game', type=str, default='game1', help="which MONFG to play")
+    parser.add_argument('-u', type=tuple, default=('u1', 'u5'), nargs='+', help="The utility functions to use.")
     parser.add_argument('--player_actions', type=int, nargs='+', default=[3, 3],
                         help='The number of actions per agent')
     parser.add_argument('--num_objectives', type=int, default=2, help="The number of objectives for the random MONFG")
@@ -121,17 +100,16 @@ if __name__ == '__main__':
     start = time.time()  # Start measuring the time.
 
     if args.game == 'random':
-        player_actions = tuple(args.player_actions)
+        player_actions = args.player_actions
         monfg = games.generate_random_monfg(player_actions, args.num_objectives, args.lower_bound, args.upper_bound)
     else:
         monfg = games.get_monfg(args.game)
 
-    player_actions = monfg[0].shape[:-1]  # Get the number of actions available to each player.
-    u_tpl = tuple([games.get_u(u_str) for u_str in args.u])  # These must be quasiconvex to ensure correctness.
+    u_tpl = tuple([uf.get_u(u_str) for u_str in args.u])  # These must be quasiconvex to ensure correctness.
 
-    psne_lst = find_all_psne(monfg, player_actions, u_tpl)
-    util.print_psne(psne_lst)
+    psne_lst = calc_all_psne(monfg, u_tpl)
+    pt.print_psne(psne_lst)
 
     end = time.time()
     elapsed_secs = (end - start)
-    print("Seconds elapsed: " + str(elapsed_secs))
+    print(f'Seconds elapsed: {str(elapsed_secs)}')
