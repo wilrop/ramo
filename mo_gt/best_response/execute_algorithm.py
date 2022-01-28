@@ -36,18 +36,20 @@ def execute_algorithm(monfg, u_tpl, algorithm='PSNE', variant='alternating', ite
     if algorithm == 'PSNE':
         psne_lst = calc_all_psne(monfg, u_tpl)
         pt.print_psne(monfg[0], psne_lst)
-        return psne_lst
+        results = psne_lst
     elif algorithm == 'IBR':
         ne, final_strategy = iterated_best_response(monfg, u_tpl, max_iter=iterations, variant=variant)
         pt.print_ne(ne, final_strategy)
-        return ne, final_strategy
+        results = ne, final_strategy
     elif algorithm == 'FP':
         ne, final_strategy = fictitious_play(monfg, u_tpl, max_iter=iterations, variant=variant)
         pt.print_ne(ne, final_strategy)
-        return ne, final_strategy
+        results = ne, final_strategy
     else:
         raise Exception(f'The requested algorithm "{algorithm}" does not exist')
 
     end = time.time()
     elapsed_secs = (end - start)
     print("Seconds elapsed: " + str(elapsed_secs))
+
+    return results
