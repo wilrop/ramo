@@ -4,11 +4,10 @@ import time
 import mo_gt.games.games as games
 import mo_gt.games.utility_functions as uf
 import mo_gt.utils.printing as pt
-
 from mo_gt.best_response.Player import FPPlayer
 
 
-def fictitious_play(u_tpl, monfg, max_iter=1000, init_joint_strategy=None, variant='simultaneous'):
+def fictitious_play(monfg, u_tpl, max_iter=1000, init_joint_strategy=None, variant='simultaneous'):
     """Execute the fictitious play algorithm on a given MONFG and utility functions.
 
     There are two variants of the fictitious play algorithm implemented, simultaneous and alternating fictitious play.
@@ -21,8 +20,8 @@ def fictitious_play(u_tpl, monfg, max_iter=1000, init_joint_strategy=None, varia
     iterations is reached.
 
     Args:
-      u_tpl (Tuple[callable]): A tuple of utility functions.
       monfg (List[ndarray]): A list of payoff matrices representing the MONFG.
+      u_tpl (Tuple[callable]): A tuple of utility functions.
       max_iter (int, optional): The maximum amount of iterations to run IBR for. (Default value = 1000)
       init_joint_strategy (List[ndarray], optional): Initial guess for the joint strategy. (Default value = None)
       variant (str, optional): The variant to use, which is either simultaneous or alternating.
