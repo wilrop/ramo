@@ -8,10 +8,9 @@ import mo_gt.games.utility_functions as uf
 
 
 class TestPSNE(unittest.TestCase):
-
     np.random.seed(42)
 
-    def test_simultaneous(self):
+    def test_alternating(self):
         game_str = 'game14'
         u_str = ('u1', 'u2', 'u3')
 
@@ -27,7 +26,7 @@ class TestPSNE(unittest.TestCase):
         for idx, strategy in enumerate(test[1]):
             np.testing.assert_array_equal(np.round(strategy, decimals=0), correct[idx])
 
-    def test_alternating(self):
+    def test_simultaneous(self):
         game_str = 'game14'
         u_str = ('u1', 'u2', 'u3')
 
