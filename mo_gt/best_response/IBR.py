@@ -8,7 +8,7 @@ import mo_gt.utils.printing as pt
 from mo_gt.best_response.Player import IBRPlayer
 
 
-def iterated_best_response(u_tpl, monfg, max_iter=1000, init_joint_strategy=None, variant='simultaneous'):
+def iterated_best_response(monfg, u_tpl, max_iter=1000, init_joint_strategy=None, variant='simultaneous'):
     """Execute the iterated best response algorithm on a given MONFG and utility functions.
 
     There are two variants of the iterated best response algorithm implemented, a simultaneous and alternating variant.
@@ -21,8 +21,8 @@ def iterated_best_response(u_tpl, monfg, max_iter=1000, init_joint_strategy=None
     iterations is reached.
 
     Args:
-      u_tpl (Tuple[callable]): A tuple of utility functions.
       monfg (List[ndarray]): A list of payoff matrices representing the MONFG.
+      u_tpl (Tuple[callable]): A tuple of utility functions.
       max_iter (int, optional): The maximum amount of iterations to run IBR for. (Default value = 1000)
       init_joint_strategy (List[ndarray], optional): Initial guess for the joint strategy. (Default value = None)
       variant (str, optional): The variant to use, which is either simultaneous or alternating.
