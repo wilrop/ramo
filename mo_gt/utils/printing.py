@@ -25,18 +25,18 @@ def print_two_player_monfg(game, name='MONFG', highlight_cells=None):
         table = Table(title=name, show_header=False, show_lines=True, box=box.HEAVY)
 
         player_actions = game[0].shape[:-1]
-        top_row = ['Action'] + [f'{action}.' for action in range(player_actions[1])]
+        top_row = ['Action'] + [f'[bold light_slate_blue]{action}.' for action in range(player_actions[1])]
         table.add_row(*top_row)
 
         for p1_action in range(player_actions[0]):
-            row_data = [f'{p1_action}.']
+            row_data = [f'[bold light_slate_blue]{p1_action}.']
 
             for p2_action in range(player_actions[1]):
                 data = f'{tuple(game[0][p1_action, p2_action])}; {tuple(game[1][p1_action, p2_action])}'
 
                 for highlight_strat in highlight_cells:
                     if ([p1_action, p2_action] == highlight_strat).all():
-                        data = f'[black on green]{data}'
+                        data = f'[black on green3]{data}'
                         break
 
                 row_data.append(data)
@@ -74,11 +74,11 @@ def print_payoff_matrices(game, name='MONFG', highlight_cells=None):
         opp_joint_strats = np.unravel_index(np.arange(np.prod(opp_actions)), opp_actions)
         opp_joint_strats = list(zip(*[opp_joint_strats[i] for i in range(len(opp_joint_strats))]))
 
-        top_row = ['Action'] + [f'{opp_strat}' for opp_strat in opp_joint_strats]
+        top_row = ['Action'] + [f'[bold light_slate_blue]{opp_strat}' for opp_strat in opp_joint_strats]
         table.add_row(*top_row)
 
         for action in range(num_actions):
-            row_data = [f'{action}.']
+            row_data = [f'[bold light_slate_blue]{action}.']
 
             for opp_strat in opp_joint_strats:
                 joint_strat = np.insert(opp_strat, player, action)
@@ -87,7 +87,7 @@ def print_payoff_matrices(game, name='MONFG', highlight_cells=None):
 
                 for highlight_strat in highlight_cells:
                     if (joint_strat == highlight_strat).all():
-                        data = f'[black on green]{payoff_vec}'
+                        data = f'[black on green3]{payoff_vec}'
                         break
 
                 row_data.append(f'{data}')
