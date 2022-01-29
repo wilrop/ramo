@@ -25,9 +25,11 @@ def print_two_player_monfg(game, name='MONFG', highlight_cells=None):
         table = Table(title=name, show_header=False, show_lines=True, box=box.HEAVY)
 
         player_actions = game[0].shape[:-1]
+        top_row = ['Action'] + [f'{action}.' for action in range(player_actions[1])]
+        table.add_row(*top_row)
 
         for p1_action in range(player_actions[0]):
-            row_data = []
+            row_data = [f'{p1_action}.']
 
             for p2_action in range(player_actions[1]):
                 data = f'{tuple(game[0][p1_action, p2_action])}; {tuple(game[1][p1_action, p2_action])}'
