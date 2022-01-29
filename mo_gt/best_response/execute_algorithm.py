@@ -1,10 +1,9 @@
 import time
 
 import numpy as np
-import mo_gt.utils.printing as pt
 
-from mo_gt.best_response.PSNE import calc_all_psne
 from mo_gt.best_response.IBR import iterated_best_response
+from mo_gt.best_response.PSNE import calc_all_psne
 from mo_gt.best_response.fictitious_play import fictitious_play
 
 
@@ -35,15 +34,12 @@ def execute_algorithm(monfg, u_tpl, algorithm='PSNE', variant='alternating', ite
 
     if algorithm == 'PSNE':
         psne_lst = calc_all_psne(monfg, u_tpl)
-        pt.print_psne(monfg[0], psne_lst)
         results = psne_lst
     elif algorithm == 'IBR':
         ne, final_strategy = iterated_best_response(monfg, u_tpl, max_iter=iterations, variant=variant)
-        pt.print_ne(ne, final_strategy)
         results = ne, final_strategy
     elif algorithm == 'FP':
         ne, final_strategy = fictitious_play(monfg, u_tpl, max_iter=iterations, variant=variant)
-        pt.print_ne(ne, final_strategy)
         results = ne, final_strategy
     else:
         raise Exception(f'The requested algorithm "{algorithm}" does not exist')
