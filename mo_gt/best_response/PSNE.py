@@ -108,7 +108,7 @@ if __name__ == '__main__':
     u_tpl = tuple([uf.get_u(u_str) for u_str in args.u])  # These must be quasiconvex to ensure correctness.
 
     psne_lst = calc_all_psne(monfg, u_tpl)
-    pt.print_psne(monfg[0], psne_lst)
+    pt.print_psne(monfg, psne_lst, name=args.game)
 
     end = time.time()
     elapsed_secs = (end - start)
