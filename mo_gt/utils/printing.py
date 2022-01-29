@@ -1,38 +1,123 @@
+import numpy as np
+
 from rich import print, box
 from rich.console import Console
 from rich.table import Table
 
 
-def print_monfg(game_str, game):
-    """Print an MONFG as a matrix.
+def print_two_player_monfg(game, name='MONFG', highlight_cells=None):
+    """Visualise a two-player MONFG as a single payoff matrix.
 
     Args:
-        game_str (str): The name of the game.
-        game (List[ndarray]): The payoffs of the game.
+        game (List[ndarray]): The list of payoff matrices.
+        name (str, optional): The name of the game. (Default = 'MONFG')
+        highlight_cells (List[array_like], optional): Cell coordinates to highlight. (Default = None)
 
     Returns:
 
     """
+    if highlight_cells is None:
+        highlight_cells = []
+
     console = Console()
 
     if len(game) == 2:
-        table = Table(title=game_str, show_header=False, show_lines=True, box=box.HEAVY)
-        for row1, row2 in zip(game[0], game[1]):
+        table = Table(title=name, show_header=False, show_lines=True, box=box.HEAVY)
+
+        player_actions = game[0].shape[:-1]
+
+        for p1_action in range(player_actions[0]):
             row_data = []
-            for payoff1, payoff2 in zip(row1, row2):
-                row_data.append(f'{tuple(payoff1)}; {tuple(payoff2)}')
+
+            for p2_action in range(player_actions[1]):
+                data = f'{tuple(game[0][p1_action, p2_action])}; {tuple(game[1][p1_action, p2_action])}'
+
+                for highlight_strat in highlight_cells:
+                    if ([p1_action, p2_action] == highlight_strat).all():
+                        data = f'[black on green]{data}'
+                        break
+
+                row_data.append(data)
+
             table.add_row(*row_data)
         console.print(table)
     else:
-        print(f'Printing games with more than two players is currently not supported')
+        print(f'This visualisation is currently not supported for games with more than two players')
 
 
-def print_psne(game, psne_lst):
+def print_payoff_matrices(game, name='MONFG', highlight_cells=None):
+    """Visualise an MONFG as a list of payoff matrices.
+
+    Args:
+        game (List[ndarray]): The list of payoff matrices.
+        name (str, optional): The name of the game. (Default = 'MONFG')
+        highlight_cells (List[array_like], optional): Cell coordinates to highlight. (Default = None)
+
+    Returns:
+
+    """
+    if highlight_cells is None:
+        highlight_cells = []
+
+    player_actions = game[0].shape[:-1]
+    num_joint_strats = np.prod(player_actions)
+    joint_strats = [np.unravel_index(joint_strat, player_actions) for joint_strat in range(num_joint_strats)]
+
+    console = Console()
+
+    for player, (payoff_matrix, num_actions) in enumerate(zip(game, player_actions)):
+        table = Table(title=f'{name}: Player {player}', show_header=False, show_lines=True, box=box.HEAVY)
+
+        opp_actions = np.delete(player_actions, player)
+        opp_joint_strats = np.unravel_index(np.arange(np.prod(opp_actions)), opp_actions)
+        opp_joint_strats = list(zip(*[opp_joint_strats[i] for i in range(len(opp_joint_strats))]))
+
+        top_row = ['Action'] + [f'{opp_strat}' for opp_strat in opp_joint_strats]
+        table.add_row(*top_row)
+
+        for action in range(num_actions):
+            row_data = [f'{action}.']
+
+            for opp_strat in opp_joint_strats:
+                joint_strat = np.insert(opp_strat, player, action)
+                payoff_vec = tuple(payoff_matrix[tuple(joint_strat)])
+                data = f'{payoff_vec}'
+
+                for highlight_strat in highlight_cells:
+                    if (joint_strat == highlight_strat).all():
+                        data = f'[black on green]{payoff_vec}'
+                        break
+
+                row_data.append(f'{data}')
+
+            table.add_row(*row_data)
+        console.print(table)
+
+
+def print_monfg(game, name='MONFG', highlight_cells=None):
+    """Visualise an MONFG as a matrix for two-player games or list of payoff matrices for n-player games.
+
+    Args:
+        game (List[ndarray]): The list of payoff matrices.
+        name (str, optional): The name of the game. (Default = 'MONFG')
+        highlight_cells (List[array_like], optional): Cell coordinates to highlight. (Default = None)
+
+    Returns:
+
+    """
+    if len(game) == 2:
+        print_two_player_monfg(game, name, highlight_cells=highlight_cells)
+    else:
+        print_payoff_matrices(game, name, highlight_cells=highlight_cells)
+
+
+def print_psne(game, psne_lst, name='MONFG'):
     """Pretty print a list of PSNE.
 
     Args:
       game (ndarray): A payoff matrix.
       psne_lst (List[ndarray]): A list of PSNE.
+      name (str, optional): The name of the game. (Default = 'MONFG')
 
     Returns:
 
@@ -42,25 +127,7 @@ def print_psne(game, psne_lst):
     for idx, psne in enumerate(psne_lst):
         print(f'PSNE {idx} indexes: {psne}')
 
-    if len(game.shape[:-1]) == 2:
-        player_actions = game.shape[:-1]
-        table = Table(title="MONFG", show_header=False, show_lines=True, box=box.HEAVY)
-
-        for i in range(player_actions[0]):
-            row_data = []
-
-            for j in range(player_actions[1]):
-                data = f'({i}, {j})'
-                for indexes in psne_lst:
-                    if indexes[0] == i and indexes[1] == j:
-                        data = f'[black on green]({i}, {j})'
-                        break
-
-                row_data.append(data)
-            table.add_row(*row_data)
-
-        console = Console()
-        console.print(table)
+    print_monfg(game, name, highlight_cells=psne_lst)
 
 
 def print_ne(ne, joint_strategy):
