@@ -62,8 +62,6 @@ def print_payoff_matrices(game, name='MONFG', highlight_cells=None):
         highlight_cells = []
 
     player_actions = game[0].shape[:-1]
-    num_joint_strats = np.prod(player_actions)
-    joint_strats = [np.unravel_index(joint_strat, player_actions) for joint_strat in range(num_joint_strats)]
 
     console = Console()
 
