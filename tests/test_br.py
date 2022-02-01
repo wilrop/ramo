@@ -42,7 +42,7 @@ class TestBestResponse(unittest.TestCase):
 
         joint_strategy1 = [np.array([1 / 3, 1 / 3, 1 / 3]), np.array([1 / 3, 1 / 3, 1 / 3])]
         test1 = np.around(br.calc_best_response(u, player, payoff_matrix, joint_strategy1), decimals=5)
-        correct1 = np.array([0.33333, 0.33333, 0.33333])
+        correct1 = np.array([0., 0., 1.])
 
         joint_strategy2 = [np.array([1 / 3, 1 / 3, 1 / 3]), np.array([0.25, 0.35, 0.4])]
         test2 = np.around(br.calc_best_response(u, player, payoff_matrix, joint_strategy2), decimals=5)

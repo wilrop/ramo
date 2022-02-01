@@ -37,7 +37,7 @@ class TestExecuteAlgorithm(unittest.TestCase):
         test = ea.execute_algorithm(game, u_tpl, algorithm='FP', variant='alternating', seed=self.seed)
         self.assertTrue(test[0])
         print(test)
-        correct = [np.array([1., 0.]), np.array([1., 0.]), np.array([1., 0.])]
+        correct = [np.array([0., 1.]), np.array([0., 1.]), np.array([1., 0.])]
         for idx, strategy in enumerate(test[1]):
             np.testing.assert_array_equal(np.round(strategy, decimals=0), correct[idx])
 
