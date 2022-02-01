@@ -62,7 +62,7 @@ def calc_expected_returns(player, payoff_matrix, joint_strategy):
     return expected_returns
 
 
-def calc_best_response(u, player, payoff_matrix, joint_strategy):
+def calc_best_response(u, player, payoff_matrix, joint_strategy, init_strat=None):
     """Calculate a best response for a given player to a joint strategy.
 
     Args:
@@ -70,6 +70,7 @@ def calc_best_response(u, player, payoff_matrix, joint_strategy):
       player (int): The player to caculate expected returns for.
       payoff_matrix (ndarray): The payoff matrix for the given player.
       joint_strategy (List[ndarray]): A list of each player's individual strategy.
+      init_strat (ndarray, optional): The initial guess for the best response. (Default = None)
 
     Returns:
       ndarray: A best response strategy.
@@ -78,10 +79,24 @@ def calc_best_response(u, player, payoff_matrix, joint_strategy):
     expected_returns = calc_expected_returns(player, payoff_matrix, joint_strategy)
     num_actions = len(joint_strategy[player])
 
-    unif_strategy = np.full(num_actions, 1 / num_actions)  # A uniform strategy as first guess for the optimiser.
-    bounds = [(0, 1)] * num_actions  # Constrain probabilities to 0 and 1.
-    constraints = {'type': 'eq', 'fun': lambda x: np.sum(x) - 1}  # Equality constraint is equal to zero by default.
-    res = minimize(lambda x: objective(x, expected_returns, u), unif_strategy, bounds=bounds, constraints=constraints)
+    if init_strat is None:
+        init_strat = np.full(num_actions, 1 / num_actions)  # A uniform strategy as first guess for the optimiser.
 
-    br_strategy = res['x'] / np.sum(res['x'])  # In case of floating point errors.
+    init_strats = [init_strat]
+    for i in range(num_actions):
+        pure_strat = np.zeros(num_actions)
+        pure_strat[i] = 1
+        init_strats.append(pure_strat)  # A pure strategy as initial guess for the optimiser.
+
+    br_strategy = None
+    br_utility = float('inf')
+    for strat in init_strats:
+        bounds = [(0, 1)] * num_actions  # Constrain probabilities to 0 and 1.
+        constraints = {'type': 'eq', 'fun': lambda x: np.sum(x) - 1}  # Equality constraint is equal to zero by default.
+        res = minimize(lambda x: objective(x, expected_returns, u), strat, bounds=bounds, constraints=constraints)
+
+        if res['fun'] < br_utility:
+            br_utility = res['fun']
+            br_strategy = res['x'] / np.sum(res['x'])  # In case of floating point errors.
+
     return br_strategy
