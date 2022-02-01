@@ -32,8 +32,11 @@ def fictitious_play(monfg, u_tpl, max_iter=1000, init_joint_strategy=None, varia
 
     """
 
-    def simultaneous_variant():
+    def simultaneous_variant(joint_strategy):
         """Execute one iteration of the simultaneous fictitious play variant.
+
+        Args:
+            joint_strategy (List[ndarray]): The current joint strategy.
 
         Returns:
             Tuple[bool, List[ndarray]]: Whether the policies have converged and the new joint strategy.
@@ -48,16 +51,19 @@ def fictitious_play(monfg, u_tpl, max_iter=1000, init_joint_strategy=None, varia
         for player in players:  # Update the empirical state distributions.
             player.update_empirical_strategies(actions)
 
-        for id, player in enumerate(players):  # Update the policies simultaneously.
+        for player_id, player in enumerate(players):  # Update the policies simultaneously.
             done, br = player.update_strategy()
-            joint_strategy[id] = br  # Update the joint strategy.
+            joint_strategy[player_id] = br  # Update the joint strategy.
             if not done:
                 converged = False
 
         return converged, joint_strategy
 
-    def alternating_variant():
+    def alternating_variant(joint_strategy):
         """Execute one iteration of the alternating fictitious play variant.
+
+        Args:
+            joint_strategy (List[ndarray]): The current joint strategy.
 
         Returns:
             Tuple[bool, List[ndarray]]: Whether the policies have converged and the new joint strategy.
@@ -65,17 +71,17 @@ def fictitious_play(monfg, u_tpl, max_iter=1000, init_joint_strategy=None, varia
         """
         converged = True
 
-        for id, player in enumerate(players):  # Loop once over each player to update with alternating.
+        for player_id, player in enumerate(players):  # Loop once over each player to update with alternating.
             actions = []
 
-            for player in players:  # Collect actions.
-                actions.append(player.select_action())
+            for action_player in players:  # Collect actions.
+                actions.append(action_player.select_action())
 
-            for player in players:  # Update the empirical state distributions.
-                player.update_empirical_strategies(actions)
+            for update_player in players:  # Update the empirical state distributions.
+                update_player.update_empirical_strategies(actions)
 
             done, br = player.update_strategy()  # Update the current player's policy.
-            joint_strategy[id] = br  # Update the joint strategy.
+            joint_strategy[player_id] = br  # Update the joint strategy.
             if not done:
                 converged = False
 
@@ -87,12 +93,12 @@ def fictitious_play(monfg, u_tpl, max_iter=1000, init_joint_strategy=None, varia
     players = []  # A list to hold all the players.
     joint_strategy = []  # A list to hold the current joint strategy.
 
-    for player, u in enumerate(u_tpl):  # Loop over all players to create a new FPAgent object.
-        payoff_matrix = monfg[player]
+    for player_id, u in enumerate(u_tpl):  # Loop over all players to create a new FPAgent object.
+        payoff_matrix = monfg[player_id]
         init_strategy = None
         if init_joint_strategy is not None:
-            init_strategy = init_joint_strategy[player]
-        player = FPPlayer(player, u, player_actions, payoff_matrix, init_strategy)
+            init_strategy = init_joint_strategy[player_id]
+        player = FPPlayer(player_id, u, player_actions, payoff_matrix, init_strategy)
         players.append(player)
         joint_strategy.append(player.strategy)
 
@@ -105,7 +111,7 @@ def fictitious_play(monfg, u_tpl, max_iter=1000, init_joint_strategy=None, varia
 
     for i in range(max_iter):
         print(f'Performing iteration {i}')
-        converged, joint_strategy = execute_iteration()
+        converged, joint_strategy = execute_iteration(joint_strategy)
 
         if converged:  # If everything already is a best-response to the joint strategy, we reached a NE.
             nash_equilibrium = True
