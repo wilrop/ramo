@@ -153,6 +153,15 @@ monfg15 = [
                [(1, 1), (2, 1), (1, 1)]]], dtype=float)
 ]
 
+# Game 16: A 2-player 2-action game with individual rewards.
+# This game has no NE when both players use the utility function u1.
+monfg16 = [
+    np.array([[(2, 0), (1, 0)],
+              [(0, 1), (0, 2)]], dtype=float),
+    np.array([[(1, 0), (0, 2)],
+              [(2, 0), (0, 1)]], dtype=float)
+]
+
 
 def get_monfg(game):
     """Get the payoffs for a game from a string.
@@ -194,6 +203,8 @@ def get_monfg(game):
         monfg = monfg14
     elif game == 'game15':
         monfg = monfg15
+    elif game == 'game16':
+        monfg = monfg16
     else:
         raise Exception("The provided game does not exist.")
 
