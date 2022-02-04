@@ -3,7 +3,7 @@ import os
 import pandas as pd
 
 
-def create_game_path(content, experiment, game, mkdir=False):
+def create_game_path(content, experiment, game, mkdir=True):
     """Create a new directory based on the given parameters.
 
     Args:
@@ -11,7 +11,7 @@ def create_game_path(content, experiment, game, mkdir=False):
       experiment (str): The name of the experiment that is being performed.
       game (str): The game that is experimented on.
       opt_init (bool): Whether the experiment involves optimistic initialisation.
-      mkdir (bool, optional): Whether to create the directory.
+      mkdir (bool, optional): Whether to create the directory. (Default = True)
 
     Returns:
       str: The path that was created.
