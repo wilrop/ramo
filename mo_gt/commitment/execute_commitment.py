@@ -14,6 +14,7 @@ from mo_gt.commitment.coop_policy_agent import CoopPolicyAgent
 from mo_gt.commitment.non_stationary_agent import NonStationaryAgent
 from mo_gt.commitment.optional_com_agent import OptionalComAgent
 from mo_gt.learners.indep_actor_critic import IndependentActorCriticAgent
+from mo_gt.utils.data import save_data
 
 
 def get_leader(agents, episode, alternate=False):
@@ -368,5 +369,5 @@ if __name__ == "__main__":
     num_agents = len(payoff_matrices)
     player_actions = tuple(payoff_matrices[0].shape[:-1])
     path = ex.create_game_path('data', experiment, game, parent_dir=parent_dir)
-    ex.save_data(path, experiment, game, num_agents, player_actions, runs, episodes, returns_log=returns_log,
-                 action_probs_log=action_probs_log, state_dist_log=state_dist_log, com_probs_log=com_probs_log)
+    save_data(path, experiment, game, num_agents, player_actions, runs, episodes, returns_log=returns_log,
+              action_probs_log=action_probs_log, state_dist_log=state_dist_log, com_probs_log=com_probs_log)
