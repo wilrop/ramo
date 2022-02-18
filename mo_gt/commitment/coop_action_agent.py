@@ -4,7 +4,8 @@ from jax import grad, jit
 from jax.nn import softmax
 
 from mo_gt.best_response.best_response import calc_expected_returns
-from mo_gt.utils.experiments import array_slice, make_strat_from_action
+from mo_gt.utils.experiments import make_strat_from_action, make_joint_strat
+from mo_gt.utils.helpers import array_slice
 
 
 class CoopActionAgent:
@@ -77,8 +78,7 @@ class CoopActionAgent:
         self.last_op_commitment = make_strat_from_action(commitment, self.num_actions)
 
         theta = self.next_thetas[commitment]
-        joint_policy = [self.last_op_commitment]
-        joint_policy.insert(self.id, self.policy)
+        joint_policy = make_joint_strat(self.id, self.policy, [self.last_op_commitment])
         q_vals = calc_expected_returns(self.id, self.q_table, joint_policy)
 
         self.theta += self.alpha_theta * self.grad(theta, q_vals)
