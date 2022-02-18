@@ -60,17 +60,9 @@ def plot_returns(path_plots, filetype, game, name, episodes, ag1_data, ag2_data)
         y_constant = np.full(len(x_data), 0)
         ax = sns.lineplot(x=x_data, y=y_constant, linewidth=2.0, linestyle='--', label='Lower bound', color='grey')
 
-    if episodes > 5000:
-        scale = 'log'
-    else:
-        scale = 'linear'
-    ax.set(ylabel='Scalarised Expected Returns', xscale=scale)
-
-    # ax.set_ylim(1, 40)
-    if game in ['game1', 'game2']:
-        ax.set_xlim(0, 1000)
-    else:
-        ax.set_xlim(0, 1500)
+    ax.set(ylabel='Scalarised Expected Returns')
+    ax.set_xlim(0, episodes)
+    ax.set_ylim(0, 17.5)
 
     plot_name = f"{path_plots}/{name}_{game}_returns"
     plt.tight_layout()
@@ -113,10 +105,7 @@ def plot_action_probabilities(path_plots, filetype, game, name, episodes, agent,
 
     ax.set(ylabel='Action probability')
     ax.set_ylim(-0.05, 1.05)
-    if game in ['game1', 'game2']:
-        ax.set_xlim(0, 1000)
-    else:
-        ax.set_xlim(0, 1500)
+    ax.set_xlim(0, episodes)
 
     plot_name = f"{path_plots}/{name}_{game}_{agent}_probs"
     plt.tight_layout()
@@ -189,10 +178,7 @@ def plot_com_probabilities(path_plots, filetype, game, name, episodes, agent, da
 
     ax.set(ylabel='Communication probability')
     ax.set_ylim(-0.05, 1.05)
-    if game in ['game1', 'game2']:
-        ax.set_xlim(0, 1000)
-    else:
-        ax.set_xlim(0, 1500)
+    ax.set_xlim(0, episodes)
 
     plot_name = f"{path_plots}/{name}_{game}_{agent}_com"
     plt.tight_layout()
@@ -201,14 +187,14 @@ def plot_com_probabilities(path_plots, filetype, game, name, episodes, agent, da
     print(f'Finished plotting message probabilities for agent: {agent}')
 
 
-def plot_results(games, name, filetype, opt_init):
+def plot_results(games, name, parent_dir=None, filetype='pdf'):
     """Executes the different plotting functions needed for each requested game.
 
     Args:
       games (List[str]): The games to plot the results for.
       name (str): The name of the experiment.
+      parent_dir (str, optional): Parent directory for data and plots. (Default = None)
       filetype (str): The filetype to save the file under.
-      opt_init (bool): Whether optimistic initialization was used
 
     Returns:
 
@@ -216,8 +202,8 @@ def plot_results(games, name, filetype, opt_init):
     for game in games:
         print(f'Generating plots for: {game}')
         # Get all the paths in order.
-        path_data = ue.create_game_path('data', name, game, opt_init, mkdir=False)
-        path_plots = ue.create_game_path('plots', name, game, opt_init, mkdir=True)
+        path_data = ue.create_game_path('data', name, game, parent_dir=parent_dir, mkdir=False)
+        path_plots = ue.create_game_path('plots', name, game, parent_dir=parent_dir, mkdir=True)
 
         # Plot the returns for both actions in one plot.
         df1 = pd.read_csv(f'{path_data}/{name}_{game}_A1_returns.csv')
@@ -257,16 +243,16 @@ if __name__ == "__main__":
 
     parser.add_argument('--games', type=str, default=['game7'], nargs='+', help="Which games to plot results for.")
     parser.add_argument('--experiment', type=str, default='best_response', help='The experiment to generate plots for.')
+    parser.add_argument('--dir', type=str, default='/Users/willemropke/Documents/mo-game-theory', help='Parent directory for data and plots.')
     parser.add_argument('--filetype', type=str, default='pdf', help="The filetype to save the plots under.")
-    parser.add_argument('--opt_init', action='store_true', help="Whether optimistic initialization was used.")
 
     args = parser.parse_args()
 
     # Extracting the arguments.
     games = args.games
     experiment = args.experiment
+    parent_dir = args.dir
     filetype = args.filetype
-    opt_init = args.opt_init
 
     # Plotting the results for the requested games
-    plot_results(games, experiment, filetype, opt_init)
+    plot_results(games, experiment, parent_dir=parent_dir, filetype=filetype)
