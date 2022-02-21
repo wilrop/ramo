@@ -1,110 +1,45 @@
-import numpy as np
 import jax.numpy as jnp
-
+import numpy as np
 from jax import grad, jit
 from jax.nn import softmax
 
+from mo_gt.utils.helpers import array_slice
+
 
 class CompActionAgent:
-    """This class represents an agent that uses the SER multi-objective optimisation criterion."""
+    """An agent that learns a best-response policy to each pure-strategy commitment from the leader."""
 
-    def __init__(self, id, u, du, alpha_q, alpha_theta, alpha_decay, num_actions, num_objectives, opt=False):
+    def __init__(self, id, u, num_actions, num_objectives, alpha_q=0.01, alpha_theta=0.01, alpha_q_decay=1,
+                 alpha_theta_decay=1):
         self.id = id
         self.u = u
-        self.grad_obj_func = jit(grad(self.objective_function))
-        self.alpha_q = alpha_q
-        self.alpha_theta = alpha_theta
-        self.alpha_decay = alpha_decay
+        self.grad = jit(grad(self.objective_function))
         self.num_actions = num_actions
         self.num_objectives = num_objectives
-        # optimistic initialization of Q-table
-        if opt:
-            self.msg_q_table = np.ones((num_actions, num_objectives)) * 20
-        else:
-            self.msg_q_table = np.zeros((num_actions, num_objectives))
+
+        self.alpha_q = alpha_q
+        self.alpha_theta = alpha_theta
+        self.alpha_q_decay = alpha_q_decay
+        self.alpha_theta_decay = alpha_theta_decay
+
         self.payoffs_table = np.zeros((num_actions, num_actions, num_objectives))
-        self.msg_theta = np.zeros(num_actions)
-        self.msg_policy = np.full(num_actions, 1 / num_actions)
-        self.counter_thetas = np.zeros((num_actions, num_actions))
-        self.counter_policies = np.full((num_actions, num_actions), 1 / num_actions)
-        self.communicating = False
+        self.leader_q_table = np.zeros((num_actions, num_objectives))
+        self.leader_theta = np.zeros(num_actions)
+        self.leader_policy = np.full(num_actions, 1 / num_actions)
+        self.follower_thetas = np.zeros((num_actions, num_actions))
+        self.follower_policies = np.full((num_actions, num_actions), 1 / num_actions)
 
-    def update(self, communicator, message, actions, reward):
-        """This method will update the Q-table, strategy and internal parameters of the agent.
-
-        Args:
-          communicator: The id of the communicating agent.
-          message: The message that was sent.
-          actions: The actions selected in the previous episode.
-          reward: The reward that was obtained by the agent.
-
-        Returns:
-
-        """
-        self.update_payoffs_table(actions, reward)
-        own_action = actions[self.id]
-        if communicator == self.id:
-            self.update_msg_q_table(own_action, reward)
-            self.msg_theta += self.alpha_theta * self.grad_obj_func(self.msg_theta, self.msg_q_table)
-            self.msg_policy = self.update_policy(self.msg_theta)
-        else:
-            if self.id == 0:
-                expected_q = self.payoffs_table.transpose((1, 0, 2))[message]
-            else:
-                expected_q = self.payoffs_table[message]
-            self.counter_thetas[message] += self.alpha_theta * self.grad_obj_func(self.counter_thetas[message],
-                                                                                  expected_q)
-            self.counter_policies[message] = self.update_policy(self.counter_thetas[message])
-        self.update_parameters()
-
-    def update_msg_q_table(self, action, reward):
-        """This method will update the Q-table based on the chosen actions and the obtained reward.
-
-        Args:
-          action: The action chosen by this agent.
-          reward: The reward obtained by this agent.
-
-        Returns:
-
-        """
-        self.msg_q_table[action] += self.alpha_q * (reward - self.msg_q_table[action])
-
-    def update_payoffs_table(self, actions, reward):
-        """This method will update the payoffs table to learn the payoff vector of joint actions.
-
-        Args:
-          actions: The actions that were taken in the previous episode.
-          reward: The reward obtained by this joint action.
-
-        Returns:
-
-        """
-        self.payoffs_table[actions[0], actions[1]] += self.alpha_q * (
-                reward - self.payoffs_table[actions[0], actions[1]])
-
-    def update_policy(self, theta):
-        """This method will update the given theta parameters and policy.
-
-        Args:
-          theta: The updated theta parameters.
-
-        Returns:
-          The updated policy.
-
-        """
-        policy = np.asarray(softmax(theta), dtype=float)
-        policy = policy / np.sum(policy)
-        return policy
+        self.leader = False
 
     def objective_function(self, theta, q_values):
         """The objective function.
 
         Args:
-          theta: The parameters for a policy.
-          q_values: The Q-values relating to this policy.
+          theta (ndarray): The policy parameters.
+          q_values (ndarray): Learned Q-values used to calculate the SER from these parameters.
 
         Returns:
-          The utility from the current policy strategy.
+            float: The utility from the current parameters theta and Q-values.
 
         """
         policy = softmax(theta)
@@ -112,68 +47,126 @@ class CompActionAgent:
         utility = self.u(expected_returns)
         return utility
 
-    def update_parameters(self):
-        """This method will update the internal parameters of the agent.
-        :return: /
+    def make_leader(self):
+        """Make this agent the leader."""
+        self.leader = True
+
+    def make_follower(self):
+        """Make this agent the follower."""
+        self.leader = False
+
+    def update(self, commitment, actions, reward):
+        """Perform an update of the agent. Specifically updates the Q-tables, policies and hyperparameters.
 
         Args:
+          commitment (int): The leader's committed action.
+          actions (List[int]): The actions selected in an episode.
+          reward (float): The reward that was obtained by the agent in that episode.
 
         Returns:
 
         """
-        self.alpha_q *= self.alpha_decay
-        self.alpha_theta *= self.alpha_decay
-
-    def select_action(self, message):
-        """This method will select an action based on the message that was sent.
-
-        Args:
-          message: The message that was sent.
-
-        Returns:
-          The selected action.
-
-        """
-        if self.communicating:
-            self.communicating = False
-            return self.select_published_action(message)  # If this agent is committing, they must follow through.
+        own_action = actions[self.id]
+        self.update_payoffs_table(actions, reward)
+        if self.leader:
+            self.update_leader_q_table(own_action, reward)
+            self.leader_theta += self.alpha_theta * self.grad(self.leader_theta, self.leader_q_table)
+            self.leader_policy = self.update_policy(self.leader_theta)
         else:
-            return self.select_counter_action(message)  # Otherwise select a counter action.
+            q = array_slice(self.payoffs_table, abs(1 - self.id), commitment, commitment + 1)
+            q = q.reshape(self.num_actions, self.num_objectives)
+            self.follower_thetas[commitment] += self.alpha_theta * self.grad(self.follower_thetas[commitment], q)
+            self.follower_policies[commitment] = self.update_policy(self.follower_thetas[commitment])
+        self.update_parameters()
 
-    def get_message(self):
-        """This method will determine what action this agent will publish.
-        :return: The action that will maximise this agent's SER, given that the other agent also maximises its response.
+    def update_leader_q_table(self, action, reward):
+        """Update the leader's Q-table based on their own action and the obtained reward.
 
         Args:
+          action (int): The action taken by the leader.
+          reward (float): The reward obtained by this agent.
 
         Returns:
 
         """
-        self.communicating = True
-        return np.random.choice(range(self.num_actions), p=self.msg_policy)
+        self.leader_q_table[action] += self.alpha_q * (reward - self.leader_q_table[action])
 
-    def select_counter_action(self, state):
-        """This method will select the best counter policy and choose an action using this policy.
-
-        Args:
-          state: The message from an agent in the form of their next action.
-
-        Returns:
-          The selected action.
-
-        """
-        policy = self.counter_policies[state]
-        return np.random.choice(range(self.num_actions), p=policy)
-
-    @staticmethod
-    def select_published_action(state):
-        """This method simply plays the action that it already published.
+    def update_payoffs_table(self, actions, reward):
+        """Update the joint-action payoffs table.
 
         Args:
-          state: The action it published.
+          actions (List[int]): The actions that were taken in an episode.
+          reward (float): The reward obtained by this joint action.
 
         Returns:
-          The action it published.
 
         """
-        return state
+        idx = tuple(actions)
+        self.payoffs_table[idx] += self.alpha_q * (reward - self.payoffs_table[idx])
+
+    def update_policy(self, theta):
+        """Determine a policy from given parameters.
+
+        Args:
+          theta (ndarray): The updated theta parameters.
+
+        Returns:
+          ndarray: The updated policy.
+
+        """
+        policy = np.asarray(softmax(theta), dtype=float)
+        policy = policy / np.sum(policy)
+        return policy
+
+    def update_parameters(self):
+        """Update the internal parameters of the agent."""
+        self.alpha_q *= self.alpha_q_decay
+        self.alpha_theta *= self.alpha_theta_decay
+
+    def get_commitment(self):
+        """Get the commitment from the leader.
+
+        Returns:
+            int: A pure strategy commitment of the leader.
+
+        """
+        return np.random.choice(range(self.num_actions), p=self.leader_policy)
+
+    def select_action(self, commitment):
+        """Select an action based on the commitment of the leader.
+
+        Args:
+          commitment (int): The message that was sent.
+
+        Returns:
+          int: The selected action.
+
+        """
+        if self.leader:
+            return self.select_committed(commitment)  # If this agent is committing, they must follow through.
+        else:
+            return self.select_counter_action(commitment)  # Otherwise select a counter action.
+
+    def select_counter_action(self, leader_action):
+        """Select the correct counter policy and sample an action using this policy.
+
+        Args:
+          leader_action (int): The committed pure strategy from the leader.
+
+        Returns:
+          int: The selected action.
+
+        """
+        return np.random.choice(range(self.num_actions), p=self.follower_policies[leader_action])
+
+    def select_committed(self, leader_action):
+        """Play the pure strategy that was committed.
+
+        Args:
+          leader_action (int): The pure strategy (action) the leader published.
+
+        Returns:
+          int: The committed action.
+
+        """
+        return leader_action
