@@ -146,8 +146,8 @@ def update(agents, commitment, actions, payoffs):
     Returns:
 
     """
-    for idx, agent in enumerate(agents):
-        agent.update(commitment, actions, payoffs[idx])
+    for agent, payoff in zip(agents, payoffs):
+        agent.update(commitment, actions, payoff)
 
 
 def create_agents(experiment, u_tpl, num_agents, player_actions, num_objectives, alpha_q=0.2, alpha_theta=0.005,
@@ -229,7 +229,7 @@ def create_agents(experiment, u_tpl, num_agents, player_actions, num_objectives,
 
 def execute_commitment(payoff_matrices, u_tpl, experiment='coop_action', runs=100, episodes=5000, rollouts=100,
                        alternate=False, alpha_q=0.01, alpha_theta=0.01, alpha_q_decay=1, alpha_theta_decay=1,
-                       alpha_com=0.01, alpha_com_decay=1):
+                       alpha_com=0.01, alpha_com_decay=1, seed=1):
     """Execute a commitment experiment.
 
     Args:
@@ -246,6 +246,7 @@ def execute_commitment(payoff_matrices, u_tpl, experiment='coop_action', runs=10
         alpha_theta_decay (float, optional): The decay for the learning rate of policy parameters. (Default = 1)
         alpha_com (float, optional): The learning rate for optional commitment. (Default = 0.005)
         alpha_com_decay (float, optional): The decay for the learning rate of commitment. (Default = 1)
+        seed (int, optional): The seed for random number generation. (Default = 1)
 
     Returns:
         Tuple[Dict, Dict, ndarray, Dict}: A log of payoffs, a log of action probabilities for both agents, a log of the
@@ -259,6 +260,8 @@ def execute_commitment(payoff_matrices, u_tpl, experiment='coop_action', runs=10
 
     if num_agents != 2:
         raise Exception(f'Commitment experiments with {num_agents} are currently not supported')
+
+    np.random.seed(seed=seed)
 
     player_actions = payoff_matrices[0].shape[:-1]
     num_objectives = payoff_matrices[0].shape[-1]
