@@ -339,7 +339,7 @@ def execute_commitment(payoff_matrices, u_tpl, experiment='coop_action', runs=10
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--game', type=str, default='game5', help="which MONFG game to play")
+    parser.add_argument('--game', type=str, default='game1', help="which MONFG game to play")
     parser.add_argument('--u', type=str, default=['u1', 'u2'], nargs='+',
                         help="Which utility functions to use per player")
     parser.add_argument('--experiment', type=str, default='coop_action', help='The experiment to run.')
