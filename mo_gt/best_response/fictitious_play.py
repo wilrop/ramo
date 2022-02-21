@@ -14,10 +14,9 @@ def fictitious_play(monfg, u_tpl, max_iter=1000, init_joint_strategy=None, varia
     These variants are not equivalent in general. In the simultaneous variant, all players calculate their best-response
     strategy simultaneously. The alternating variant does it by alternating.
 
-    Notes
-    -----
-    At this point in time, the algorithm does not find cycles and will continue to execute until the maximum number of
-    iterations is reached.
+    Note:
+        At this point in time, the algorithm does not find cycles and will continue to execute until the maximum number
+        of iterations is reached.
 
     Args:
       monfg (List[ndarray]): A list of payoff matrices representing the MONFG.

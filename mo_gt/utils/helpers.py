@@ -1,9 +1,8 @@
 def array_slice(array, axis, start, end, step=1):
     """Slice an array across a desired index.
 
-    Notes
-    ------
-    See: https://stackoverflow.com/questions/24398708/slicing-a-numpy-array-along-a-dynamically-specified-axis
+    Note:
+        See: https://stackoverflow.com/questions/24398708/slicing-a-numpy-array-along-a-dynamically-specified-axis
 
     Args:
         array (ndarray): An input array.

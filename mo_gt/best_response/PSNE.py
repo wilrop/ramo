@@ -66,8 +66,7 @@ def calc_nfg_psne(nfg, player_actions):
 def calc_all_psne(monfg, u_tpl):
     """Calculate all Pure Strategy Nash Equilibria (PSNE) for a given MONFG with quasiconvex utility functions.
 
-    Notes
-    -----
+    Note:
         This algorithm is only guaranteed to be correct when using quasiconvex utility functions.
 
     Args:
