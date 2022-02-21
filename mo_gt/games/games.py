@@ -79,8 +79,8 @@ monfg9 = [np.array([[(10, 2), (2, 3)],
 
 # Game 10: A 2-action 2-player game with individual rewards.
 # This game has no Nash equilibrium with utility functions u1 and u2, but does have a cyclic Nash equilibrium.
-monfg10 = [np.array([[(2, 0), (1, 0)],
-                     [(0, 1), (0, 2)]], dtype=float),
+monfg10 = [np.array([[(2, 0), (0, 1)],
+                     [(1, 0), (0, 2)]], dtype=float),
            np.array([[(2, 0), (1, 1)],
                      [(1, 1), (0, 2)]], dtype=float)]
 
@@ -88,8 +88,8 @@ monfg10 = [np.array([[(2, 0), (1, 0)],
 # The same game as game 10 but intended to be used with the utility functions reversed.
 monfg11 = [np.array([[(2, 0), (1, 1)],
                      [(1, 1), (0, 2)]], dtype=float),
-           np.array([[(2, 0), (1, 0)],
-                     [(0, 1), (0, 2)]], dtype=float)]
+           np.array([[(2, 0), (0, 1)],
+                     [(1, 0), (0, 2)]], dtype=float)]
 
 # Game 12: A 3-action 2-player game with individual rewards.
 # This game has two PSNE using u1 and u5: [0, 0], [2, 2]. Checked for correctness using Gambit.
