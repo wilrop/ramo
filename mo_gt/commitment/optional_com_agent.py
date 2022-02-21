@@ -11,7 +11,8 @@ class OptionalComAgent:
     committing.
     """
 
-    def __init__(self, no_com_agent, com_agent, id, u, num_actions, num_objectives, alpha_q=0.01, alpha_theta=0.01, alpha_q_decay=1, alpha_theta_decay=1):
+    def __init__(self, no_com_agent, com_agent, id, u, num_actions, num_objectives, alpha_q=0.01, alpha_theta=0.01,
+                 alpha_q_decay=1, alpha_theta_decay=1):
         self.no_com_agent = no_com_agent
         self.com_agent = com_agent
 
