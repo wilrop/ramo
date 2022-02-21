@@ -2,7 +2,7 @@ import jax.numpy as jnp
 import numpy as np
 from jax import grad, jit
 from jax.nn import softmax
-
+from mo_gt.utils.experiments import softmax_policy
 
 class OptionalComAgent:
     """An agent that learns when to commit through a two layer system.
@@ -30,7 +30,7 @@ class OptionalComAgent:
 
         self.q_table = np.zeros((self.num_options, num_objectives))
         self.theta = np.zeros(self.num_options)
-        self.policy = self.update_policy(self.theta)
+        self.policy = softmax_policy(self.theta)
 
         self.leader = False
 
@@ -69,22 +69,17 @@ class OptionalComAgent:
         Returns:
 
         """
-        print("id:", self.id)
         self.update_q_table(commitment, reward)
 
         self.theta += self.alpha_theta * self.grad(self.theta, self.q_table)
-        self.policy = self.update_policy(self.theta)
+        self.policy = softmax_policy(self.theta)
 
         if commitment is None:
-            print("here")
             self.no_com_agent.update(actions[self.id], reward)
         else:
             self.com_agent.update(commitment, actions, reward)
 
         self.update_parameters()
-        print(self.no_com_agent.theta)
-        print(self.no_com_agent.policy)
-        print(self.no_com_agent.q_table)
 
     def update_q_table(self, commitment, reward):
         """Update the vector-valued Q-table.
@@ -101,20 +96,6 @@ class OptionalComAgent:
         else:
             idx = 1
         self.q_table[idx] += self.alpha_q * (reward - self.q_table[idx])
-
-    def update_policy(self, theta):
-        """Determine a policy from given parameters.
-
-        Args:
-          theta (ndarray): The updated theta parameters.
-
-        Returns:
-          ndarray: The updated policy.
-
-        """
-        policy = np.asarray(softmax(theta), dtype=float)
-        policy = policy / np.sum(policy)
-        return policy
 
     def update_parameters(self):
         """Update the internal parameters of the agent."""

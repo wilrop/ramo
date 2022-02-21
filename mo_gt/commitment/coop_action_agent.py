@@ -4,7 +4,7 @@ from jax import grad, jit
 from jax.nn import softmax
 
 from mo_gt.best_response.best_response import calc_expected_returns
-from mo_gt.utils.experiments import make_strat_from_action, make_joint_strat
+from mo_gt.utils.experiments import make_strat_from_action, make_joint_strat, softmax_policy
 from mo_gt.utils.helpers import array_slice
 
 
@@ -31,7 +31,7 @@ class CoopActionAgent:
 
         self.q_table = np.zeros((num_actions, num_actions, num_objectives))
         self.theta = np.zeros(num_actions)
-        self.policy = self.update_policy(self.theta)
+        self.policy = softmax_policy(self.theta)
         self.last_op_commitment = np.full(num_actions, 1/num_actions)
         self.next_thetas = np.zeros((num_actions, num_actions))
         self.next_policies = np.tile(self.policy, (num_actions, 1))
@@ -84,7 +84,7 @@ class CoopActionAgent:
         q_vals = calc_expected_returns(self.id, self.q_table, joint_policy)
 
         self.theta += self.alpha_theta * self.grad(theta, q_vals)
-        self.policy = self.update_policy(self.theta)
+        self.policy = softmax_policy(self.theta)
         self.next_thetas = np.tile(self.theta, (self.num_actions, 1))
         self.next_policies = np.tile(self.policy, (self.num_actions, 1))
 
@@ -104,26 +104,12 @@ class CoopActionAgent:
         idx = tuple(actions)
         self.q_table[idx] += self.alpha_q * (reward - self.q_table[idx])
 
-    def update_policy(self, theta):
-        """Determine a policy from given parameters.
-
-        Args:
-          theta (ndarray): The updated theta parameters.
-
-        Returns:
-          ndarray: The updated policy.
-
-        """
-        policy = np.asarray(softmax(theta), dtype=float)
-        policy = policy / np.sum(policy)
-        return policy
-
     def pre_update_policies(self):
         """Perform a pre update of all policies depending on what commitment is received."""
         for i in range(self.num_actions):
             q_vals = array_slice(self.q_table, self.id, i, i + 1).reshape(self.num_actions, self.num_objectives)
             theta = self.theta + self.alpha_theta * self.grad(self.theta, q_vals)
-            policy = self.update_policy(theta)
+            policy = softmax_policy(theta)
             self.next_thetas[i] = theta
             self.next_policies[i] = policy
 

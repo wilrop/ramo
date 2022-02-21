@@ -4,6 +4,7 @@ from jax import grad, jit
 from jax.nn import softmax
 
 from mo_gt.utils.helpers import array_slice
+from mo_gt.utils.experiments import softmax_policy
 
 
 class CompActionAgent:
@@ -71,12 +72,12 @@ class CompActionAgent:
         if self.leader:
             self.update_leader_q_table(own_action, reward)
             self.leader_theta += self.alpha_theta * self.grad(self.leader_theta, self.leader_q_table)
-            self.leader_policy = self.update_policy(self.leader_theta)
+            self.leader_policy = softmax_policy(self.leader_theta)
         else:
             q = array_slice(self.payoffs_table, abs(1 - self.id), commitment, commitment + 1)
             q = q.reshape(self.num_actions, self.num_objectives)
             self.follower_thetas[commitment] += self.alpha_theta * self.grad(self.follower_thetas[commitment], q)
-            self.follower_policies[commitment] = self.update_policy(self.follower_thetas[commitment])
+            self.follower_policies[commitment] = softmax_policy(self.follower_thetas[commitment])
         self.update_parameters()
 
     def update_leader_q_table(self, action, reward):
@@ -103,20 +104,6 @@ class CompActionAgent:
         """
         idx = tuple(actions)
         self.payoffs_table[idx] += self.alpha_q * (reward - self.payoffs_table[idx])
-
-    def update_policy(self, theta):
-        """Determine a policy from given parameters.
-
-        Args:
-          theta (ndarray): The updated theta parameters.
-
-        Returns:
-          ndarray: The updated policy.
-
-        """
-        policy = np.asarray(softmax(theta), dtype=float)
-        policy = policy / np.sum(policy)
-        return policy
 
     def update_parameters(self):
         """Update the internal parameters of the agent."""

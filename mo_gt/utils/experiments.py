@@ -1,6 +1,7 @@
 import os
 
 import numpy as np
+from jax.nn import softmax
 
 
 def create_game_path(content, experiment, game, parent_dir=None, mkdir=True):
@@ -57,3 +58,18 @@ def make_joint_strat(player_id, player_strat, opp_strat):
     """
     opp_strat.insert(player_id, player_strat)
     return opp_strat
+
+
+def softmax_policy(theta):
+    """Take a softmax over an array of parameters.
+
+    Args:
+      theta (ndarray): An array of policy parameters.
+
+    Returns:
+      ndarray: A probability distribution over actions as a policy.
+
+    """
+    policy = np.asarray(softmax(theta), dtype=float)
+    policy = policy / np.sum(policy)
+    return policy

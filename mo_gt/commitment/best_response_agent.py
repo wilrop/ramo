@@ -4,7 +4,7 @@ from jax import grad, jit
 from jax.nn import softmax
 
 from mo_gt.best_response.best_response import calc_best_response
-from mo_gt.utils.experiments import make_joint_strat
+from mo_gt.utils.experiments import make_joint_strat, softmax_policy
 
 
 class BestResponseAgent:
@@ -32,7 +32,7 @@ class BestResponseAgent:
         self.payoffs_table = np.zeros((num_actions, num_actions, num_objectives))
         self.leader_q_table = np.zeros((num_actions, num_objectives))
         self.leader_theta = np.zeros(num_actions)
-        self.leader_policy = self.update_policy(self.leader_theta)
+        self.leader_policy = softmax_policy(self.leader_theta)
         self.best_response_policy = np.full(num_actions, 1 / num_actions)
 
         self.leader = False
@@ -91,7 +91,7 @@ class BestResponseAgent:
         if self.leader:
             self.update_leader_q_table(own_action, reward)
             self.leader_theta += self.alpha_theta * self.grad(self.leader_theta, self.leader_q_table)
-            self.leader_policy = self.update_policy(self.leader_theta)
+            self.leader_policy = softmax_policy(self.leader_theta)
 
         self.update_parameters()
         self.calculated = False
@@ -120,20 +120,6 @@ class BestResponseAgent:
         """
         idx = tuple(actions)
         self.payoffs_table[idx] += self.alpha_q * (reward - self.payoffs_table[idx])
-
-    def update_policy(self, theta):
-        """Determine a policy from given parameters.
-
-        Args:
-          theta (ndarray): The updated theta parameters.
-
-        Returns:
-          ndarray: The updated policy.
-
-        """
-        policy = np.asarray(softmax(theta), dtype=float)
-        policy = policy / np.sum(policy)
-        return policy
 
     def update_parameters(self):
         """Update the internal parameters of the agent."""

@@ -4,7 +4,7 @@ from jax import grad, jit
 from jax.nn import softmax
 
 from mo_gt.best_response.best_response import calc_expected_returns
-from mo_gt.utils.experiments import make_joint_strat
+from mo_gt.utils.experiments import make_joint_strat, softmax_policy
 
 
 class CoopPolicyAgent:
@@ -25,7 +25,7 @@ class CoopPolicyAgent:
 
         self.q_table = np.zeros((num_actions, num_actions, num_objectives))
         self.theta = np.zeros(num_actions)
-        self.policy = self.update_policy(self.theta)
+        self.policy = softmax_policy(self.theta)
         self.leader_policy = np.full(num_actions, 1 / num_actions)
 
         self.leader = False
@@ -71,7 +71,7 @@ class CoopPolicyAgent:
             q_vals = calc_expected_returns(self.id, self.q_table, joint_policy)
 
             self.theta += self.alpha_theta * self.grad(self.theta, q_vals)
-            self.policy = self.update_policy(self.theta)
+            self.policy = softmax_policy(self.theta)
 
             self.leader_policy = commitment  # Update leader policy from the commitment.
 
@@ -82,7 +82,7 @@ class CoopPolicyAgent:
         q_vals = calc_expected_returns(self.id, self.q_table, joint_policy)
 
         self.theta += self.alpha_theta * self.grad(self.theta, q_vals)
-        self.policy = self.update_policy(self.theta)
+        self.policy = softmax_policy(self.theta)
 
         self.update_parameters()
 
@@ -97,20 +97,6 @@ class CoopPolicyAgent:
 
         """
         self.q_table[actions[0], actions[1]] += self.alpha_q * (reward - self.q_table[actions[0], actions[1]])
-
-    def update_policy(self, theta):
-        """Determine a policy from given parameters.
-
-        Args:
-          theta (ndarray): The updated theta parameters.
-
-        Returns:
-          ndarray: The updated policy.
-
-        """
-        policy = np.asarray(softmax(theta), dtype=float)
-        policy = policy / np.sum(policy)
-        return policy
 
     def update_parameters(self):
         """Update the internal parameters of the agent."""
@@ -154,7 +140,7 @@ class CoopPolicyAgent:
         joint_policy = make_joint_strat(self.id, self.policy, [leader_strategy])
         q_vals = calc_expected_returns(self.id, self.q_table, joint_policy)
         theta = self.theta + self.alpha_theta * self.grad(self.theta, q_vals)
-        policy = self.update_policy(theta)
+        policy = softmax_policy(theta)
         return np.random.choice(range(self.num_actions), p=policy)
 
     def select_committed(self, leader_strategy):
