@@ -1,136 +1,149 @@
+import jax.numpy as jnp
 import numpy as np
-from utils_learn import *
+from jax import grad, jit
+from jax.nn import softmax
 
 
 class OptionalComAgent:
-    """This class represents an agent that uses the SER optimisation criterion."""
+    """An agent that learns when to commit through a two layer system.
 
-    def __init__(self, no_com_agent, com_agent, id, u, du, alpha_q, alpha_msg, alpha_decay, num_objectives, opt=False):
+    This is implemented through learning two additional agents, one used when committing and another used when not
+    committing.
+    """
+
+    def __init__(self, no_com_agent, com_agent, id, u, num_actions, num_objectives, alpha_q=0.01, alpha_theta=0.01, alpha_q_decay=1, alpha_theta_decay=1):
         self.no_com_agent = no_com_agent
         self.com_agent = com_agent
+
         self.id = id
         self.u = u
-        self.du = du
-        self.num_messages = 2  # Only two types of communication: send a message or don't send a message
+        self.grad = jit(grad(self.objective_function))
+        self.num_actions = num_actions
         self.num_objectives = num_objectives
+        self.num_options = 2  # Only two types of commitment: commit or don't commit.
+
         self.alpha_q = alpha_q
-        self.alpha_msg = alpha_msg
-        self.alpha_decay = alpha_decay
-        self.theta = np.zeros(self.num_messages)
-        self.policy = softmax(self.theta)
-        self.op_policy = np.full(self.num_messages, 1.0 / self.num_messages)
-        # optimistic initialization of Q-table
-        if opt:
-            self.q_table = np.ones((self.num_messages, num_objectives)) * 20
-        else:
-            self.q_table = np.zeros((self.num_messages, num_objectives))
-        self.communicator = False
+        self.alpha_theta = alpha_theta
+        self.alpha_q_decay = alpha_q_decay
+        self.alpha_theta_decay = alpha_theta_decay
 
-    def update(self, communicator, message, actions, reward):
-        """This method will update the Q-table, strategy and internal parameters of the agent, as well as the secondary
-        agent that played in this round.
+        self.q_table = np.zeros((self.num_options, num_objectives))
+        self.theta = np.zeros(self.num_options)
+        self.policy = self.update_policy(self.theta)
+
+        self.leader = False
+
+    def objective_function(self, theta, q_values):
+        """The objective function.
 
         Args:
-          communicator: The id of the communicating agent.
-          actions: The actions taken by the agents.
-          reward: The reward obtained in this episode.
-          message: 
+          theta (ndarray): The policy parameters.
+          q_values (ndarray): Learned Q-values used to calculate the SER from these parameters.
+
+        Returns:
+            float: The utility from the current parameters theta and Q-values.
+
+        """
+        policy = softmax(theta)
+        expected_returns = jnp.matmul(policy, q_values)
+        utility = self.u(expected_returns)
+        return utility
+
+    def make_leader(self):
+        """Make this agent the leader."""
+        self.leader = True
+
+    def make_follower(self):
+        """Make this agent the follower."""
+        self.leader = False
+
+    def update(self, commitment, actions, reward):
+        """Perform an update of the agent and cascade an update to the lower layer agent.
+
+        Args:
+          commitment (int): The leader's non-stationary commitment strategy.
+          actions (List[int]): The actions selected in an episode.
+          reward (float): The reward that was obtained by the agent in that episode.
 
         Returns:
 
         """
-        self.update_q_table(message, reward)
-        theta, policy = self.update_policy(self.policy, self.theta, self.alpha_msg, self.q_table)
-        self.theta = theta
-        self.policy = policy
-        if message is None:
-            self.no_com_agent.update(communicator, message, actions, reward)
+        print("id:", self.id)
+        self.update_q_table(commitment, reward)
+
+        self.theta += self.alpha_theta * self.grad(self.theta, self.q_table)
+        self.policy = self.update_policy(self.theta)
+
+        if commitment is None:
+            print("here")
+            self.no_com_agent.update(actions[self.id], reward)
         else:
-            self.com_agent.update(communicator, message, actions, reward)
+            self.com_agent.update(commitment, actions, reward)
+
         self.update_parameters()
+        print(self.no_com_agent.theta)
+        print(self.no_com_agent.policy)
+        print(self.no_com_agent.q_table)
 
-    def update_q_table(self, message, reward):
-        """This method will update the Q-table based on the message and the obtained reward.
+    def update_q_table(self, commitment, reward):
+        """Update the vector-valued Q-table.
 
         Args:
-          message: The message that was sent in the finished episode.
-          reward: The reward obtained by this agent.
+            commitment (int | ndarray | None): The commitment from the leader.
+            reward (float): The reward obtained by this agent.
 
         Returns:
 
         """
-        if message is None:
+        if commitment is None:
             idx = 0
         else:
             idx = 1
         self.q_table[idx] += self.alpha_q * (reward - self.q_table[idx])
 
-    def update_policy(self, policy, theta, alpha, expected_q):
-        """This method will update the given theta parameters and policy.
-        :policy: The policy we want to update
-        :theta: The current parameters for this policy.
-        :expected_q: The Q-values for this policy.
+    def update_policy(self, theta):
+        """Determine a policy from given parameters.
 
         Args:
-          policy: param theta:
-          alpha: param expected_q:
-          theta: 
-          expected_q: 
+          theta (ndarray): The updated theta parameters.
 
         Returns:
-          Updated theta parameters and policy.
+          ndarray: The updated policy.
 
         """
-        policy = np.copy(policy)  # This avoids some weird numpy bugs where the policy/theta is referenced by pointer.
-        theta = np.copy(theta)
-        expected_u = policy @ expected_q
-        # We apply the chain rule to calculate the gradient.
-        grad_u = self.du(expected_u)  # The gradient of u
-        grad_pg = softmax_grad(policy).T @ expected_q  # The gradient of the softmax function
-        grad_theta = grad_u @ grad_pg.T  # The gradient of the complete function J(theta).
-        theta += alpha * grad_theta
-        policy = softmax(theta)
-        return theta, policy
+        policy = np.asarray(softmax(theta), dtype=float)
+        policy = policy / np.sum(policy)
+        return policy
 
     def update_parameters(self):
-        """This method will update the internal parameters of the agent.
-        :return: /
+        """Update the internal parameters of the agent."""
+        self.alpha_q *= self.alpha_q_decay
+        self.alpha_theta *= self.alpha_theta_decay
 
-        Args:
-
-        Returns:
-
-        """
-        self.alpha_q *= self.alpha_decay
-        self.alpha_msg *= self.alpha_decay
-
-    def get_message(self):
-        """This method will choose what message is sent to the other agent.
-        :return: Either None if opting to not communicate or the current policy if opting to communicate.
-
-        Args:
+    def get_commitment(self):
+        """Get the commitment from the leader.
 
         Returns:
+            int | None: A commitment from the leader.
 
         """
-        message = np.random.choice(range(self.num_messages), p=self.policy)
-        if message == 0:  # Don't communicate
+        commit = np.random.choice(range(self.num_options), p=self.policy)
+        if commit == 0:  # Don't communicate
             return None
         else:
-            self.communicator = True
-            return self.com_agent.get_message()
+            return self.com_agent.get_commitment()
 
-    def select_action(self, message):
-        """This method will select an action based on the message that was sent.
+    def select_action(self, commitment):
+        """Select an action based on the commitment of the leader. Pass the commitment to the correct layer.
 
         Args:
-          message: The message that was sent.
+          commitment (int | ndarray): The commitment from the leader.
 
         Returns:
-          The selected action.
+          int: The selected action.
 
         """
-        if message is None:
-            return self.no_com_agent.select_action(message)
+        if commitment is None:
+            return self.no_com_agent.select_action()
         else:
-            return self.com_agent.select_action(message)
+            return self.com_agent.select_action(commitment)
