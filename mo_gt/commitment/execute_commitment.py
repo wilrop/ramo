@@ -195,6 +195,7 @@ def create_agents(experiment, u_tpl, num_agents, player_actions, num_objectives,
         elif experiment == 'non_stationary':
             new_agent = NonStationaryAgent(ag, u, num_actions, num_objectives, alpha_q=alpha_q, alpha_theta=alpha_theta,
                                            alpha_q_decay=alpha_q_decay, alpha_theta_decay=alpha_theta_decay)
+            new_agent.set_opponent_actions(player_actions[abs(1 - ag)])
         elif experiment == 'opt_coop_action':
             no_com_agent = IndependentActorCriticAgent(u, num_actions, num_objectives, alpha_q=alpha_q,
                                                        alpha_theta=alpha_theta, alpha_q_decay=alpha_q_decay,
