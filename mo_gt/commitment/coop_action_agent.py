@@ -75,14 +75,16 @@ class CoopActionAgent:
 
         """
         self.update_q_table(actions, reward)
-        self.last_op_commitment = make_strat_from_action(commitment, self.num_actions)
+
+        if not self.leader:
+            self.last_op_commitment = make_strat_from_action(commitment, self.num_actions)
 
         theta = self.next_thetas[commitment]
         joint_policy = make_joint_strat(self.id, self.policy, [self.last_op_commitment])
         q_vals = calc_expected_returns(self.id, self.q_table, joint_policy)
 
         self.theta += self.alpha_theta * self.grad(theta, q_vals)
-        self.policy = self.update_policy(theta)
+        self.policy = self.update_policy(self.theta)
         self.next_thetas = np.tile(self.theta, (self.num_actions, 1))
         self.next_policies = np.tile(self.policy, (self.num_actions, 1))
 
