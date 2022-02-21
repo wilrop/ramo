@@ -1,243 +1,192 @@
+import jax.numpy as jnp
 import numpy as np
-from utils_learn import *
-import games
-from scipy.optimize import minimize
+from jax import grad, jit
+from jax.nn import softmax
 
-
-def objective(strategy, expected_returns, u):
-    """The objective function to minimise for is the negative SER, as we want to maximise for the SER.
-
-    Args:
-      strategy: The current estimate for the best response strategy.
-      expected_returns: The expected returns given all other players' strategies.
-      u: The utility function of this agent.
-
-    Returns:
-      A best response policy.
-
-    """
-    expected_vec = strategy @ expected_returns  # The expected vector of the strategy applied to the expected returns.
-    objective = - u(expected_vec)  # The negative utility.
-    return objective
-
-
-def best_response(u, player, payoff_matrix, joint_strategy):
-    """This function calculates a best response for a given player.
-
-    Args:
-      u: The utility function for this player.
-      player: The player id.
-      payoff_matrix: The payoff matrix for this player.
-      joint_strategy: The joint strategy of all players.
-
-    Returns:
-      A best response strategy.
-
-    """
-    num_objectives = payoff_matrix.shape[-1]
-    num_actions = len(joint_strategy[player])
-    num_players = len(joint_strategy)
-    opponents = np.delete(np.arange(num_players), player)
-    expected_returns = payoff_matrix
-
-    for opponent in opponents:  # Loop over all opponent strategies.
-        strategy = joint_strategy[opponent]  # Get this opponent's strategy.
-
-        # We reshape this strategy to be able to multiply along the correct axis for weighting expected returns.
-        # For example if you end up in [1, 2] or [2, 3] with 50% probability.
-        # We calculate the individual expected returns first: [0.5, 1] or [1, 1.5]
-        dim_array = np.ones((1, expected_returns.ndim), int).ravel()
-        dim_array[opponent] = -1
-        strategy_reshaped = strategy.reshape(dim_array)
-
-        expected_returns = expected_returns * strategy_reshaped  # Calculate the probability of a joint state occurring.
-        # We now take the sum of the weighted returns to get the expected returns.
-        # We need keepdims=True to make sure that the opponent still exists at the correct axis, their action space is
-        # just reduced to one action resulting in the expected return now.
-        expected_returns = np.sum(expected_returns, axis=opponent, keepdims=True)
-
-    expected_returns = expected_returns.reshape(num_actions, num_objectives)  # Cast the result to a correct shape.
-
-    init_guesses = [np.full(num_actions, 1 / num_actions)]  # A uniform strategy as first guess for the optimiser.
-    for i in range(num_actions):
-        pure_strat = np.zeros(num_actions)
-        pure_strat[i] = 1
-        init_guesses.append(pure_strat)  # A pure strategy as first guess for the optimiser.
-
-    best_response = None
-    best_utility = float('inf')
-    for init_guess in init_guesses:
-        bounds = [(0, 1)] * num_actions  # Constrain probabilities to 0 and 1.
-        constraints = {'type': 'eq', 'fun': lambda x: np.sum(x) - 1}  # Equality constraint is equal to zero by default.
-        res = minimize(lambda x: objective(x, expected_returns, u), init_guess, bounds=bounds, constraints=constraints)
-
-        if res['fun'] < best_utility:
-            best_utility = res['fun']
-            best_response = res['x'] / np.sum(res['x'])  # In case of floating point errors.
-
-    return best_response
+from mo_gt.best_response.best_response import calc_best_response
+from mo_gt.utils.experiments import make_joint_strat
 
 
 class BestResponseAgent:
-    """This class represents an agent that uses the SER multi-objective optimisation criterion."""
+    """A learner used in two-player Stackelberg games. The leader uses multi-objective actor-critic and the follower
+    calculates a best-response using optimisation for the SER.
+    """
 
-    def __init__(self, id, u, du, alpha_q, alpha_theta, alpha_decay, num_actions, num_objectives, opt=False, epsilon=1,
-                 epsilon_decay=0.995):
+    def __init__(self, id, u, num_actions, num_objectives, alpha_q=0.01, alpha_theta=0.01, alpha_q_decay=1,
+                 alpha_theta_decay=1, epsilon=1, epsilon_decay=0.995, min_epsilon=0.1):
         self.id = id
         self.u = u
-        self.du = du
-        self.alpha_q = alpha_q
-        self.alpha_theta = alpha_theta
-        self.alpha_decay = alpha_decay
+        self.grad = jit(grad(self.objective_function))
         self.num_actions = num_actions
         self.num_objectives = num_objectives
-        # optimistic initialization of Q-table
-        if opt:
-            self.msg_q_table = np.ones((num_actions, num_objectives)) * 20
-        else:
-            self.msg_q_table = np.zeros((num_actions, num_objectives))
-        self.payoffs_table = np.zeros((num_actions, num_actions, num_objectives))
-        self.msg_theta = np.zeros(num_actions)
-        self.msg_policy = np.full(num_actions, 1 / num_actions)
-        self.best_response_policy = np.full(num_actions, 1 / num_actions)
-        self.communicating = False
-        self.calculated = False
+        self.leader_u = np.sum  # Default leader utility function is a simple sum of objectives.
+
+        self.alpha_q = alpha_q
+        self.alpha_theta = alpha_theta
+        self.alpha_q_decay = alpha_q_decay
+        self.alpha_theta_decay = alpha_theta_decay
         self.epsilon = epsilon
         self.epsilon_decay = epsilon_decay
+        self.min_epsilon = min_epsilon
 
-    def update(self, communicator, message, actions, reward):
-        """This method will update the Q-table, strategy and internal parameters of the agent.
+        self.payoffs_table = np.zeros((num_actions, num_actions, num_objectives))
+        self.leader_q_table = np.zeros((num_actions, num_objectives))
+        self.leader_theta = np.zeros(num_actions)
+        self.leader_policy = self.update_policy(self.leader_theta)
+        self.best_response_policy = np.full(num_actions, 1 / num_actions)
+
+        self.leader = False
+        self.calculated = False
+
+    def objective_function(self, theta, q_values):
+        """The objective function for the leader. This is the SER criterion.
 
         Args:
-          communicator: The id of the communicating agent.
-          message: The message that was sent.
-          actions: The actions selected in the previous episode.
-          reward: The reward that was obtained by the agent.
+          theta (ndarray): The policy parameters.
+          q_values (ndarray): The expected returns for the actions.
+
+        Returns:
+            float: The utility from the current policy and leader Q-values.
+
+        """
+        policy = softmax(theta)
+        expected_returns = jnp.matmul(policy, q_values)
+        utility = self.u(expected_returns)
+        return utility
+
+    def make_leader(self):
+        """Make this agent the leader."""
+        self.leader = True
+
+    def make_follower(self):
+        """Make this agent the follower."""
+        self.leader = False
+
+    def set_leader_utility(self, leader_u):
+        """Set the leader's utility function. This is used by a pessimistic follower.
+
+        Args:
+            leader_u (callable): The utility function used by the leader.
 
         Returns:
 
         """
-        self.update_payoffs_table(actions, reward)
-        own_action = actions[self.id]
+        self.leader_u = leader_u
 
-        if communicator == self.id:
-            self.update_msg_q_table(own_action, reward)
-            theta, policy = self.update_policy(self.msg_policy, self.msg_theta, self.msg_q_table)
-            self.msg_theta = theta
-            self.msg_policy = policy
-        else:
-            self.epsilon = min(0.1, self.epsilon * self.epsilon_decay)
+    def update(self, commitment, actions, reward):
+        """Perform an update of the agent. Specifically updates the Q-tables, policies and hyperparameters.
+
+        Args:
+          commitment (ndarray): The opponent's committed policy. Unused at this point in time. Still provided to make it
+            compatible with other commitment agents.
+          actions (List[int]): The actions selected in an episode.
+          reward (float): The reward that was obtained by the agent in that episode.
+
+        Returns:
+
+        """
+        own_action = actions[self.id]
+        self.update_payoffs_table(actions, reward)
+
+        if self.leader:
+            self.update_leader_q_table(own_action, reward)
+            self.leader_theta += self.alpha_theta * self.grad(self.leader_theta, self.leader_q_table)
+            self.leader_policy = self.update_policy(self.leader_theta)
 
         self.update_parameters()
         self.calculated = False
 
-    def update_msg_q_table(self, action, reward):
-        """This method will update the Q-table based on the chosen actions and the obtained reward.
+    def update_leader_q_table(self, own_action, reward):
+        """Update the leader's Q-table based on their own action and the obtained reward.
 
         Args:
-          action: The action chosen by this agent.
-          reward: The reward obtained by this agent.
+          own_action (int): The action taken by the leader.
+          reward (float): The reward obtained by this agent.
 
         Returns:
 
         """
-        self.msg_q_table[action] += self.alpha_q * (reward - self.msg_q_table[action])
+        self.leader_q_table[own_action] += self.alpha_q * (reward - self.leader_q_table[own_action])
 
     def update_payoffs_table(self, actions, reward):
-        """This method will update the payoffs table to learn the payoff vector of joint actions.
+        """Update the joint-action payoffs table.
 
         Args:
-          actions: The actions that were taken in the previous episode.
-          reward: The reward obtained by this joint action.
+          actions (List[int]): The actions that were taken in an episode.
+          reward (float): The reward obtained by this joint action.
 
         Returns:
 
         """
-        self.payoffs_table[actions[0], actions[1]] += self.alpha_q * (
-                reward - self.payoffs_table[actions[0], actions[1]])
+        idx = tuple(actions)
+        self.payoffs_table[idx] += self.alpha_q * (reward - self.payoffs_table[idx])
 
-    def update_policy(self, policy, theta, expected_q):
-        """This method will update the given theta parameters and policy.
+    def update_policy(self, theta):
+        """Determine a policy from given parameters.
 
         Args:
-          policy: The policy we want to update.
-          theta: The current theta parameters for this policy.
-          expected_q: The Q-values for this policy.
+          theta (ndarray): The updated theta parameters.
 
         Returns:
-          Updated theta parameters and policy.
+          ndarray: The updated policy.
 
         """
-        policy = np.copy(policy)  # This avoids some weird numpy bugs where the policy/theta is referenced by pointer.
-        theta = np.copy(theta)
-        expected_u = policy @ expected_q
-        # We apply the chain rule to calculate the gradient.
-        grad_u = self.du(expected_u)  # The gradient of u
-        grad_pg = softmax_grad(policy).T @ expected_q  # The gradient of the softmax function
-        grad_theta = grad_u @ grad_pg.T  # The gradient of the complete function J(theta).
-        theta += self.alpha_theta * grad_theta
-        policy = softmax(theta)
-        return theta, policy
+        policy = np.asarray(softmax(theta), dtype=float)
+        policy = policy / np.sum(policy)
+        return policy
 
     def update_parameters(self):
-        """This method will update the internal parameters of the agent.
-        :return: /
-
-        Args:
-
-        Returns:
-
-        """
-        self.alpha_q *= self.alpha_decay
-        self.alpha_theta *= self.alpha_decay
-
-    def select_action(self, message):
-        """This method will select an action based on the message that was sent.
-
-        Args:
-          message: The message that was sent.
-
-        Returns:
-          The selected action.
-
-        """
-        if self.communicating:
-            self.communicating = False
-            return self.select_committed()  # If this agent is committing, they must follow through.
+        """Update the internal parameters of the agent."""
+        self.alpha_q *= self.alpha_q_decay
+        if self.leader:
+            self.alpha_theta *= self.alpha_theta_decay
         else:
-            return self.select_counter_action(message)  # Otherwise select a counter action.
+            self.epsilon = max(self.min_epsilon, self.epsilon * self.epsilon_decay)
 
-    def get_message(self):
-        """This method will determine what action this agent will publish.
-        :return: The action that will maximise this agent's SER, given that the other agent also maximises its response.
-
-        Args:
+    def get_commitment(self):
+        """Get the commitment from the leader.
 
         Returns:
+            ndarray: The current policy of the leader.
 
         """
-        self.communicating = True
-        return self.msg_policy
+        return self.leader_policy
 
-    def select_counter_action(self, op_policy, optimistic=False):
-        """This method will select the best counter policy and choose an action using this policy.
+    def select_action(self, commitment):
+        """This method will select an action based on the commitment from the leader.
 
         Args:
-          op_policy: The message from an agent in the form of their current policy.
-          optimistic: Whether the agent is optimistic or pessimistic. (Default value = False)
+          commitment (ndarray): The commitment from the leader.
 
         Returns:
-          The selected action.
+          int: The selected action.
+
+        """
+        if self.leader:
+            return self.select_committed()  # If this agent is the leader, they must follow through.
+        else:
+            return self.select_counter_action(commitment)  # Otherwise select a counter action.
+
+    def select_counter_action(self, commitment, optimistic=False):
+        """Calculate a best-response policy and sample an action from this policy as response to the commitment.
+
+        Args:
+          commitment (ndarray): The commitment from the leader.
+          optimistic (bool, optional): Whether the agent is optimistic or pessimistic. A pessimistic agent will minimise
+            the leader's utility. An optimistic agent will maximise their own utility. (Default value = False)
+
+        Returns:
+          int: The selected action.
 
         """
         if not self.calculated:
             strategy = np.full(self.num_actions, 1 / self.num_actions)
-            joint_strategy = [op_policy, strategy]
+            joint_strategy = make_joint_strat(self.id, strategy, [commitment])
             if optimistic:
-                self.best_response_policy = best_response(self.u, self.id, self.payoffs_table, joint_strategy)
+                self.best_response_policy = calc_best_response(self.u, self.id, self.payoffs_table, joint_strategy)
             else:
-                proxy_u = lambda x: - games.u3(x)
-                self.best_response_policy = best_response(proxy_u, self.id, self.payoffs_table, joint_strategy)
+                proxy_u = lambda x: - self.leader_u(x)
+                self.best_response_policy = calc_best_response(proxy_u, self.id, self.payoffs_table, joint_strategy)
             self.calculated = True
 
         if np.random.uniform(0, 1) < self.epsilon:
@@ -246,12 +195,10 @@ class BestResponseAgent:
             return np.random.choice(range(self.num_actions), p=self.best_response_policy)
 
     def select_committed(self):
-        """This method simply plays the action that it already published.
-        :return: The action it published.
-
-        Args:
+        """Play an action according to the committed policy.
 
         Returns:
+            int: The selected action.
 
         """
-        return np.random.choice(range(self.num_actions), p=self.msg_policy)
+        return np.random.choice(range(self.num_actions), p=self.leader_policy)
