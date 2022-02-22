@@ -3,6 +3,8 @@ import numpy as np
 from jax import grad, jit
 from jax.nn import softmax
 
+from mo_gt.utils.experiments import softmax_policy
+
 
 class IndependentActorCriticAgent:
     """An independent learner using the multi-objective actor-critic algorithm for the SER criterion."""
@@ -19,9 +21,9 @@ class IndependentActorCriticAgent:
         self.alpha_q_decay = alpha_q_decay
         self.alpha_theta_decay = alpha_theta_decay
 
-        self.theta = np.zeros(num_actions)
-        self.policy = self.update_policy(self.theta)
         self.q_table = np.zeros((num_actions, num_objectives))
+        self.theta = np.zeros(num_actions)
+        self.policy = softmax_policy(self.theta)
 
     def objective_function(self, theta, q_values):
         """The objective function for the agent. This is the SER criterion.
@@ -51,7 +53,7 @@ class IndependentActorCriticAgent:
         """
         self.update_q_table(action, reward)
         self.theta += self.alpha_theta * self.grad(self.theta, self.q_table)
-        self.policy = self.update_policy(self.theta)
+        self.policy = softmax_policy(self.theta)
         self.update_parameters()
 
     def update_q_table(self, action, reward):
@@ -65,20 +67,6 @@ class IndependentActorCriticAgent:
 
         """
         self.q_table[action] += self.alpha_q * (reward - self.q_table[action])
-
-    def update_policy(self, theta):
-        """Determine a policy from given parameters.
-
-        Args:
-          theta (ndarray): The updated theta parameters.
-
-        Returns:
-          ndarray: The updated policy.
-
-        """
-        policy = np.asarray(softmax(theta), dtype=float)
-        policy = policy / np.sum(policy)
-        return policy
 
     def update_parameters(self):
         """Update the hyperparameters. Decays the learning rate for the Q-values and policy parameters."""

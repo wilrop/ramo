@@ -1,105 +1,123 @@
+import jax.numpy as jnp
 import numpy as np
-from utils_learn import *
+from jax import grad, jit
+from jax.nn import softmax
+
+from mo_gt.best_response.best_response import calc_expected_returns
+from mo_gt.utils.experiments import softmax_policy
 
 
-class NoComAgent:
-    """This class represents an agent that uses the SER multi-objective optimisation criterion."""
+class JointActionActorCriticAgent:
+    """A joint-action learner using the multi-objective actor-critic algorithm for the SER criterion."""
 
-    def __init__(self, id, u, du, alpha_q, alpha_theta, alpha_decay, num_actions, num_objectives, opt=False):
+    def __init__(self, id, u, num_actions, num_objectives, player_actions, alpha_q=0.01, alpha_theta=0.01,
+                 alpha_q_decay=1,
+                 alpha_theta_decay=1):
         self.id = id
         self.u = u
-        self.du = du
-        self.alpha_q = alpha_q
-        self.alpha_theta = alpha_theta
-        self.alpha_decay = alpha_decay
+        self.grad = jit(grad(self.objective_function))
         self.num_actions = num_actions
         self.num_objectives = num_objectives
+        self.num_players = len(player_actions)
+
+        self.alpha_q = alpha_q
+        self.alpha_theta = alpha_theta
+        self.alpha_q_decay = alpha_q_decay
+        self.alpha_theta_decay = alpha_theta_decay
+
+        ja_shape = player_actions + tuple([num_objectives])
+        self.q_table = np.zeros(ja_shape)
+        self.counts = np.zeros(player_actions)
+        self.joint_policy = [np.full(actions, 1 / actions) for actions in player_actions]
         self.theta = np.zeros(num_actions)
         self.policy = softmax(self.theta)
-        # optimistic initialization of Q-table
-        if opt:
-            self.q_table = np.ones((num_actions, num_objectives)) * 20
-        else:
-            self.q_table = np.zeros((num_actions, num_objectives))
 
-    def update(self, communicator, message, actions, reward):
-        """This method will update the Q-table, strategy and internal parameters of the agent.
+    def objective_function(self, theta, q_values):
+        """The objective function for the agent. This is the SER criterion.
 
         Args:
-          communicator: The id of the communicating agent.
-          message: The message that was sent. Unused by this agent.
-          actions: The actions that were executed.
-          reward: The reward that was obtained by the agent.
+          theta (ndarray): The policy parameters.
+          q_values (ndarray): The expected returns for the actions.
+
+        Returns:
+            float: The utility from the current policy and Q-values.
+
+        """
+        policy = softmax(theta)
+        expected_returns = jnp.matmul(policy, q_values)
+        utility = self.u(expected_returns)
+        return utility
+
+    def update(self, actions, reward):
+        """Perform an update for the agent.
+
+        Args:
+          actions (List[int]): The actions taken by all players.
+          reward (float): The reward that was obtained by the agent.
 
         Returns:
 
         """
-        action = actions[self.id]
-        self.update_q_table(action, reward)
-        self.update_policy()
+        self.update_q_table(actions, reward)
+        self.update_counts(actions)
+        self.update_policies()
+        q_values = calc_expected_returns(self.id, self.q_table, self.joint_policy)
+        self.theta += self.alpha_theta * self.grad(self.q_table, q_values)
+        self.policy = softmax_policy(self.theta)
         self.update_parameters()
 
-    def update_q_table(self, action, reward):
-        """This method will update the Q-table based on the chosen actions and the obtained reward.
+    def update_q_table(self, actions, reward):
+        """Update the joint-action Q-table.
 
         Args:
-          action: The action chosen by this agent.
-          reward: The reward obtained by this agent.
+          actions (List[int]): The actions chosen by the agents.
+          reward (float): The reward obtained by this agent.
 
         Returns:
 
         """
-        self.q_table[action] += self.alpha_q * (reward - self.q_table[action])
+        idx = tuple(actions)
+        self.q_table[idx] += self.alpha_q * (reward - self.q_table[idx])
 
-    def update_policy(self):
-        """This method will update the given theta parameters and policy.
-        :return: /
+    def update_counts(self, actions):
+        """Update the joint-action counts.
 
         Args:
+          actions (List[int]): The actions chosen by the agents.
 
         Returns:
 
         """
-        expected_u = self.policy @ self.q_table
-        # We apply the chain rule to calculate the gradient.
-        grad_u = self.du(expected_u)  # The gradient of u
-        grad_pg = softmax_grad(self.policy).T @ self.q_table  # The gradient of the softmax function
-        grad_theta = grad_u @ grad_pg.T  # The gradient of the complete function J(theta).
-        self.theta += self.alpha_theta * grad_theta
-        self.policy = softmax(self.theta)
+        idx = tuple(actions)
+        self.counts[idx] += 1
+
+    def update_policies(self):
+        """Update the joint policies from the empirical action distribution."""
+        joint_strategy = []
+        total_count = np.sum(self.counts)
+
+        for player in range(self.num_players):
+            axis = tuple(np.delete(np.arange(self.num_players), player))
+            action_counts = np.sum(self.counts, axis=axis)
+            player_strat = action_counts / total_count
+            joint_strategy.append(player_strat)
+
+        self.joint_policy = joint_strategy
 
     def update_parameters(self):
-        """This method will update the internal parameters of the agent.
-        :return: /
-
-        Args:
+        """Update the hyperparameters. This entails decaying the learning rate for the Q-values and policy parameters.
 
         Returns:
 
         """
-        self.alpha_q *= self.alpha_decay
-        self.alpha_theta *= self.alpha_decay
+        self.alpha_q *= self.alpha_q_decay
+        self.alpha_theta *= self.alpha_theta_decay
 
-    @staticmethod
-    def get_message():
-        """This method will get a message from this agent.
-        :return: This agent doesn't communicate so it always returns None.
-
-        Args:
+    def select_action(self):
+        """Select an action according to the agent's policy.
 
         Returns:
-
-        """
-        return None
-
-    def select_action(self, message):
-        """This method will select an action according to the agent's policy.
-
-        Args:
-          message: The communication from this episode (unused by this agent).
-
-        Returns:
-          The selected action.
+            int: The selected action.
 
         """
         return np.random.choice(range(self.num_actions), p=self.policy)
