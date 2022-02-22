@@ -1,44 +1,106 @@
 # Multi-Objective Game Theory
-=======
-This repository contains algorithms, plotting functions and more related to Multi-Objective Game Theory (MOGT). We aim to add more algorithms to this repository over time as research into this area continues.
+A collection of algorithms and utilities for calculating or learning (approximate) equilibria in multi-objective games.
 
 
-Below we present all algorithms and give an example of their output on the following MONFG with two objectives (x, y):
+## Features
+The main focus of this repository is to develop and maintain different algorithms for learning or calculating equilibria in MONFGs. Below we provide a handy table giving an overview of our current algorithms, their type and the equilibrium concept they aim to find.
 
-|  | A | B | C |
-|---|:---:|:---:|:---:|
-| **A** | (4, 1); (4, 0) | (1, 2); (3, 1) | (2, 1); (2, 2) |
-| **B** | (3, 1); (3, 1) | (3, 2); (2, 2) | (1, 2); (1, 3) |
-| **C** | (1, 2); (2, 2) | (2, 1); (1, 3) | (1, 3); (0, 4) |
+| Algorithm | Type | Equilibrium |
+|---|---|---|
+| PSNE | Calculating | Pure-strategy Nash equilibria |
+| Iterated best-response | Learning | Nash equilibrium |
+| Fictitious play | Learning | Nash equilibrium |
+| Independent Q-learners | Learning | Nash equilibrium |
+| Independent actor-critic learners | Learning | Nash equilibrium |
+| Joint-action Q-learners | Learning | Nash equilibrium |
+| Joint-action actor-critic learners | Learning | Nash equilibrium |
+| Cooperative action communication | Learning | Nash equilibrium |
+| Self-interested action communication | Learning | Nash equilibrium |
+| Cooperative policy communication | Learning | Nash equilibrium |
+| Hierarchical communication | Learning | Nash equilibrium |
+| Non-stationary agent | Learning | Leadership equilibrium |
+| Best-response agent | Learning | Leadership equilibrium |
 
-Unless explicitly stated otherwise, we use the following utility functions:
- 1) Player 1: u(x, y) = x² + y²
- 2) Player 2: u(x, y) = x² + xy + y²
+We also provide a number of handy utilities. For example, this repository comes with a number of known and pre-analysed example games and utility functions. There are also helper functions to generate random games, scalarise games, etc. In addition, there is functionality to save and plot data resulting from experiments
+and a bunch more, with even more on the way!
 
+## References
+This repository contains (derivatives of) original work that has been published in several papers. We present here a link to the original resources and citations.
+### Preference Communication in Multi-Objective Normal-Form Games
+This work developed several communication protocols.
 
-## Pure Strategy Nash Equilibria
-The first algorithm in this repository is able to calculate all Pure Strategy Nash Equilibria (PSNE) in a MONFG when given only quasiconvex utility functions. Due to the theorems shown in the paper, the PSNE retrieved using this algorithm must necessarily represent all PSNE in the MONFG under ESR, SER and any blended setting.
+[paper](https://arxiv.org/abs/2111.09191) | [repo](https://github.com/wilrop/communication_monfg)
 
-The algorithm can be found in [PSNE.py](mo-gt/best-response/PSNE.py) and can easily be called from [main.py](mo-gt/best-response/main.py) by adding the ``--algorithm PSNE`` flag.
+```
+@misc{ropke2021preference,
+      title={Preference Communication in Multi-Objective Normal-Form Games}, 
+      author={Willem Röpke and Diederik M. Roijers and Ann Nowé and Roxana Rădulescu},
+      year={2021},
+      eprint={2111.09191},
+      archivePrefix={arXiv},
+      primaryClass={cs.GT}
+}
+```
 
-In the example MONFG, it successfully finds the PSNE of (A, A) and (C, C). The first PSNE leads to a utility of 17 for player 1 and 16 for player 2. The second PSNE leads to a utility of 10 for player 1 and 16 for player 2.
+### On Nash Equilibria in Normal-Form Games With Vectorial Payoffs
+This work developed the *PSNE* algorithm for finding all pure-strategy Nash equilibria in games with quasiconvex utility functions.
 
-Note that this algorithm can easily be adapted to output only a sample PSNE (i.e. a subset or just the first).
+[paper](https://arxiv.org/abs/2112.06500) | [repo](https://github.com/wilrop/Nash-Equilibria-MONFG)
 
-## Iterated Best Response
-Iterated Best Response (IBR) is a learning algorithm that was adapted from single-objective games to work with MONFGs as well. It is not guaranteed to find a Nash equilibrium as it can end up in cycles.
+```
+@misc{ropke2021nash,
+      title={On Nash Equilibria in Normal-Form Games With Vectorial Payoffs}, 
+      author={Willem Röpke and Diederik M. Roijers and Ann Nowé and Roxana Rădulescu},
+      year={2021},
+      eprint={2112.06500},
+      archivePrefix={arXiv},
+      primaryClass={cs.GT}
+}
+```
 
-The algorithm can be found in [IBR.py](mo-gt/best-response/IBR.py) and can easily be called from [main.py](mo-gt/best-response/main.py) by adding the ``--algorithm IBR`` flag. We have implemented two variants, simultaneous and alternating IBR, that can also be selected using the flag ``--variant``.
+### Commitment and Cyclic Strategies in Multi-Objective Games
+This work developed the non-stationary commitment and best-response learners.
 
-In the example MONFG, it successfully finds the mixed strategy NE with strategy [0, 1, 0] for player 1 and [1/3, 1/3, 1/3] for player 2. This leads to a utility of 8.2222 for player 1 and 12 for player 2.
+[repo](https://github.com/wilrop/Cyclic-Equilibria-MONFG)
 
-## Fictitious Play
-Fictitious Play (FP) is a learning algorithm that was adapted from single-objective games to work with MONFGs as well. It is not guaranteed to find a Nash equilibrium as it can end up in cycles.
+*No citation available yet.*
 
-The algorithm can be found in [fictitious_play.py](mo-gt/best-response/fictitious_play.py) and can easily be called from [main.py](mo-gt/best-response/main.py) by adding the ``--algorithm FP`` flag. We have implemented two variants, simultaneous and alternating FP, that can also be selected using the flag ``--variant``.
+### A utility-based analysis of equilibria in multi-objective normal-form games
+The first work to introduce independent multi-objective Q-learners.
 
-In the example MONFG, it successfully finds the PSNE (A, A). This leads to a utility of 17 for player 1 and 16 for player 2.
+[paper](https://www.cambridge.org/core/journals/knowledge-engineering-review/article/abs/utilitybased-analysis-of-equilibria-in-multiobjective-normalform-games/00229BD20BB55C72B7DF80007E5725E1) | [arXiv](https://arxiv.org/abs/2001.08177) | [repo](https://github.com/rradules/equilibria_monfg)
 
-## Cite
-Please use the following citation if you use these algorithms in your work.
-CITATION
+```
+@article{radulescu2020utility,
+    author = {Rădulescu, Roxana and Mannion, Patrick and Zhang, Yijie and Roijers, Diederik M. and Now{\'{e}}, Ann},
+    doi = {10.1017/S0269888920000351},
+    journal = {The Knowledge Engineering Review},
+    pages = {e32},
+    publisher = {Cambridge University Press},
+    title = {{A utility-based analysis of equilibria in multi-objective normal-form games}},
+    volume = {35},
+    year = {2020}
+}
+```
+
+### Opponent Modelling for Reinforcement Learning in Multi-Objective Normal Form Games
+The first work to introduce independent multi-objective actor-critic learners.
+
+[paper](https://www.ifaamas.org/Proceedings/aamas2020/pdfs/p2080.pdf) | [full paper](https://ala2020.vub.ac.be/papers/ALA2020_paper_32.pdf)
+
+```
+@inproceedings{zhang2020opponent,
+    address = {Auckland, New Zealand},
+    author = {Zhang, Yijie and Rădulescu, Roxana and Mannion, Patrick and Roijers, Diederik M. and Now{\'{e}}, Ann},
+    booktitle = {Proceedings of the 19th International Conference on Autonomous Agents and MultiAgent Systems},
+    isbn = {9781450375184},
+    pages = {2080--2082},
+    publisher = {International Foundation for Autonomous Agents and Multiagent Systems},
+    series = {AAMAS '20},
+    title = {{Opponent Modelling for Reinforcement Learning in Multi-Objective Normal Form Games}},
+    year = {2020}
+}
+```
+
+## License
+This project is licensed under the terms of the MIT license.
