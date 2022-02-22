@@ -1,5 +1,4 @@
 import numpy as np
-import jax.numpy as jnp
 from scipy.optimize import minimize
 
 
@@ -60,7 +59,7 @@ def optimise_policy(expected_returns, u, init_strat=None):
     return br_strategy
 
 
-def calc_expected_returns(player, payoff_matrix, joint_strategy, api='np'):
+def calc_expected_returns(player, payoff_matrix, joint_strategy):
     """Calculate the expected return for a player's actions with a given joint strategy.
 
     Args:
@@ -72,11 +71,6 @@ def calc_expected_returns(player, payoff_matrix, joint_strategy, api='np'):
         ndarray: The expected returns for the given player's actions.
 
     """
-    if api == 'np':
-        api = np
-    else:
-        api = jnp
-
     num_objectives = payoff_matrix.shape[-1]
     num_actions = len(joint_strategy[player])
     num_players = len(joint_strategy)
@@ -89,7 +83,7 @@ def calc_expected_returns(player, payoff_matrix, joint_strategy, api='np'):
         # We reshape this strategy to be able to multiply along the correct axis for weighting expected returns.
         # For example if you end up in [1, 2] or [2, 3] with 50% probability.
         # We calculate the individual expected returns first: [0.5, 1] or [1, 1.5]
-        dim_array = api.ones((1, expected_returns.ndim), int).ravel()
+        dim_array = np.ones((1, expected_returns.ndim), int).ravel()
         dim_array[opponent] = -1
         strategy_reshaped = strategy.reshape(dim_array)
 
@@ -97,7 +91,7 @@ def calc_expected_returns(player, payoff_matrix, joint_strategy, api='np'):
         # We now take the sum of the weighted returns to get the expected returns.
         # We need keepdims=True to make sure that the opponent still exists at the correct axis, their action space is
         # just reduced to one action resulting in the expected return now.
-        expected_returns = api.sum(expected_returns, axis=opponent, keepdims=True)
+        expected_returns = np.sum(expected_returns, axis=opponent, keepdims=True)
 
     expected_returns = expected_returns.reshape(num_actions, num_objectives)  # Cast the result to a correct shape.
 
