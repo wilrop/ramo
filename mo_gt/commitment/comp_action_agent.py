@@ -3,23 +3,25 @@ import numpy as np
 from jax import grad, jit
 from jax.nn import softmax
 
-from mo_gt.utils.helpers import array_slice
 from mo_gt.utils.experiments import softmax_policy
+from mo_gt.utils.helpers import array_slice
 
 
 class CompActionAgent:
     """An agent that learns a best-response policy to each pure-strategy commitment from the leader."""
 
-    def __init__(self, id, u, num_actions, num_objectives, alpha_q=0.01, alpha_theta=0.01, alpha_q_decay=1,
-                 alpha_theta_decay=1):
+    def __init__(self, id, u, num_actions, num_objectives, alpha_lq=0.01, alpha_ltheta=0.01, alpha_fq=0.01,
+                 alpha_ftheta=0.01, alpha_q_decay=1, alpha_theta_decay=1):
         self.id = id
         self.u = u
         self.grad = jit(grad(self.objective_function))
         self.num_actions = num_actions
         self.num_objectives = num_objectives
 
-        self.alpha_q = alpha_q
-        self.alpha_theta = alpha_theta
+        self.alpha_lq = alpha_lq
+        self.alpha_ltheta = alpha_ltheta
+        self.alpha_fq = alpha_fq
+        self.alpha_ftheta = alpha_ftheta
         self.alpha_q_decay = alpha_q_decay
         self.alpha_theta_decay = alpha_theta_decay
 
@@ -71,12 +73,12 @@ class CompActionAgent:
         self.update_payoffs_table(actions, reward)
         if self.leader:
             self.update_leader_q_table(own_action, reward)
-            self.leader_theta += self.alpha_theta * self.grad(self.leader_theta, self.leader_q_table)
+            self.leader_theta += self.alpha_ltheta * self.grad(self.leader_theta, self.leader_q_table)
             self.leader_policy = softmax_policy(self.leader_theta)
         else:
             q = array_slice(self.payoffs_table, abs(1 - self.id), commitment, commitment + 1)
             q = q.reshape(self.num_actions, self.num_objectives)
-            self.follower_thetas[commitment] += self.alpha_theta * self.grad(self.follower_thetas[commitment], q)
+            self.follower_thetas[commitment] += self.alpha_ftheta * self.grad(self.follower_thetas[commitment], q)
             self.follower_policies[commitment] = softmax_policy(self.follower_thetas[commitment])
         self.update_parameters()
 
@@ -90,7 +92,7 @@ class CompActionAgent:
         Returns:
 
         """
-        self.leader_q_table[action] += self.alpha_q * (reward - self.leader_q_table[action])
+        self.leader_q_table[action] += self.alpha_lq * (reward - self.leader_q_table[action])
 
     def update_payoffs_table(self, actions, reward):
         """Update the joint-action payoffs table.
@@ -103,12 +105,14 @@ class CompActionAgent:
 
         """
         idx = tuple(actions)
-        self.payoffs_table[idx] += self.alpha_q * (reward - self.payoffs_table[idx])
+        self.payoffs_table[idx] += self.alpha_fq * (reward - self.payoffs_table[idx])
 
     def update_parameters(self):
         """Update the internal parameters of the agent."""
-        self.alpha_q *= self.alpha_q_decay
-        self.alpha_theta *= self.alpha_theta_decay
+        self.alpha_lq *= self.alpha_q_decay
+        self.alpha_ltheta *= self.alpha_theta_decay
+        self.alpha_fq *= self.alpha_q_decay
+        self.alpha_ftheta *= self.alpha_theta_decay
 
     def get_commitment(self):
         """Get the commitment from the leader.

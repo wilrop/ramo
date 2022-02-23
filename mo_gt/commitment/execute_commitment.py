@@ -76,8 +76,9 @@ def update(agents, commitment, actions, payoffs):
         agent.update(commitment, actions, payoff)
 
 
-def create_agents(experiment, u_tpl, num_agents, player_actions, num_objectives, alpha_q=0.2, alpha_theta=0.005,
-                  alpha_q_decay=1, alpha_theta_decay=1, alpha_com=0.005, alpha_com_decay=1):
+def create_agents(experiment, u_tpl, num_agents, player_actions, num_objectives, alpha_lq=0.01, alpha_ltheta=0.01,
+                  alpha_fq=0.01, alpha_ftheta=0.01, alpha_cq=0.01, alpha_ctheta=0.01, alpha_q_decay=1,
+                  alpha_theta_decay=1, alpha_com_decay=1):
     """Create a list of commitment agents.
 
     Args:
@@ -86,12 +87,14 @@ def create_agents(experiment, u_tpl, num_agents, player_actions, num_objectives,
         num_agents (int): The number of agents to create.
         player_actions (Tuple[int]): The number of actions per player.
         num_objectives (int): The number of objectives.
-        alpha_q (float, optional): The learning rate for Q-values. (Default = 0.2)
-        alpha_theta (float, optional): The learning rate for policy parameters. (Default = 0.005)
+        alpha_lq (float, optional): The learning rate for leader Q-values. (Default = 0.01)
+        alpha_ltheta (float, optional): The learning rate for leader policy parameters. (Default = 0.01)
+        alpha_fq (float, optional): The learning rate for follower Q-values. (Default = 0.01)
+        alpha_ftheta (float, optional): The learning rate for follower policy parameters. (Default = 0.01)
+        alpha_cq (float, optional): The learning rate for optional commitment Q-values. (Default = 0.01)
+        alpha_ctheta (float, optional): The learning rate for optional commitment policy parameters. (Default = 0.01)
         alpha_q_decay (float, optional): The decay for the Q-values learning rate. (Default = 1)
         alpha_theta_decay (float, optional): The decay for the policy parameters learning rate. (Default = 1)
-        alpha_com (float, optional): The learning rate for a commitment strategy when using optional commitment.
-            (Default = 0.005)
         alpha_com_decay (float, optional): The decay for the commitment strategy learning rate when using optional
             commitment. (Default = 1)
 
@@ -106,48 +109,52 @@ def create_agents(experiment, u_tpl, num_agents, player_actions, num_objectives,
     for ag, u_str, num_actions in zip(range(num_agents), u_tpl, player_actions):
         u = uf.get_u(u_str)
         if experiment == 'coop_action':
-            new_agent = CoopActionAgent(ag, u, num_actions, num_objectives, alpha_q=alpha_q, alpha_theta=alpha_theta,
+            new_agent = CoopActionAgent(ag, u, num_actions, num_objectives, alpha_q=alpha_lq, alpha_theta=alpha_ltheta,
                                         alpha_q_decay=alpha_q_decay, alpha_theta_decay=alpha_theta_decay)
         elif experiment == 'comp_action':
-            new_agent = CompActionAgent(ag, u, num_actions, num_objectives, alpha_q=alpha_q, alpha_theta=alpha_theta,
+            new_agent = CompActionAgent(ag, u, num_actions, num_objectives, alpha_lq=alpha_lq,
+                                        alpha_ltheta=alpha_ltheta, alpha_fq=alpha_fq, alpha_ftheta=alpha_ftheta,
                                         alpha_q_decay=alpha_q_decay, alpha_theta_decay=alpha_theta_decay)
         elif experiment == 'coop_policy':
-            new_agent = CoopPolicyAgent(ag, u, num_actions, num_objectives, alpha_q=alpha_q, alpha_theta=alpha_theta,
+            new_agent = CoopPolicyAgent(ag, u, num_actions, num_objectives, alpha_q=alpha_lq, alpha_theta=alpha_ltheta,
                                         alpha_q_decay=alpha_q_decay, alpha_theta_decay=alpha_theta_decay)
         elif experiment == 'best_response':
-            new_agent = BestResponseAgent(ag, u, num_actions, num_objectives, alpha_q=alpha_q, alpha_theta=alpha_theta,
-                                          alpha_q_decay=alpha_q_decay, alpha_theta_decay=alpha_theta_decay)
+            new_agent = BestResponseAgent(ag, u, num_actions, num_objectives, alpha_q=alpha_lq,
+                                          alpha_theta=alpha_ltheta, alpha_q_decay=alpha_q_decay,
+                                          alpha_theta_decay=alpha_theta_decay)
             new_agent.set_leader_utility(uf.get_u(u_tpl[0]))
         elif experiment == 'non_stationary':
-            new_agent = NonStationaryAgent(ag, u, num_actions, num_objectives, alpha_q=alpha_q, alpha_theta=alpha_theta,
-                                           alpha_q_decay=alpha_q_decay, alpha_theta_decay=alpha_theta_decay)
+            new_agent = NonStationaryAgent(ag, u, num_actions, num_objectives, alpha_q=alpha_lq,
+                                           alpha_theta=alpha_ltheta, alpha_q_decay=alpha_q_decay,
+                                           alpha_theta_decay=alpha_theta_decay)
             new_agent.set_opponent_actions(player_actions[abs(1 - ag)])
         elif experiment == 'opt_coop_action':
-            no_com_agent = IndependentActorCriticAgent(u, num_actions, num_objectives, alpha_q=alpha_q,
-                                                       alpha_theta=alpha_theta, alpha_q_decay=alpha_q_decay,
+            no_com_agent = IndependentActorCriticAgent(u, num_actions, num_objectives, alpha_q=alpha_lq,
+                                                       alpha_theta=alpha_ltheta, alpha_q_decay=alpha_q_decay,
                                                        alpha_theta_decay=alpha_theta_decay)
-            com_agent = CoopActionAgent(ag, u, num_actions, num_objectives, alpha_q=alpha_q, alpha_theta=alpha_theta,
+            com_agent = CoopActionAgent(ag, u, num_actions, num_objectives, alpha_q=alpha_lq, alpha_theta=alpha_ltheta,
                                         alpha_q_decay=alpha_q_decay, alpha_theta_decay=alpha_theta_decay)
-            new_agent = OptionalComAgent(no_com_agent, com_agent, ag, u, num_actions, num_objectives, alpha_q=alpha_q,
-                                         alpha_theta=alpha_com, alpha_q_decay=alpha_q_decay,
+            new_agent = OptionalComAgent(no_com_agent, com_agent, ag, u, num_actions, num_objectives, alpha_q=alpha_cq,
+                                         alpha_theta=alpha_ctheta, alpha_q_decay=alpha_q_decay,
                                          alpha_theta_decay=alpha_com_decay)
         elif experiment == 'opt_comp_action':
-            no_com_agent = IndependentActorCriticAgent(u, num_actions, num_objectives, alpha_q=alpha_q,
-                                                       alpha_theta=alpha_theta, alpha_q_decay=alpha_q_decay,
+            no_com_agent = IndependentActorCriticAgent(u, num_actions, num_objectives, alpha_q=alpha_lq,
+                                                       alpha_theta=alpha_ltheta, alpha_q_decay=alpha_q_decay,
                                                        alpha_theta_decay=alpha_theta_decay)
-            com_agent = CompActionAgent(ag, u, num_actions, num_objectives, alpha_q=alpha_q, alpha_theta=alpha_theta,
+            com_agent = CompActionAgent(ag, u, num_actions, num_objectives, alpha_lq=alpha_lq,
+                                        alpha_ltheta=alpha_ltheta, alpha_fq=alpha_fq, alpha_ftheta=alpha_ftheta,
                                         alpha_q_decay=alpha_q_decay, alpha_theta_decay=alpha_theta_decay)
-            new_agent = OptionalComAgent(no_com_agent, com_agent, ag, u, num_actions, num_objectives, alpha_q=alpha_q,
-                                         alpha_theta=alpha_com, alpha_q_decay=alpha_q_decay,
+            new_agent = OptionalComAgent(no_com_agent, com_agent, ag, u, num_actions, num_objectives, alpha_q=alpha_cq,
+                                         alpha_theta=alpha_ctheta, alpha_q_decay=alpha_q_decay,
                                          alpha_theta_decay=alpha_com_decay)
         elif experiment == 'opt_coop_policy':
-            no_com_agent = IndependentActorCriticAgent(u, num_actions, num_objectives, alpha_q=alpha_q,
-                                                       alpha_theta=alpha_theta, alpha_q_decay=alpha_q_decay,
+            no_com_agent = IndependentActorCriticAgent(u, num_actions, num_objectives, alpha_q=alpha_lq,
+                                                       alpha_theta=alpha_ltheta, alpha_q_decay=alpha_q_decay,
                                                        alpha_theta_decay=alpha_theta_decay)
-            com_agent = CoopPolicyAgent(ag, u, num_actions, num_objectives, alpha_q=alpha_q, alpha_theta=alpha_theta,
+            com_agent = CoopPolicyAgent(ag, u, num_actions, num_objectives, alpha_q=alpha_lq, alpha_theta=alpha_ltheta,
                                         alpha_q_decay=alpha_q_decay, alpha_theta_decay=alpha_theta_decay)
-            new_agent = OptionalComAgent(no_com_agent, com_agent, ag, u, num_actions, num_objectives, alpha_q=alpha_q,
-                                         alpha_theta=alpha_com, alpha_q_decay=alpha_q_decay,
+            new_agent = OptionalComAgent(no_com_agent, com_agent, ag, u, num_actions, num_objectives, alpha_q=alpha_cq,
+                                         alpha_theta=alpha_ctheta, alpha_q_decay=alpha_q_decay,
                                          alpha_theta_decay=alpha_com_decay)
         else:
             raise Exception(f'No agent of type {experiment} exists')
@@ -156,8 +163,9 @@ def create_agents(experiment, u_tpl, num_agents, player_actions, num_objectives,
 
 
 def execute_commitment(payoff_matrices, u_tpl, experiment='coop_action', runs=100, episodes=5000, rollouts=100,
-                       alternate=False, alpha_q=0.01, alpha_theta=0.01, alpha_q_decay=1, alpha_theta_decay=1,
-                       alpha_com=0.01, alpha_com_decay=1, seed=1):
+                       alternate=False, alpha_lq=0.01, alpha_ltheta=0.01, alpha_fq=0.01, alpha_ftheta=0.01,
+                       alpha_cq=0.01, alpha_ctheta=0.01, alpha_q_decay=1, alpha_theta_decay=1, alpha_com_decay=1,
+                       seed=1):
     """Execute a commitment experiment.
 
     Args:
@@ -168,12 +176,16 @@ def execute_commitment(payoff_matrices, u_tpl, experiment='coop_action', runs=10
         episodes (int, optional): The number of episodes in one run of the experiment. (Default = 100)
         rollouts (int, optional): The number of Monte-Carlo simulations at each episode. (Default = 100)
         alternate (bool, optional): Whether to alternate the players between leader and follower. (Default = False)
-        alpha_q (float, optional): The learning rate for Q-values. (Default = 0.2)
-        alpha_theta (float, optional): The learning rate for policy parameters. (Default = 0.005)
-        alpha_q_decay (float, optional): The decay of the learning rate for Q-values. (Default = 1)
-        alpha_theta_decay (float, optional): The decay for the learning rate of policy parameters. (Default = 1)
-        alpha_com (float, optional): The learning rate for optional commitment. (Default = 0.005)
-        alpha_com_decay (float, optional): The decay for the learning rate of commitment. (Default = 1)
+        alpha_lq (float, optional): The learning rate for leader Q-values. (Default = 0.01)
+        alpha_ltheta (float, optional): The learning rate for leader policy parameters. (Default = 0.01)
+        alpha_fq (float, optional): The learning rate for follower Q-values. (Default = 0.01)
+        alpha_ftheta (float, optional): The learning rate for follower policy parameters. (Default = 0.01)
+        alpha_cq (float, optional): The learning rate for optional commitment Q-values. (Default = 0.01)
+        alpha_ctheta (float, optional): The learning rate for optional commitment policy parameters. (Default = 0.01)
+        alpha_q_decay (float, optional): The decay for the Q-values learning rate. (Default = 1)
+        alpha_theta_decay (float, optional): The decay for the policy parameters learning rate. (Default = 1)
+        alpha_com_decay (float, optional): The decay for the commitment strategy learning rate when using optional
+            commitment. (Default = 1)
         seed (int, optional): The seed for random number generation. (Default = 1)
 
     Returns:
@@ -204,10 +216,10 @@ def execute_commitment(payoff_matrices, u_tpl, experiment='coop_action', runs=10
 
     for run in range(runs):
         print("Starting run: ", run)
-        agents = create_agents(experiment, u_tpl, num_agents, player_actions, num_objectives, alpha_q=alpha_q,
-                               alpha_theta=alpha_theta, alpha_q_decay=alpha_q_decay,
-                               alpha_theta_decay=alpha_theta_decay, alpha_com=alpha_com,
-                               alpha_com_decay=alpha_com_decay)
+        agents = create_agents(experiment, u_tpl, num_agents, player_actions, num_objectives, alpha_lq=alpha_lq,
+                               alpha_ltheta=alpha_ltheta, alpha_fq=alpha_fq, alpha_ftheta=alpha_ftheta,
+                               alpha_cq=alpha_cq, alpha_ctheta=alpha_ctheta, alpha_q_decay=alpha_q_decay,
+                               alpha_theta_decay=alpha_theta_decay, alpha_com_decay=alpha_com_decay)
 
         for episode in range(episodes):
             # We keep the actions and payoffs of this episode so that we can later calculate the SER.
