@@ -194,9 +194,9 @@ monfg16 = [
 This game has no NE when both players use the utility function u1.
 """
 
-monfg17 = [np.array([[(4, 1), (0, 2)],
+monfg17 = [np.array([[(4, 1), (1, 1.5)],
                     [(3, 1), (3, 2)]], dtype=float),
-          np.array([[(4, 1), (0, 2)],
+          np.array([[(4, 1), (1, 1.5)],
                     [(3, 1), (3, 2)]], dtype=float)]
 """List[ndarray]: Game 17: A 2-action 2-player game with team rewards.
 
@@ -207,12 +207,12 @@ This game shows cyclic behaviour under IBR with simultaneous updates but not wit
 This game shows no cyclic behaviour with fictitious play.
 """
 
-monfg18 = [np.array([[(4, 1), (0, 2), (2, 1)],
+monfg18 = [np.array([[(4, 1), (1, 1.5), (2, 1)],
                     [(3, 1), (3, 2), (1, 2)],
-                    [(1, 2), (2, 0), (1, 3)]], dtype=float),
-          np.array([[(4, 1), (0, 2), (2, 1)],
+                    [(1, 2), (2, 1.5), (1.5, 3)]], dtype=float),
+          np.array([[(4, 1), (1, 1.5), (2, 1)],
                     [(3, 1), (3, 2), (1, 2)],
-                    [(1, 2), (2, 0), (1, 3)]], dtype=float)]
+                    [(1, 2), (2, 1.5), (1.5, 3)]], dtype=float)]
 """List[ndarray]: Game 18: A 3-action 2-player game with team rewards.
 
 There are three NE under SER using u1 and u2: (M, M), (L, L) and (R, R).
