@@ -5,13 +5,8 @@ from collections import defaultdict
 import numpy as np
 
 import mo_gt.games.games as games
-import mo_gt.games.utility_functions as uf
-from mo_gt.learners.indep_actor_critic import IndependentActorCriticAgent
-from mo_gt.learners.indep_q import IndependentQAgent
-from mo_gt.learners.ja_actor_critic import JointActionActorCriticAgent
-from mo_gt.learners.ja_q import JointActionQAgent
 from mo_gt.utils.data import save_metadata, save_data
-from mo_gt.utils.experiments import create_game_path, calc_returns, calc_action_probs, get_payoffs
+from mo_gt.utils.experiments import create_game_path, calc_returns, calc_action_probs, get_payoffs, create_agents
 
 
 def select_actions(agents):
@@ -43,55 +38,6 @@ def update(agents, actions, payoffs):
     """
     for agent, payoff in zip(agents, payoffs):
         agent.update(actions, payoff)
-
-
-def create_agents(experiment, u_tpl, num_agents, player_actions, num_objectives, alpha_q=0.2, alpha_theta=0.005,
-                  alpha_q_decay=1, alpha_theta_decay=1, epsilon=1, epsilon_decay=0.995, min_epsilon=0.1):
-    """Create a list of commitment agents.
-
-    Args:
-        experiment (str): The type of experiment that is run. This is used to determine which agents to create.
-        u_tpl (Tuple[callable]): A tuple of utility functions.
-        num_agents (int): The number of agents to create.
-        player_actions (Tuple[int]): The number of actions per player.
-        num_objectives (int): The number of objectives.
-        alpha_q (float, optional): The learning rate for Q-values. (Default = 0.2)
-        alpha_theta (float, optional): The learning rate for policy parameters. (Default = 0.005)
-        alpha_q_decay (float, optional): The decay for the Q-values learning rate. (Default = 1)
-        alpha_theta_decay (float, optional): The decay for the policy parameters learning rate. (Default = 1)
-        epsilon (float, optional): The exploration rate for a Q-learner agent. (Default = 1)
-        epsilon_decay (float, optional): The decay for the exploration rate. (Default = 0.995)
-        min_epsilon (float, optional): The minimum value for the exploration rate. (Default = 0.1)
-
-    Returns:
-        List[Agent]: A list of commitment agents.
-
-    Raises:
-        Exception: When the requested agent is unknown.
-
-    """
-    agents = []
-    for ag, u_str, num_actions in zip(range(num_agents), u_tpl, player_actions):
-        u = uf.get_u(u_str)
-        if experiment == 'indep_ac':
-            new_agent = IndependentActorCriticAgent(u, num_actions, num_objectives, alpha_q=alpha_q,
-                                                    alpha_theta=alpha_theta, alpha_q_decay=alpha_q_decay,
-                                                    alpha_theta_decay=alpha_theta_decay)
-        elif experiment == 'indep_q':
-            new_agent = IndependentQAgent(u, num_actions, num_objectives, alpha_q=alpha_q, alpha_q_decay=alpha_q_decay,
-                                          epsilon=epsilon, epsilon_decay=epsilon_decay, min_epsilon=min_epsilon)
-        elif experiment == 'ja_ac':
-            new_agent = JointActionActorCriticAgent(ag, u, num_actions, num_objectives, player_actions, alpha_q=alpha_q,
-                                                    alpha_theta=alpha_theta, alpha_q_decay=alpha_q_decay,
-                                                    alpha_theta_decay=alpha_theta_decay)
-        elif experiment == 'ja_q':
-            new_agent = JointActionQAgent(ag, u, num_actions, num_objectives, player_actions, alpha_q=alpha_q,
-                                          alpha_q_decay=alpha_q_decay, epsilon=epsilon, epsilon_decay=epsilon_decay,
-                                          min_epsilon=min_epsilon)
-        else:
-            raise Exception(f'No agent of type {experiment} exists')
-        agents.append(new_agent)
-    return agents
 
 
 def execute_learner(payoff_matrices, u_tpl, experiment='coop_action', runs=100, episodes=5000, rollouts=100,
