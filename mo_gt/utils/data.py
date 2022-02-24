@@ -1,4 +1,17 @@
+import json
+
 import pandas as pd
+
+
+def save_metadata(path, **metadata):
+    """Save keyword arguments as metadata in a JSON file.
+
+    Args:
+        path (str): The path to the directory in which all files will be saved.
+        **metadata: A dictionary of metadata to save.
+    """
+    with open(f'{path}/metadata.json', 'w') as f:
+        json.dump(metadata, f)
 
 
 def save_data(path, name, game, num_agents, player_actions, runs, episodes, returns_log=None, action_probs_log=None,

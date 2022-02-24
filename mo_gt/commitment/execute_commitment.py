@@ -13,7 +13,7 @@ from mo_gt.commitment.coop_policy_agent import CoopPolicyAgent
 from mo_gt.commitment.non_stationary_agent import NonStationaryAgent
 from mo_gt.commitment.optional_com_agent import OptionalComAgent
 from mo_gt.learners.indep_actor_critic import IndependentActorCriticAgent
-from mo_gt.utils.data import save_data
+from mo_gt.utils.data import save_metadata, save_data
 from mo_gt.utils.experiments import create_game_path, calc_com_probs, calc_returns, calc_action_probs
 
 
@@ -83,7 +83,7 @@ def create_agents(experiment, u_tpl, num_agents, player_actions, num_objectives,
 
     Args:
         experiment (str): The type of experiment that is run. This is used to determine which agents to create.
-        u_tpl (Tuple[callable]): A tuple of utility functions.
+        u_tpl (Tuple[str]): A tuple of names of utility functions.
         num_agents (int): The number of agents to create.
         player_actions (Tuple[int]): The number of actions per player.
         num_objectives (int): The number of objectives.
@@ -171,7 +171,7 @@ def execute_commitment(payoff_matrices, u_tpl, experiment='coop_action', runs=10
 
     Args:
         payoff_matrices (List[ndarray]): A list of payoff matrices representing the MONFG.
-        u_tpl (Tuple[callable]): A tuple of utility functions.
+        u_tpl (Tuple[str]): A tuple of names of utility functions.
         experiment (str, optional): The type of commitment experiment to execute. (Default = 'coop_action')
         runs (int, optional): The number of times to repeat the experiment. (Default = 100)
         episodes (int, optional): The number of episodes in one run of the experiment. (Default = 100)
@@ -190,8 +190,8 @@ def execute_commitment(payoff_matrices, u_tpl, experiment='coop_action', runs=10
         seed (int, optional): The seed for random number generation. (Default = 1)
 
     Returns:
-        Tuple[Dict, Dict, ndarray, Dict}: A log of payoffs, a log of action probabilities for both agents, a log of the
-            state distribution and a log of the commitment probabilities.
+        Tuple[Dict, Dict, ndarray, Dict, Dict]: A log of payoffs, a log of action probabilities for both agents, a log
+            of the state distribution and a log of the commitment probabilities.
 
     Raises:
         Exception: When the number of players does not equal two.
@@ -212,6 +212,25 @@ def execute_commitment(payoff_matrices, u_tpl, experiment='coop_action', runs=10
     action_probs_log = defaultdict(list)
     state_dist_log = np.zeros(player_actions)
     com_probs_log = defaultdict(list)
+    metadata = {
+        'payoff_matrices': list(map(lambda x: x.tolist(), payoff_matrices)),
+        'u_tpl': u_tpl,
+        'experiment': experiment,
+        'runs': runs,
+        'episodes': episodes,
+        'rollouts': rollouts,
+        'alternate': alternate,
+        'alpha_lq': alpha_lq,
+        'alpha_ltheta': alpha_ltheta,
+        'alpha_fq': alpha_fq,
+        'alpha_ftheta': alpha_ftheta,
+        'alpha_cq': alpha_cq,
+        'alpha_ctheta': alpha_ctheta,
+        'alpha_q_decay': alpha_q_decay,
+        'alpha_theta_decay': alpha_theta_decay,
+        'alpha_com_decay': alpha_com_decay,
+        'seed': seed
+    }
 
     start = time.time()
 
@@ -274,7 +293,7 @@ def execute_commitment(payoff_matrices, u_tpl, experiment='coop_action', runs=10
     elapsed_mins = (end - start) / 60.0
     print("Minutes elapsed: " + str(elapsed_mins))
 
-    return returns_log, action_probs_log, state_dist_log, com_probs_log
+    return returns_log, action_probs_log, state_dist_log, com_probs_log, metadata
 
 
 if __name__ == "__main__":
@@ -307,11 +326,12 @@ if __name__ == "__main__":
     payoff_matrices = games.get_monfg(game)
     data = execute_commitment(payoff_matrices, u, experiment=experiment, runs=runs, episodes=episodes,
                               rollouts=rollouts, alternate=alternate)
-    returns_log, action_probs_log, state_dist_log, com_probs_log = data
+    returns_log, action_probs_log, state_dist_log, com_probs_log, metadata = data
 
     # Writing the data to disk.
     num_agents = len(payoff_matrices)
     player_actions = tuple(payoff_matrices[0].shape[:-1])
     path = create_game_path('data', experiment, game, parent_dir=parent_dir)
+    save_metadata(path, **metadata)
     save_data(path, experiment, game, num_agents, player_actions, runs, episodes, returns_log=returns_log,
               action_probs_log=action_probs_log, state_dist_log=state_dist_log, com_probs_log=com_probs_log)

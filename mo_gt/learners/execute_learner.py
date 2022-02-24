@@ -10,7 +10,7 @@ from mo_gt.learners.indep_actor_critic import IndependentActorCriticAgent
 from mo_gt.learners.indep_q import IndependentQAgent
 from mo_gt.learners.ja_actor_critic import JointActionActorCriticAgent
 from mo_gt.learners.ja_q import JointActionQAgent
-from mo_gt.utils.data import save_data
+from mo_gt.utils.data import save_metadata, save_data
 from mo_gt.utils.experiments import create_game_path, calc_returns, calc_action_probs, get_payoffs
 
 
@@ -132,7 +132,22 @@ def execute_learner(payoff_matrices, u_tpl, experiment='coop_action', runs=100, 
     returns_log = defaultdict(list)
     action_probs_log = defaultdict(list)
     state_dist_log = np.zeros(player_actions)
-    com_probs_log = defaultdict(list)
+    metadata = {
+        'payoff_matrices': list(map(lambda x: x.tolist(), payoff_matrices)),
+        'u_tpl': u_tpl,
+        'experiment': experiment,
+        'runs': runs,
+        'episodes': episodes,
+        'rollouts': rollouts,
+        'alpha_q': alpha_q,
+        'alpha_theta': alpha_theta,
+        'alpha_q_decay': alpha_q_decay,
+        'alpha_theta_decay': alpha_theta_decay,
+        'epsilon': epsilon,
+        'epsilon_decay': epsilon_decay,
+        'min_epsilon': min_epsilon,
+        'seed': seed
+    }
 
     start = time.time()
 
@@ -186,7 +201,7 @@ def execute_learner(payoff_matrices, u_tpl, experiment='coop_action', runs=100, 
     elapsed_mins = (end - start) / 60.0
     print("Minutes elapsed: " + str(elapsed_mins))
 
-    return returns_log, action_probs_log, state_dist_log
+    return returns_log, action_probs_log, state_dist_log, metadata
 
 
 if __name__ == "__main__":
@@ -216,11 +231,12 @@ if __name__ == "__main__":
     # Starting the experiments.
     payoff_matrices = games.get_monfg(game)
     data = execute_learner(payoff_matrices, u, experiment=experiment, runs=runs, episodes=episodes, rollouts=rollouts)
-    returns_log, action_probs_log, state_dist_log = data
+    returns_log, action_probs_log, state_dist_log, metadata = data
 
     # Writing the data to disk.
     num_agents = len(payoff_matrices)
     player_actions = tuple(payoff_matrices[0].shape[:-1])
     path = create_game_path('data', experiment, game, parent_dir=parent_dir)
+    save_metadata(path, **metadata)
     save_data(path, experiment, game, num_agents, player_actions, runs, episodes, returns_log=returns_log,
               action_probs_log=action_probs_log, state_dist_log=state_dist_log)
