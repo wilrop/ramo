@@ -47,7 +47,7 @@ def iterated_best_response(monfg, u_tpl, max_iter=1000, init_joint_strategy=None
         init_strategy = None
         if init_joint_strategy is not None:
             init_strategy = init_joint_strategy[player]
-        player = IBRPlayer(player, u, num_actions, payoff_matrix, rng, init_strategy=init_strategy)
+        player = IBRPlayer(player, u, num_actions, payoff_matrix, init_strategy=init_strategy, rng=rng)
         players.append(player)
         joint_strategy.append(player.strategy)
 
