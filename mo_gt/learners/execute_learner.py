@@ -69,7 +69,7 @@ def execute_learner(payoff_matrices, u_tpl, experiment='coop_action', runs=100, 
         Exception: When the number of players does not equal two.
 
     """
-    np.random.seed(seed=seed)
+    rng = np.random.default_rng(seed=seed)  # Initialise a random number generator.
 
     player_actions = payoff_matrices[0].shape[:-1]
     num_objectives = payoff_matrices[0].shape[-1]
@@ -102,7 +102,7 @@ def execute_learner(payoff_matrices, u_tpl, experiment='coop_action', runs=100, 
         agents = create_agents(experiment, u_tpl, num_agents, player_actions, num_objectives, alpha_q=alpha_q,
                                alpha_theta=alpha_theta, alpha_q_decay=alpha_q_decay,
                                alpha_theta_decay=alpha_theta_decay, epsilon=epsilon, epsilon_decay=epsilon_decay,
-                               min_epsilon=min_epsilon)
+                               min_epsilon=min_epsilon, rng=rng)
 
         for episode in range(episodes):
             # We keep the actions and payoffs of this episode so that we can later calculate the SER.

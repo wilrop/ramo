@@ -142,8 +142,8 @@ def execute_commitment(payoff_matrices, u_tpl, experiment='coop_action', runs=10
 
     for run in range(runs):
         print("Starting run: ", run)
-        agents = create_agents(experiment, u_tpl, num_agents, player_actions, num_objectives, alpha_lq=alpha_lq,
-                               alpha_ltheta=alpha_ltheta, alpha_fq=alpha_fq, alpha_ftheta=alpha_ftheta,
+        agents = create_agents(experiment, u_tpl, num_agents, player_actions, num_objectives, alpha_q=alpha_lq,
+                               alpha_theta=alpha_ltheta, alpha_fq=alpha_fq, alpha_ftheta=alpha_ftheta,
                                alpha_cq=alpha_cq, alpha_ctheta=alpha_ctheta, alpha_q_decay=alpha_q_decay,
                                alpha_theta_decay=alpha_theta_decay, alpha_com_decay=alpha_com_decay, rng=rng)
 

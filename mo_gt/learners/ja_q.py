@@ -7,9 +7,10 @@ class JointActionQAgent:
     """An independent learner using Q-learning for the SER criterion."""
 
     def __init__(self, id, u, num_actions, num_objectives, player_actions, alpha_q=0.01, alpha_q_decay=1, epsilon=0.01,
-                 epsilon_decay=1, min_epsilon=0.01):
+                 epsilon_decay=1, min_epsilon=0.01, rng=None):
         self.id = id
         self.u = u
+        self.rng = rng if rng is not None else np.random.default_rng()
         self.num_actions = num_actions
         self.num_objectives = num_objectives
         self.player_actions = player_actions
@@ -93,7 +94,7 @@ class JointActionQAgent:
             int: The selected action.
 
         """
-        if np.random.uniform(0, 1) < self.epsilon:
-            return np.random.randint(self.num_actions)
+        if self.rng.uniform(0, 1) < self.epsilon:
+            return self.rng.integers(self.num_actions)
         else:
-            return np.random.choice(range(self.num_actions), p=self.policy)
+            return self.rng.choice(range(self.num_actions), p=self.policy)

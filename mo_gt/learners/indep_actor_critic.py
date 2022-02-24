@@ -10,8 +10,9 @@ class IndependentActorCriticAgent:
     """An independent learner using the multi-objective actor-critic algorithm for the SER criterion."""
 
     def __init__(self, u, num_actions, num_objectives, alpha_q=0.01, alpha_theta=0.01, alpha_q_decay=1,
-                 alpha_theta_decay=1):
+                 alpha_theta_decay=1, rng=None):
         self.u = u
+        self.rng = rng if rng is not None else np.random.default_rng()
         self.grad = jit(grad(self.objective_function))
         self.num_actions = num_actions
         self.num_objectives = num_objectives
@@ -80,4 +81,4 @@ class IndependentActorCriticAgent:
             int: The selected action.
 
         """
-        return np.random.choice(range(self.num_actions), p=self.policy)
+        return self.rng.choice(range(self.num_actions), p=self.policy)
