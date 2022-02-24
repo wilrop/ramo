@@ -298,7 +298,7 @@ def scalarise_matrix(payoff_matrix, u):
     return scalarised_matrix
 
 
-def generate_random_monfg(player_actions=(2, 2), num_objectives=2, reward_min_bound=0, reward_max_bound=5):
+def generate_random_monfg(player_actions=(2, 2), num_objectives=2, reward_min_bound=0, reward_max_bound=5, rng=None):
     """Generate a random MONFG with payoffs from a discrete uniform distribution.
 
     Args:
@@ -306,16 +306,18 @@ def generate_random_monfg(player_actions=(2, 2), num_objectives=2, reward_min_bo
       num_objectives (int, optional): The number of objectives in the game. (Default value = 2)
       reward_min_bound (int, optional): The minimum reward on an objective. (Default value = 0)
       reward_max_bound (int, optional): The maximum reward on an objective. (Default value = 5)
+      rng (Generator, optional): A random number generator. (Default value = None)
 
     Returns:
       List[ndarray]: A list of payoff matrices representing the MONFG.
 
     """
+    rng = rng if rng is not None else np.random.default_rng()
     payoffs = []
     payoffs_shape = player_actions + tuple([num_objectives])  # Define the shape of the payoff matrices.
 
     for _ in range(len(player_actions)):
-        payoff_matrix = np.random.randint(low=reward_min_bound, high=reward_max_bound, size=payoffs_shape)
+        payoff_matrix = rng.integers(low=reward_min_bound, high=reward_max_bound, size=payoffs_shape)
         payoffs.append(payoff_matrix)
 
     return payoffs
