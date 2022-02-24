@@ -14,6 +14,17 @@ def save_metadata(path, **metadata):
         json.dump(metadata, f)
 
 
+def load_metadata(path):
+    """Load metadata from a directory.
+
+    Returns:
+        Dict: A dictionary of metadata.
+    """
+    with open(f'{path}/metadata.json', 'w') as f:
+        metadata = json.load(f)
+    return metadata
+
+
 def save_data(path, name, game, num_agents, player_actions, runs, episodes, returns_log=None, action_probs_log=None,
               state_dist_log=None, com_probs_log=None):
     """Save results from an experiment to disk in CSV format.
