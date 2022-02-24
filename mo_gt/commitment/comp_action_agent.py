@@ -71,12 +71,12 @@ class CompActionAgent:
 
         """
         own_action = actions[self.id]
-        self.update_payoffs_table(actions, reward)
         if self.leader:
             self.update_leader_q_table(own_action, reward)
             self.leader_theta += self.alpha_ltheta * self.grad(self.leader_theta, self.leader_q_table)
             self.leader_policy = softmax_policy(self.leader_theta)
         else:
+            self.update_payoffs_table(actions, reward)
             q = array_slice(self.payoffs_table, abs(1 - self.id), commitment, commitment + 1)
             q = q.reshape(self.num_actions, self.num_objectives)
             self.follower_thetas[commitment] += self.alpha_ftheta * self.grad(self.follower_thetas[commitment], q)
