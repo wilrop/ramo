@@ -1,10 +1,11 @@
 import argparse
-import matplotlib
 
-import numpy as np
-import seaborn as sns
-import pandas as pd
+import matplotlib
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+
 import mo_gt.utils.experiments as ue
 
 matplotlib.rcParams['pdf.fonttype'] = 42
@@ -37,7 +38,7 @@ def save_plot(plot_name, filetype, dpi=300):
     plt.clf()
 
 
-def plot_returns(path_plots, filetype, game, name, episodes, ag1_data, ag2_data):
+def plot_returns(path_plots, filetype, game, name, ag1_data, ag2_data, min_x=0, max_x=5000, min_y=0, max_y=20):
     """Plot the returns obtained by both agents in one graph.
 
     Args:
@@ -45,9 +46,12 @@ def plot_returns(path_plots, filetype, game, name, episodes, ag1_data, ag2_data)
       filetype (str): The filetype to save the file under.
       game (str): The game that was played.
       name (str): The name of the experiment that was ran.
-      episodes (int): The number of episodes that the experiment was executed.
       ag1_data (DataFrame): The data for agent 1.
       ag2_data (DataFrame): The data for agent 2.
+      min_x (float, optional): The minimum value for the x-axis. (Default = 0)
+      max_x (float, optional): The maximum value for the x-axis. (Default = 5000)
+      min_y (float, optional): The minimum value for the y-axis. (Default = 0)
+      max_y (float, optional): The maximum value for the y-axis. (Default = 20)
 
     Returns:
 
@@ -61,8 +65,8 @@ def plot_returns(path_plots, filetype, game, name, episodes, ag1_data, ag2_data)
         ax = sns.lineplot(x=x_data, y=y_constant, linewidth=2.0, linestyle='--', label='Lower bound', color='grey')
 
     ax.set(ylabel='Scalarised Expected Returns')
-    ax.set_xlim(0, episodes)
-    ax.set_ylim(0, 17.5)
+    ax.set_xlim(min_x, max_x)
+    ax.set_ylim(min_y, max_y)
 
     plot_name = f"{path_plots}/{name}_{game}_returns"
     plt.tight_layout()
@@ -71,7 +75,7 @@ def plot_returns(path_plots, filetype, game, name, episodes, ag1_data, ag2_data)
     print(f'Finished plotting scalarised expected returns')
 
 
-def plot_action_probabilities(path_plots, filetype, game, name, episodes, agent, data):
+def plot_action_probabilities(path_plots, filetype, game, name, agent, data, min_x=0, max_x=5000, min_y=0, max_y=20):
     """Plot the action probabilities for a given agent.
 
     Args:
@@ -79,9 +83,12 @@ def plot_action_probabilities(path_plots, filetype, game, name, episodes, agent,
       filetype (str): The filetype to save the file under.
       game (str): The game that was played.
       name (str): The name of the experiment that was ran.
-      episodes (int): The number of episodes that the experiment was executed.
       agent (str): The agent that is being plotted.
       data (DataFrame): The data for this agent.
+      min_x (float, optional): The minimum value for the x-axis. (Default = 0)
+      max_x (float, optional): The maximum value for the x-axis. (Default = 5000)
+      min_y (float, optional): The minimum value for the y-axis. (Default = 0)
+      max_y (float, optional): The maximum value for the y-axis. (Default = 20)
 
     Returns:
 
@@ -104,8 +111,8 @@ def plot_action_probabilities(path_plots, filetype, game, name, episodes, agent,
         ax = sns.lineplot(x='Episode', y='Action 3', linewidth=2.0, data=data, ci='sd', label='R')
 
     ax.set(ylabel='Action probability')
-    ax.set_ylim(-0.05, 1.05)
-    ax.set_xlim(0, episodes)
+    ax.set_xlim(min_x, max_x)
+    ax.set_ylim(min_y, max_y)
 
     plot_name = f"{path_plots}/{name}_{game}_{agent}_probs"
     plt.tight_layout()
@@ -156,7 +163,7 @@ def plot_joint_action_distribution(path_plots, game, name, data):
     print(f'Finished plotting the state distribution')
 
 
-def plot_com_probabilities(path_plots, filetype, game, name, episodes, agent, data):
+def plot_com_probabilities(path_plots, filetype, game, name, agent, data, min_x=0, max_x=5000, min_y=0, max_y=20):
     """Plot the message probabilities for a given agent.
 
     Args:
@@ -164,9 +171,12 @@ def plot_com_probabilities(path_plots, filetype, game, name, episodes, agent, da
       filetype (str): The filetype to save the file under.
       game (str): The game that was played.
       name (str): The name of the experiment that was ran.
-      episodes (int): The number of episodes that the experiment was executed.
       agent (str): The agent that is being plotted.
       data (DataFrame): The data for this agent.
+      min_x (float, optional): The minimum value for the x-axis. (Default = 0)
+      max_x (float, optional): The maximum value for the x-axis. (Default = 5000)
+      min_y (float, optional): The minimum value for the y-axis. (Default = 0)
+      max_y (float, optional): The maximum value for the y-axis. (Default = 20)
 
     Returns:
 
@@ -177,8 +187,8 @@ def plot_com_probabilities(path_plots, filetype, game, name, episodes, agent, da
     ax = sns.lineplot(x='Episode', y='Communication', linewidth=2.0, data=data, ci='sd', label='Communication')
 
     ax.set(ylabel='Communication probability')
-    ax.set_ylim(-0.05, 1.05)
-    ax.set_xlim(0, episodes)
+    ax.set_xlim(min_x, max_x)
+    ax.set_ylim(min_y, max_y)
 
     plot_name = f"{path_plots}/{name}_{game}_{agent}_com"
     plt.tight_layout()
@@ -205,21 +215,33 @@ def plot_results(games, name, parent_dir=None, filetype='pdf'):
         path_data = ue.create_game_path('data', name, game, parent_dir=parent_dir, mkdir=False)
         path_plots = ue.create_game_path('plots', name, game, parent_dir=parent_dir, mkdir=True)
 
-        # Plot the returns for both actions in one plot.
+        # Read returns data from the CSV files.
         df1 = pd.read_csv(f'{path_data}/{name}_{game}_A1_returns.csv')
         df2 = pd.read_csv(f'{path_data}/{name}_{game}_A2_returns.csv')
-        episodes = df1['Episode'].max() + 1  # Episodes start at 0
+
+        # Define the ranges for the x and y axis.
+        min_x = df1['Episode'].min()
+        max_x = df1['Episode'].max() + 1  # Episodes start at 0
+        min_y = 0
+        max_payoff = df1['Payoff'].max()
+        max_y = max_payoff - (max_payoff % 10) + 10
+
+        # Plot the returns for both actions in one plot.
         df1 = df1.iloc[::5, :]
         df2 = df2.iloc[::5, :]
-        plot_returns(path_plots, filetype, game, name, episodes, df1, df2)
+        plot_returns(path_plots, filetype, game, name, df1, df2, min_x=min_x, max_x=max_x, min_y=min_y, max_y=max_y)
 
         # Plot the action probabilities for both agents in a separate plot.
         df1 = pd.read_csv(f'{path_data}/{name}_{game}_A1_probs.csv')
-        df1 = df1.iloc[::5, :]
         df2 = pd.read_csv(f'{path_data}/{name}_{game}_A2_probs.csv')
+        df1 = df1.iloc[::5, :]
         df2 = df2.iloc[::5, :]
-        plot_action_probabilities(path_plots, filetype, game, name, episodes, 'A1', df1)
-        plot_action_probabilities(path_plots, filetype, game, name, episodes, 'A2', df2)
+        min_y = 0
+        max_y = 1
+        plot_action_probabilities(path_plots, filetype, game, name, 'A1', df1, min_x=min_x, max_x=max_x, min_y=min_y,
+                                  max_y=max_y)
+        plot_action_probabilities(path_plots, filetype, game, name, 'A2', df2, min_x=min_x, max_x=max_x, min_y=min_y,
+                                  max_y=max_y)
 
         # Plot the state distribution.
         df = pd.read_csv(f'{path_data}/{name}_{game}_states.csv', header=None)
@@ -231,8 +253,10 @@ def plot_results(games, name, parent_dir=None, filetype='pdf'):
             df1 = df1.iloc[::5, :]
             df2 = pd.read_csv(f'{path_data}/{name}_{game}_A2_com.csv')
             df2 = df2.iloc[::5, :]
-            plot_com_probabilities(path_plots, filetype, game, name, episodes, 'A1', df1)
-            plot_com_probabilities(path_plots, filetype, game, name, episodes, 'A2', df2)
+            plot_com_probabilities(path_plots, filetype, game, name, 'A1', df1, min_x=min_x, max_x=max_x, min_y=min_y,
+                                   max_y=max_y)
+            plot_com_probabilities(path_plots, filetype, game, name, 'A2', df2, min_x=min_x, max_x=max_x, min_y=min_y,
+                                   max_y=max_y)
 
         print(f'Finished generating plots for: {game}')
         print('------------------------------------------------')
@@ -243,7 +267,8 @@ if __name__ == "__main__":
 
     parser.add_argument('--games', type=str, default=['game7'], nargs='+', help="Which games to plot results for.")
     parser.add_argument('--experiment', type=str, default='best_response', help='The experiment to generate plots for.')
-    parser.add_argument('--dir', type=str, default='/Users/willemropke/Documents/mo-game-theory', help='Parent directory for data and plots.')
+    parser.add_argument('--dir', type=str, default='/Users/willemropke/Documents/mo-game-theory',
+                        help='Parent directory for data and plots.')
     parser.add_argument('--filetype', type=str, default='pdf', help="The filetype to save the plots under.")
 
     args = parser.parse_args()
