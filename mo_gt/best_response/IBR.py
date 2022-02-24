@@ -108,7 +108,7 @@ if __name__ == '__main__':
     variant = args.variant
     iterations = args.iterations
 
-    ne, final_strategy = iterated_best_response(u_tpl, monfg, max_iter=iterations, variant=variant)
+    ne, final_strategy = iterated_best_response(monfg, u_tpl, max_iter=iterations, variant=variant)
     pt.print_ne(ne, final_strategy)
 
     end = time.time()

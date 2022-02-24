@@ -150,7 +150,7 @@ if __name__ == '__main__':
     variant = args.variant
     iterations = args.iterations
 
-    ne, final_strategy = fictitious_play(u_tpl, monfg, max_iter=iterations, variant=variant)
+    ne, final_strategy = fictitious_play(monfg, u_tpl, max_iter=iterations, variant=variant)
     pt.print_ne(ne, final_strategy)
 
     end = time.time()
