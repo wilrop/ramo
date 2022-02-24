@@ -8,7 +8,7 @@ import mo_gt.games.utility_functions as uf
 
 
 class TestExecuteAlgorithm(unittest.TestCase):
-    seed = 42
+    test_seed = 42
 
     def test_execute_PSNE(self):
         game_str = 'game15'
@@ -20,7 +20,7 @@ class TestExecuteAlgorithm(unittest.TestCase):
             u_tpl.append(uf.get_u(u_str[i]))
         u_tpl = tuple(u_tpl)
 
-        test = ea.execute_algorithm(game, u_tpl, algorithm='PSNE', seed=self.seed)
+        test = ea.execute_algorithm(game, u_tpl, algorithm='PSNE', seed=self.test_seed)
         correct = np.array([[0, 1, 1], [1, 0, 2], [1, 1, 0]])
         np.testing.assert_array_equal(test, correct)
 
@@ -34,7 +34,7 @@ class TestExecuteAlgorithm(unittest.TestCase):
             u_tpl.append(uf.get_u(u_str[i]))
         u_tpl = tuple(u_tpl)
 
-        test = ea.execute_algorithm(game, u_tpl, algorithm='FP', variant='alternating', seed=self.seed)
+        test = ea.execute_algorithm(game, u_tpl, algorithm='FP', variant='alternating', seed=self.test_seed)
         self.assertTrue(test[0])
         print(test)
         correct = [np.array([0., 1.]), np.array([0., 1.]), np.array([1., 0.])]
@@ -51,7 +51,7 @@ class TestExecuteAlgorithm(unittest.TestCase):
             u_tpl.append(uf.get_u(u_str[i]))
         u_tpl = tuple(u_tpl)
 
-        test = ea.execute_algorithm(game, u_tpl, algorithm='IBR', variant='alternating', seed=self.seed)
+        test = ea.execute_algorithm(game, u_tpl, algorithm='IBR', variant='alternating', seed=self.test_seed)
         self.assertTrue(test[0])
         correct = [np.array([0., 1.]), np.array([0., 1.]), np.array([1., 0.])]
         for idx, strategy in enumerate(test[1]):

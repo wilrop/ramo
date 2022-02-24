@@ -8,10 +8,9 @@ import mo_gt.games.utility_functions as uf
 
 
 class TestIteratedBestResponse(unittest.TestCase):
+    test_seed = 42
 
     def test_alternating(self):
-        np.random.seed(42)
-
         game_str = 'game14'
         u_str = ('u1', 'u2', 'u3')
 
@@ -21,15 +20,13 @@ class TestIteratedBestResponse(unittest.TestCase):
             u_tpl.append(uf.get_u(u_str[i]))
         u_tpl = tuple(u_tpl)
 
-        test = ibr.iterated_best_response(game, u_tpl, variant='alternating')
+        test = ibr.iterated_best_response(game, u_tpl, variant='alternating', seed=self.test_seed)
         self.assertTrue(test[0])
         correct = [np.array([0., 1.]), np.array([0., 1.]), np.array([1., 0.])]
         for idx, strategy in enumerate(test[1]):
             np.testing.assert_array_equal(np.round(strategy, decimals=0), correct[idx])
 
     def test_simultaneous(self):
-        np.random.seed(42)
-
         game_str = 'game14'
         u_str = ('u1', 'u2', 'u3')
 
@@ -39,7 +36,7 @@ class TestIteratedBestResponse(unittest.TestCase):
             u_tpl.append(uf.get_u(u_str[i]))
         u_tpl = tuple(u_tpl)
 
-        test = ibr.iterated_best_response(game, u_tpl, variant='simultaneous')
+        test = ibr.iterated_best_response(game, u_tpl, variant='simultaneous', seed=self.test_seed)
         self.assertTrue(test[0])
         correct = [np.array([0., 1.]), np.array([0., 1.]), np.array([1., 0.])]
         for idx, strategy in enumerate(test[1]):
