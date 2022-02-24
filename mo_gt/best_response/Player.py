@@ -4,13 +4,14 @@ from mo_gt.best_response.best_response import calc_best_response
 
 
 class IBRPlayer:
-    """A player that learns using the iterated best response algorithm."""
+    """A player that learns a strategy using best-response iteration."""
 
-    def __init__(self, id, u, num_actions, payoff_matrix, init_strategy=None):
+    def __init__(self, id, u, num_actions, payoff_matrix, rng, init_strategy=None):
         self.id = id
         self.u = u
         self.num_actions = num_actions
         self.payoff_matrix = payoff_matrix
+        self.rng = rng
         if init_strategy is None:
             self.strategy = np.full(self.num_actions, 1 / self.num_actions)
         else:
@@ -36,14 +37,15 @@ class IBRPlayer:
 
 
 class FPPlayer:
-    """A player that learns using the fictitious play algorithm."""
+    """A player that learns a strategy using the fictitious play algorithm."""
 
-    def __init__(self, id, u, player_actions, payoff_matrix, init_strategy=None):
+    def __init__(self, id, u, player_actions, payoff_matrix, rng, init_strategy=None):
         self.id = id
         self.u = u
         self.player_actions = player_actions
         self.num_actions = player_actions[id]
         self.payoff_matrix = payoff_matrix
+        self.rng = rng
         if init_strategy is None:
             self.strategy = np.full(self.num_actions, 1 / self.num_actions)
         else:
@@ -57,7 +59,7 @@ class FPPlayer:
             int: The selected action.
 
         """
-        return np.random.choice(range(self.num_actions), p=self.strategy)
+        return self.rng.choice(range(self.num_actions), p=self.strategy)
 
     def calc_joint_strategy(self):
         """Calculates the empirical joint strategy.

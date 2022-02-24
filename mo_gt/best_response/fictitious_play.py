@@ -1,13 +1,15 @@
 import argparse
 import time
 
+import numpy as np
+
 import mo_gt.games.games as games
 import mo_gt.games.utility_functions as uf
 import mo_gt.utils.printing as pt
 from mo_gt.best_response.Player import FPPlayer
 
 
-def fictitious_play(monfg, u_tpl, max_iter=1000, init_joint_strategy=None, variant='simultaneous'):
+def fictitious_play(monfg, u_tpl, max_iter=1000, init_joint_strategy=None, variant='simultaneous', seed=None):
     """Execute the fictitious play algorithm on a given MONFG and utility functions.
 
     There are two variants of the fictitious play algorithm implemented, simultaneous and alternating fictitious play.
@@ -25,11 +27,13 @@ def fictitious_play(monfg, u_tpl, max_iter=1000, init_joint_strategy=None, varia
       init_joint_strategy (List[ndarray], optional): Initial guess for the joint strategy. (Default value = None)
       variant (str, optional): The variant to use, which is either simultaneous or alternating.
         (Default value = 'simultaneous')
+      seed (int, optional): The initial seed for the random number generator. (Default value = None)
 
     Returns:
       Tuple[bool, List[ndarray]]: Whether or not we reached a Nash equilibrium and the final joint strategy.
 
     """
+    rng = np.random.default_rng(seed=seed)
 
     def simultaneous_variant(joint_strategy):
         """Execute one iteration of the simultaneous fictitious play variant.
@@ -97,7 +101,7 @@ def fictitious_play(monfg, u_tpl, max_iter=1000, init_joint_strategy=None, varia
         init_strategy = None
         if init_joint_strategy is not None:
             init_strategy = init_joint_strategy[player_id]
-        player = FPPlayer(player_id, u, player_actions, payoff_matrix, init_strategy)
+        player = FPPlayer(player_id, u, player_actions, payoff_matrix, rng, init_strategy=init_strategy)
         players.append(player)
         joint_strategy.append(player.strategy)
 

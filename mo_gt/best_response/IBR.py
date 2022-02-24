@@ -2,13 +2,15 @@ import argparse
 import copy
 import time
 
+import numpy as np
+
 import mo_gt.games.games as games
 import mo_gt.games.utility_functions as uf
 import mo_gt.utils.printing as pt
 from mo_gt.best_response.Player import IBRPlayer
 
 
-def iterated_best_response(monfg, u_tpl, max_iter=1000, init_joint_strategy=None, variant='simultaneous'):
+def iterated_best_response(monfg, u_tpl, max_iter=1000, init_joint_strategy=None, variant='simultaneous', seed=None):
     """Execute the iterated best response algorithm on a given MONFG and utility functions.
 
     There are two variants of the iterated best response algorithm implemented, a simultaneous and alternating variant.
@@ -26,11 +28,13 @@ def iterated_best_response(monfg, u_tpl, max_iter=1000, init_joint_strategy=None
       init_joint_strategy (List[ndarray], optional): Initial guess for the joint strategy. (Default value = None)
       variant (str, optional): The variant to use, which is either simultaneous or alternating.
         (Default value = 'simultaneous')
+      seed (int, optional): The initial seed for the random number generator. (Default value = None)
 
     Returns:
       Tuple[bool, List[ndarray]]: Whether or not we reached a Nash equilibrium and the final joint strategy.
 
     """
+    rng = np.random.default_rng(seed=seed)
     pt.print_start('Iterated Best Response')
 
     player_actions = monfg[0].shape[:-1]  # Get the number of actions available to each player.
@@ -43,7 +47,7 @@ def iterated_best_response(monfg, u_tpl, max_iter=1000, init_joint_strategy=None
         init_strategy = None
         if init_joint_strategy is not None:
             init_strategy = init_joint_strategy[player]
-        player = IBRPlayer(player, u, num_actions, payoff_matrix, init_strategy)
+        player = IBRPlayer(player, u, num_actions, payoff_matrix, rng, init_strategy=init_strategy)
         players.append(player)
         joint_strategy.append(player.strategy)
 
