@@ -11,9 +11,10 @@ class CompActionAgent:
     """An agent that learns a best-response policy to each pure-strategy commitment from the leader."""
 
     def __init__(self, id, u, num_actions, num_objectives, alpha_lq=0.01, alpha_ltheta=0.01, alpha_fq=0.01,
-                 alpha_ftheta=0.01, alpha_q_decay=1, alpha_theta_decay=1):
+                 alpha_ftheta=0.01, alpha_q_decay=1, alpha_theta_decay=1, rng=None):
         self.id = id
         self.u = u
+        self.rng = rng if rng is not None else np.random.default_rng()
         self.grad = jit(grad(self.objective_function))
         self.num_actions = num_actions
         self.num_objectives = num_objectives
@@ -121,7 +122,7 @@ class CompActionAgent:
             int: A pure strategy commitment of the leader.
 
         """
-        return np.random.choice(range(self.num_actions), p=self.leader_policy)
+        return self.rng.choice(range(self.num_actions), p=self.leader_policy)
 
     def select_action(self, commitment):
         """Select an action based on the commitment of the leader.
@@ -148,7 +149,7 @@ class CompActionAgent:
           int: The selected action.
 
         """
-        return np.random.choice(range(self.num_actions), p=self.follower_policies[leader_action])
+        return self.rng.choice(range(self.num_actions), p=self.follower_policies[leader_action])
 
     def select_committed(self, leader_action):
         """Play the pure strategy that was committed.

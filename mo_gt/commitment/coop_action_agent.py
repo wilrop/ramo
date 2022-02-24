@@ -17,9 +17,10 @@ class CoopActionAgent:
     """
 
     def __init__(self, id, u, num_actions, num_objectives, alpha_q=0.01, alpha_theta=0.01, alpha_q_decay=1,
-                 alpha_theta_decay=1):
+                 alpha_theta_decay=1, rng=None):
         self.id = id
         self.u = u
+        self.rng = rng if rng is not None else np.random.default_rng()
         self.grad = jit(grad(self.objective_function))
         self.num_actions = num_actions
         self.num_objectives = num_objectives
@@ -125,7 +126,7 @@ class CoopActionAgent:
             int: A pure strategy commitment of the leader.
 
         """
-        return np.random.choice(range(self.num_actions), p=self.policy)
+        return self.rng.choice(range(self.num_actions), p=self.policy)
 
     def select_action(self, commitment):
         """Select an action based on the commitment of the leader.
@@ -156,7 +157,7 @@ class CoopActionAgent:
             self.pre_update_policies()
             self.calculated = True
         policy = self.next_policies[leader_action]
-        return np.random.choice(range(self.num_actions), p=policy)
+        return self.rng.choice(range(self.num_actions), p=policy)
 
     def select_committed(self, leader_action):
         """Play the pure strategy that was committed.

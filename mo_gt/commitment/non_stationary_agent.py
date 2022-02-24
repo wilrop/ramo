@@ -13,9 +13,10 @@ class NonStationaryAgent:
     """An agent that learns a non-stationary policy to each pure-strategy commitment from the leader."""
 
     def __init__(self, id, u, num_actions, num_objectives, alpha_q=0.01, alpha_theta=0.01, alpha_q_decay=1,
-                 alpha_theta_decay=1, buffer_size=20):
+                 alpha_theta_decay=1, buffer_size=20, rng=None):
         self.id = id
         self.u = u
+        self.rng = rng if rng is not None else np.random.default_rng()
         self.grad_leader = jit(grad(self.objective_function_leader))
         self.grad_follower = jit(grad(self.objective_function_follower))
         self.num_actions = num_actions
@@ -164,7 +165,7 @@ class NonStationaryAgent:
             int: A pure strategy commitment of the leader.
 
         """
-        return np.random.choice(range(self.num_actions), p=self.leader_policy)
+        return self.rng.choice(range(self.num_actions), p=self.leader_policy)
 
     def select_action(self, commitment):
         """Select an action based on the commitment of the leader.
@@ -192,7 +193,7 @@ class NonStationaryAgent:
 
         """
         policy = self.follower_policies[leader_action]
-        return np.random.choice(range(self.num_actions), p=policy)
+        return self.rng.choice(range(self.num_actions), p=policy)
 
     def select_committed(self, leader_action):
         """Play the pure strategy that was committed.

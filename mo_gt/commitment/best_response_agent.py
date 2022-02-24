@@ -13,9 +13,10 @@ class BestResponseAgent:
     """
 
     def __init__(self, id, u, num_actions, num_objectives, alpha_q=0.01, alpha_theta=0.01, alpha_q_decay=1,
-                 alpha_theta_decay=1, epsilon=1, epsilon_decay=0.995, min_epsilon=0.1):
+                 alpha_theta_decay=1, epsilon=1, epsilon_decay=0.995, min_epsilon=0.1, rng=None):
         self.id = id
         self.u = u
+        self.rng = rng if rng is not None else np.random.default_rng()
         self.grad = jit(grad(self.objective_function))
         self.num_actions = num_actions
         self.num_objectives = num_objectives
@@ -175,10 +176,10 @@ class BestResponseAgent:
                 self.best_response_policy = calc_best_response(proxy_u, self.id, self.payoffs_table, joint_strategy)
             self.calculated = True
 
-        if np.random.uniform(0, 1) < self.epsilon:
-            return np.random.randint(self.num_actions)
+        if self.rng.uniform(0, 1) < self.epsilon:
+            return self.rng.integers(self.num_actions)
         else:
-            return np.random.choice(range(self.num_actions), p=self.best_response_policy)
+            return self.rng.choice(range(self.num_actions), p=self.best_response_policy)
 
     def select_committed(self):
         """Play an action according to the committed policy.
@@ -187,4 +188,4 @@ class BestResponseAgent:
             int: The selected action.
 
         """
-        return np.random.choice(range(self.num_actions), p=self.leader_policy)
+        return self.rng.choice(range(self.num_actions), p=self.leader_policy)

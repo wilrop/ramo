@@ -4,6 +4,7 @@ from jax import grad, jit
 from jax.nn import softmax
 from mo_gt.utils.experiments import softmax_policy
 
+
 class OptionalComAgent:
     """An agent that learns when to commit through a two layer system.
 
@@ -12,12 +13,13 @@ class OptionalComAgent:
     """
 
     def __init__(self, no_com_agent, com_agent, id, u, num_actions, num_objectives, alpha_q=0.01, alpha_theta=0.01,
-                 alpha_q_decay=1, alpha_theta_decay=1):
+                 alpha_q_decay=1, alpha_theta_decay=1, rng=None):
         self.no_com_agent = no_com_agent
         self.com_agent = com_agent
 
         self.id = id
         self.u = u
+        self.rng = rng if rng is not None else np.random.default_rng()
         self.grad = jit(grad(self.objective_function))
         self.num_actions = num_actions
         self.num_objectives = num_objectives
@@ -109,7 +111,7 @@ class OptionalComAgent:
             int | None: A commitment from the leader.
 
         """
-        commit = np.random.choice(range(self.num_options), p=self.policy)
+        commit = self.rng.choice(range(self.num_options), p=self.policy)
         if commit == 0:  # Don't communicate
             return None
         else:
