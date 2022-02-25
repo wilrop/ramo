@@ -20,8 +20,8 @@ def reduce_monfg(monfg, u_tpl):
 
     """
     nfg = []  # Collect the payoff matrices for the NFG.
-    for player, u in enumerate(u_tpl):
-        scalarised_payoff = games.scalarise_matrix(monfg[player], u)  # Scalarise each payoff matrix.
+    for payoff_matrix, u in zip(monfg, u_tpl):
+        scalarised_payoff = games.scalarise_matrix(payoff_matrix, u)  # Scalarise each payoff matrix.
         nfg.append(scalarised_payoff)
     return nfg
 
