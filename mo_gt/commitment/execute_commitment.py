@@ -4,7 +4,7 @@ from collections import defaultdict
 
 import numpy as np
 
-import mo_gt.games.games as games
+import mo_gt.games.monfg as games
 from mo_gt.utils.data import save_metadata, save_data
 from mo_gt.utils.agent_loader import create_agents
 from mo_gt.utils.experiments import create_game_path, calc_com_probs, calc_returns, calc_action_probs, get_payoffs
