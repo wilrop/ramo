@@ -72,7 +72,7 @@ def update(agents, commitment, actions, payoffs):
 def execute_commitment(payoff_matrices, u_tpl, experiment='coop_action', runs=100, episodes=5000, rollouts=100,
                        alternate=False, alpha_lq=0.01, alpha_ltheta=0.01, alpha_fq=0.01, alpha_ftheta=0.01,
                        alpha_cq=0.01, alpha_ctheta=0.01, alpha_q_decay=1, alpha_theta_decay=1, alpha_com_decay=1,
-                       seed=1):
+                       seed=1, save_mode='all', path='.'):
     """Execute a commitment experiment.
 
     Args:
@@ -94,10 +94,11 @@ def execute_commitment(payoff_matrices, u_tpl, experiment='coop_action', runs=10
         alpha_com_decay (float, optional): The decay for the commitment strategy learning rate when using optional
             commitment. (Default = 1)
         seed (int, optional): The seed for random number generation. (Default = 1)
+        save_mode (str, optional): The save mode for this experiment. (Default = all)
+        path (str, optional): The directory to the save path for experiment data. (Default = .)
 
     Returns:
-        Tuple[Dict, Dict, ndarray, Dict, Dict]: A log of payoffs, a log of action probabilities for both agents, a log
-            of the state distribution and a log of the commitment probabilities.
+        List[Agent]: A list of trained agents.
 
     Raises:
         Exception: When the number of players does not equal two.
@@ -108,35 +109,35 @@ def execute_commitment(payoff_matrices, u_tpl, experiment='coop_action', runs=10
     if num_agents != 2:
         raise Exception(f'Commitment experiments with {num_agents} are currently not supported')
 
-    rng = np.random.default_rng(seed=seed)
+    rng = np.random.default_rng(seed=seed)  # Set the seed.
 
+    # Some basic setup.
     player_actions = payoff_matrices[0].shape[:-1]
     num_objectives = payoff_matrices[0].shape[-1]
-
-    # Set up logging data structures.
-    returns_log = defaultdict(list)
-    action_probs_log = defaultdict(list)
+    agents = []
     state_dist_log = np.zeros(player_actions)
-    com_probs_log = defaultdict(list)
-    metadata = {
-        'payoff_matrices': list(map(lambda x: x.tolist(), payoff_matrices)),
-        'u_tpl': u_tpl,
-        'experiment': experiment,
-        'runs': runs,
-        'episodes': episodes,
-        'rollouts': rollouts,
-        'alternate': alternate,
-        'alpha_lq': alpha_lq,
-        'alpha_ltheta': alpha_ltheta,
-        'alpha_fq': alpha_fq,
-        'alpha_ftheta': alpha_ftheta,
-        'alpha_cq': alpha_cq,
-        'alpha_ctheta': alpha_ctheta,
-        'alpha_q_decay': alpha_q_decay,
-        'alpha_theta_decay': alpha_theta_decay,
-        'alpha_com_decay': alpha_com_decay,
-        'seed': seed
-    }
+
+    if save_mode in ['all', 'metadata']:
+        metadata = {
+            'payoff_matrices': list(map(lambda x: x.tolist(), payoff_matrices)),
+            'u_tpl': u_tpl,
+            'experiment': experiment,
+            'runs': runs,
+            'episodes': episodes,
+            'rollouts': rollouts,
+            'alternate': alternate,
+            'alpha_lq': alpha_lq,
+            'alpha_ltheta': alpha_ltheta,
+            'alpha_fq': alpha_fq,
+            'alpha_ftheta': alpha_ftheta,
+            'alpha_cq': alpha_cq,
+            'alpha_ctheta': alpha_ctheta,
+            'alpha_q_decay': alpha_q_decay,
+            'alpha_theta_decay': alpha_theta_decay,
+            'alpha_com_decay': alpha_com_decay,
+            'seed': seed
+        }
+        save_metadata(path, **metadata)
 
     start = time.time()
 
@@ -146,6 +147,10 @@ def execute_commitment(payoff_matrices, u_tpl, experiment='coop_action', runs=10
                                alpha_theta=alpha_ltheta, alpha_fq=alpha_fq, alpha_ftheta=alpha_ftheta,
                                alpha_cq=alpha_cq, alpha_ctheta=alpha_ctheta, alpha_q_decay=alpha_q_decay,
                                alpha_theta_decay=alpha_theta_decay, alpha_com_decay=alpha_com_decay, rng=rng)
+
+        returns_log = defaultdict(list)
+        action_probs_log = defaultdict(list)
+        com_probs_log = defaultdict(list)
 
         for episode in range(episodes):
             # We keep the actions and payoffs of this episode so that we can later calculate the SER.
@@ -195,11 +200,16 @@ def execute_commitment(payoff_matrices, u_tpl, experiment='coop_action', runs=10
                 state_dist /= rollouts
                 state_dist_log += state_dist
 
+        if save_mode in ['all', 'experiment']:
+            save_data(path, experiment, game, num_agents, player_actions, runs, episodes, returns_log=returns_log,
+                      action_probs_log=action_probs_log, state_dist_log=state_dist_log, com_probs_log=com_probs_log,
+                      mode='a')
+
     end = time.time()
     elapsed_mins = (end - start) / 60.0
     print("Minutes elapsed: " + str(elapsed_mins))
 
-    return returns_log, action_probs_log, state_dist_log, com_probs_log, metadata
+    return agents
 
 
 if __name__ == "__main__":
@@ -230,14 +240,6 @@ if __name__ == "__main__":
 
     # Starting the experiments.
     payoff_matrices = games.get_monfg(game)
-    data = execute_commitment(payoff_matrices, u, experiment=experiment, runs=runs, episodes=episodes,
-                              rollouts=rollouts, alternate=alternate)
-    returns_log, action_probs_log, state_dist_log, com_probs_log, metadata = data
-
-    # Writing the data to disk.
-    num_agents = len(payoff_matrices)
-    player_actions = tuple(payoff_matrices[0].shape[:-1])
     path = create_game_path('data', experiment, game, parent_dir=parent_dir)
-    save_metadata(path, **metadata)
-    save_data(path, experiment, game, num_agents, player_actions, runs, episodes, returns_log=returns_log,
-              action_probs_log=action_probs_log, state_dist_log=state_dist_log, com_probs_log=com_probs_log)
+    data = execute_commitment(payoff_matrices, u, experiment=experiment, runs=runs, episodes=episodes,
+                              rollouts=rollouts, alternate=alternate, save_mode='all', path=path)
