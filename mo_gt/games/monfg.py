@@ -1,6 +1,5 @@
 import numpy as np
 
-
 monfg1 = [np.array([[(4, 0), (3, 1), (2, 2)],
                     [(3, 1), (2, 2), (1, 3)],
                     [(2, 2), (1, 3), (0, 4)]], dtype=float),
@@ -195,9 +194,9 @@ This game has no NE when both players use the utility function u1.
 """
 
 monfg17 = [np.array([[(4, 1), (1, 1.5)],
-                    [(3, 1), (3, 2)]], dtype=float),
-          np.array([[(4, 1), (1, 1.5)],
-                    [(3, 1), (3, 2)]], dtype=float)]
+                     [(3, 1), (3, 2)]], dtype=float),
+           np.array([[(4, 1), (1, 1.5)],
+                     [(3, 1), (3, 2)]], dtype=float)]
 """List[ndarray]: Game 17: A 2-action 2-player game with team rewards.
 
 There are two NE under SER using u1 and u2: (L, L) and (M, M).
@@ -208,11 +207,11 @@ This game shows no cyclic behaviour with fictitious play.
 """
 
 monfg18 = [np.array([[(4, 1), (1, 1.5), (2, 1)],
-                    [(3, 1), (3, 2), (1, 2)],
-                    [(1, 2), (2, 1.5), (1.5, 3)]], dtype=float),
-          np.array([[(4, 1), (1, 1.5), (2, 1)],
-                    [(3, 1), (3, 2), (1, 2)],
-                    [(1, 2), (2, 1.5), (1.5, 3)]], dtype=float)]
+                     [(3, 1), (3, 2), (1, 2)],
+                     [(1, 2), (2, 1.5), (1.5, 3)]], dtype=float),
+           np.array([[(4, 1), (1, 1.5), (2, 1)],
+                     [(3, 1), (3, 2), (1, 2)],
+                     [(1, 2), (2, 1.5), (1.5, 3)]], dtype=float)]
 """List[ndarray]: Game 18: A 3-action 2-player game with team rewards.
 
 There are three NE under SER using u1 and u2: (M, M), (L, L) and (R, R).
@@ -220,6 +219,16 @@ This game solves the problem from game 5, which in some papers falsely claims to
 There are three NE under SER using u1 and u2: (L,L), (M,M) and (R,R).
 There are three PSNE using u1 and u5: [0, 0], [1, 1], [2, 2]. Checked for correctness using Gambit.
 This game shows cyclic behaviour under IBR with simultaneous updates but not with alternating updates.
+"""
+
+monfg19 = [np.array([[(7, 12), (3, 4)],
+                     [(11, 7), (7, 3)]], dtype=float),
+           np.array([[(6, 2), (5, 4)],
+                     [(2, 8), (7, 2)]], dtype=float)]
+"""List[ndarray]: Game 18: A 2-action 2-player game with individual rewards.
+
+This game has a NE of {(0.75, 0.25), (0.5, 0.5)} using u2 for both players. 
+It is used to test the correctness of the FP and IBR algorithms.
 """
 
 
@@ -269,6 +278,8 @@ def get_monfg(game):
         monfg = monfg17
     elif game == 'game18':
         monfg = monfg18
+    elif game == 'game19':
+        monfg = monfg19
     else:
         raise Exception("The provided game does not exist.")
 
