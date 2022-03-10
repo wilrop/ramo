@@ -140,11 +140,11 @@ def print_ne(ne, joint_strategy):
     Returns:
 
     """
+    printable_strat = list(map(list, joint_strategy))
     if ne:
-        printable_strat = list(map(list, joint_strategy))
         print(f'The Nash equilibrium that was found is the joint strategy: {printable_strat}')
     else:
-        print(f'No Nash equilibrium was found.')
+        print(f'No Nash equilibrium was found, but the final joint strategy was: {printable_strat}.')
 
 
 def print_all_ne(ne_lst):
