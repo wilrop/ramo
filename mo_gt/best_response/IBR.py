@@ -8,9 +8,11 @@ import mo_gt.games.monfg as games
 import mo_gt.games.utility_functions as uf
 import mo_gt.utils.printing as pt
 from mo_gt.best_response.Player import IBRPlayer
+from mo_gt.best_response.best_response import verify_nash
 
 
-def iterated_best_response(monfg, u_tpl, max_iter=1000, init_joint_strategy=None, variant='simultaneous', seed=None):
+def iterated_best_response(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_strategy=None, variant='simultaneous',
+                           verify=True, seed=None):
     """Execute the iterated best response algorithm on a given MONFG and utility functions.
 
     There are two variants of the iterated best response algorithm implemented, a simultaneous and alternating variant.
@@ -24,10 +26,13 @@ def iterated_best_response(monfg, u_tpl, max_iter=1000, init_joint_strategy=None
     Args:
       monfg (List[ndarray]): A list of payoff matrices representing the MONFG.
       u_tpl (Tuple[callable]): A tuple of utility functions.
+      epsilon (float, optional): An optional parameter to allow for approximate Nash equilibria. (Default = 0)
       max_iter (int, optional): The maximum amount of iterations to run IBR for. (Default value = 1000)
       init_joint_strategy (List[ndarray], optional): Initial guess for the joint strategy. (Default value = None)
       variant (str, optional): The variant to use, which is either simultaneous or alternating.
         (Default value = 'simultaneous')
+      verify (bool, optional): Verify if a converged joint strategy is a Nash equilibrium. When set to true, this uses
+        a global optimiser and might be computationally expensive. (Default = True)
       seed (int, optional): The initial seed for the random number generator. (Default value = None)
 
     Returns:
@@ -72,8 +77,8 @@ def iterated_best_response(monfg, u_tpl, max_iter=1000, init_joint_strategy=None
             if not done:
                 converged = False
 
-        if converged:  # If everything already is a best-response to the joint strategy, we reached a NE.
-            nash_equilibrium = True
+        if converged and verify:  # If IBR converged, and we want to verify, check if it is a Nash equilibrium.
+            nash_equilibrium = verify_nash(monfg, u_tpl, joint_strategy, epsilon=epsilon)
             break
         else:
             joint_strategy = copy.deepcopy(new_joint_strategy)  # Update the joint strategy.

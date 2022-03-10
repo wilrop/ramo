@@ -7,9 +7,11 @@ import mo_gt.games.monfg as games
 import mo_gt.games.utility_functions as uf
 import mo_gt.utils.printing as pt
 from mo_gt.best_response.Player import FPPlayer
+from mo_gt.best_response.best_response import verify_nash
 
 
-def fictitious_play(monfg, u_tpl, max_iter=1000, init_joint_strategy=None, variant='simultaneous', seed=None):
+def fictitious_play(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_strategy=None, variant='simultaneous',
+                    verify=True, seed=None):
     """Execute the fictitious play algorithm on a given MONFG and utility functions.
 
     There are two variants of the fictitious play algorithm implemented, simultaneous and alternating fictitious play.
@@ -23,10 +25,13 @@ def fictitious_play(monfg, u_tpl, max_iter=1000, init_joint_strategy=None, varia
     Args:
       monfg (List[ndarray]): A list of payoff matrices representing the MONFG.
       u_tpl (Tuple[callable]): A tuple of utility functions.
+      epsilon (float, optional): An optional parameter to allow for approximate Nash equilibria. (Default = 0)
       max_iter (int, optional): The maximum amount of iterations to run IBR for. (Default value = 1000)
       init_joint_strategy (List[ndarray], optional): Initial guess for the joint strategy. (Default value = None)
       variant (str, optional): The variant to use, which is either simultaneous or alternating.
         (Default value = 'simultaneous')
+      verify (bool, optional): Verify if a converged joint strategy is a Nash equilibrium. When set to true, this uses
+        a global optimiser and might be computationally expensive. (Default = True)
       seed (int, optional): The initial seed for the random number generator. (Default value = None)
 
     Returns:
@@ -116,8 +121,8 @@ def fictitious_play(monfg, u_tpl, max_iter=1000, init_joint_strategy=None, varia
         print(f'Performing iteration {i}')
         converged, joint_strategy = execute_iteration(joint_strategy)
 
-        if converged:  # If everything already is a best-response to the joint strategy, we reached a NE.
-            nash_equilibrium = True
+        if converged and verify:  # If FP converged, and we want to verify, check if it is a Nash equilibrium.
+            nash_equilibrium = verify_nash(monfg, u_tpl, joint_strategy, epsilon=epsilon)
             break
 
     return nash_equilibrium, joint_strategy
@@ -127,7 +132,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--game', type=str, default='game1', help="which MONFG to play")
-    parser.add_argument('--variant', type=str, default='simultaneous', choices=['simultaneous', 'alternating'])
+    parser.add_argument('--variant', type=str, default='alternating', choices=['simultaneous', 'alternating'])
     parser.add_argument('--iterations', type=int, default=1000, help="The maximum number of iterations.")
     parser.add_argument('-u', type=str, default=['u1', 'u2'], nargs='+', help="The utility functions to use.")
     parser.add_argument('--player_actions', type=int, nargs='+', default=[5, 5],
