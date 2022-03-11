@@ -26,8 +26,8 @@ class IndependentQAgent:
         """Perform an update for the agent.
 
         Args:
-          action: The actions that was taken by the agent.
-          reward: The reward that was obtained by the agent.
+            action (int): The actions that was taken by the agent.
+            reward (float): The reward that was obtained by the agent.
 
         Returns:
 
@@ -40,8 +40,8 @@ class IndependentQAgent:
         """Update the Q-table based on the chosen actions and the obtained reward.
 
         Args:
-          action (int): The action chosen by this agent.
-          reward (float): The reward obtained by this agent.
+            action (int): The action chosen by this agent.
+            reward (float): The reward obtained by this agent.
 
         Returns:
 

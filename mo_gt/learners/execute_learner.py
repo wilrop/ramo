@@ -51,10 +51,10 @@ def execute_learner(payoff_matrices, u_tpl, experiment='coop_action', runs=100, 
         u_tpl (Tuple[callable]): A tuple of utility functions.
         experiment (str, optional): The type of commitment experiment to execute. (Default value = 'coop_action')
         runs (int, optional): The number of times to repeat the experiment. (Default value = 100)
-        episodes (int, optional): The number of episodes in one run of the experiment. (Default value = 100)
+        episodes (int, optional): The number of episodes in one run of the experiment. (Default value = 5000)
         rollouts (int, optional): The number of Monte-Carlo simulations at each episode. (Default value = 100)
-        alpha_q (float, optional): The learning rate for Q-values. (Default value = 0.2)
-        alpha_theta (float, optional): The learning rate for policy parameters. (Default value = 0.005)
+        alpha_q (float, optional): The learning rate for Q-values. (Default value = 0.01)
+        alpha_theta (float, optional): The learning rate for policy parameters. (Default value = 0.01)
         alpha_q_decay (float, optional): The decay of the learning rate for Q-values. (Default value = 1)
         alpha_theta_decay (float, optional): The decay for the learning rate of policy parameters. (Default value = 1)
         epsilon (float, optional): The exploration rate for a Q-learner agent. (Default value = 1)

@@ -36,8 +36,8 @@ class JointActionActorCriticAgent:
         """The objective function for the agent. This is the SER criterion.
 
         Args:
-          theta (ndarray): The policy parameters.
-          q_values (ndarray): The expected returns for the actions.
+            theta (ndarray): The policy parameters.
+            q_values (ndarray): The expected returns for the actions.
 
         Returns:
             float: The utility from the current policy and Q-values.
@@ -52,8 +52,8 @@ class JointActionActorCriticAgent:
         """Perform an update for the agent.
 
         Args:
-          actions (List[int]): The actions taken by all players.
-          reward (float): The reward that was obtained by the agent.
+            actions (List[int]): The actions taken by all players.
+            reward (float): The reward that was obtained by the agent.
 
         Returns:
 
@@ -70,8 +70,8 @@ class JointActionActorCriticAgent:
         """Update the joint-action Q-table.
 
         Args:
-          actions (List[int]): The actions chosen by the agents.
-          reward (float): The reward obtained by this agent.
+            actions (List[int]): The actions chosen by the agents.
+            reward (float): The reward obtained by this agent.
 
         Returns:
 
@@ -83,7 +83,7 @@ class JointActionActorCriticAgent:
         """Update the joint-action counts.
 
         Args:
-          actions (List[int]): The actions chosen by the agents.
+            actions (List[int]): The actions chosen by the agents.
 
         Returns:
 
@@ -105,11 +105,7 @@ class JointActionActorCriticAgent:
         self.joint_policy = joint_strategy
 
     def update_parameters(self):
-        """Update the hyperparameters. This entails decaying the learning rate for the Q-values and policy parameters.
-
-        Returns:
-
-        """
+        """Update the hyperparameters."""
         self.alpha_q *= self.alpha_q_decay
         self.alpha_theta *= self.alpha_theta_decay
 

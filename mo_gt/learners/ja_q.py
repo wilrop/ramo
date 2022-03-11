@@ -32,8 +32,8 @@ class JointActionQAgent:
         """Perform an update for the agent.
 
         Args:
-          actions (List[int]): The actions that were taken by the agents.
-          reward (float): The reward that was obtained by the agent.
+            actions (List[int]): The actions that were taken by the agents.
+            reward (float): The reward that was obtained by the agent.
 
         Returns:
 
@@ -48,8 +48,8 @@ class JointActionQAgent:
         """Update the joint-action Q-table.
 
         Args:
-          actions (List[int]): The actions chosen by the agents.
-          reward (float): The reward obtained by this agent.
+            actions (List[int]): The actions chosen by the agents.
+            reward (float): The reward obtained by this agent.
 
         Returns:
 
@@ -61,7 +61,7 @@ class JointActionQAgent:
         """Update the joint-action counts.
 
         Args:
-          actions (List[int]): The actions chosen by the agents.
+            actions (List[int]): The actions chosen by the agents.
 
         Returns:
 

@@ -30,8 +30,8 @@ class IndependentActorCriticAgent:
         """The objective function for the agent. This is the SER criterion.
 
         Args:
-          theta (ndarray): The policy parameters.
-          q_values (ndarray): The expected returns for the actions.
+            theta (ndarray): The policy parameters.
+            q_values (ndarray): The expected returns for the actions.
 
         Returns:
             float: The utility from the current policy and Q-values.
@@ -46,8 +46,8 @@ class IndependentActorCriticAgent:
         """Perform an update for the agent.
 
         Args:
-          action: The actions that was taken by the agent.
-          reward: The reward that was obtained by the agent.
+            action (int): The actions that was taken by the agent.
+            reward (float): The reward that was obtained by the agent.
 
         Returns:
 
@@ -61,8 +61,8 @@ class IndependentActorCriticAgent:
         """Update the Q-table based on the chosen actions and the obtained reward.
 
         Args:
-          action (int): The action chosen by this agent.
-          reward (float): The reward obtained by this agent.
+            action (int): The action chosen by this agent.
+            reward (float): The reward obtained by this agent.
 
         Returns:
 
