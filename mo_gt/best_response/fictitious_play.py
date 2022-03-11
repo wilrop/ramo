@@ -11,7 +11,7 @@ from mo_gt.best_response.best_response import verify_nash
 
 
 def fictitious_play(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_strategy=None, variant='simultaneous',
-                    verify=True, seed=None):
+                    global_opt=False, verify=True, seed=None):
     """Execute the fictitious play algorithm on a given MONFG and utility functions.
 
     There are two variants of the fictitious play algorithm implemented, simultaneous and alternating fictitious play.
@@ -23,19 +23,20 @@ def fictitious_play(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_strategy=
         of iterations is reached.
 
     Args:
-      monfg (List[ndarray]): A list of payoff matrices representing the MONFG.
-      u_tpl (Tuple[callable]): A tuple of utility functions.
-      epsilon (float, optional): An optional parameter to allow for approximate Nash equilibria. (Default = 0)
-      max_iter (int, optional): The maximum amount of iterations to run IBR for. (Default value = 1000)
-      init_joint_strategy (List[ndarray], optional): Initial guess for the joint strategy. (Default value = None)
-      variant (str, optional): The variant to use, which is either simultaneous or alternating.
+        monfg (List[ndarray]): A list of payoff matrices representing the MONFG.
+        u_tpl (Tuple[callable]): A tuple of utility functions.
+        epsilon (float, optional): An optional parameter to allow for approximate Nash equilibria. (Default = 0)
+        max_iter (int, optional): The maximum amount of iterations to run IBR for. (Default value = 1000)
+        init_joint_strategy (List[ndarray], optional): Initial guess for the joint strategy. (Default value = None)
+        variant (str, optional): The variant to use, which is either simultaneous or alternating.
         (Default value = 'simultaneous')
-      verify (bool, optional): Verify if a converged joint strategy is a Nash equilibrium. When set to true, this uses
+        global_opt (bool, optional): Whether to use a global optimiser or a local one. (Default = False)
+        verify (bool, optional): Verify if a converged joint strategy is a Nash equilibrium. When set to true, this uses
         a global optimiser and might be computationally expensive. (Default = True)
-      seed (int, optional): The initial seed for the random number generator. (Default value = None)
+        seed (int, optional): The initial seed for the random number generator. (Default value = None)
 
     Returns:
-      Tuple[bool, List[ndarray]]: Whether or not we reached a Nash equilibrium and the final joint strategy.
+        Tuple[bool, List[ndarray]]: Whether or not we reached a Nash equilibrium and the final joint strategy.
 
     """
     rng = np.random.default_rng(seed=seed)
@@ -60,7 +61,7 @@ def fictitious_play(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_strategy=
             player.update_empirical_strategies(actions)
 
         for player_id, player in enumerate(players):  # Update the policies simultaneously.
-            done, br = player.update_strategy()
+            done, br = player.update_strategy(epsilon=epsilon, global_opt=global_opt)
             joint_strategy[player_id] = br  # Update the joint strategy.
             if not done:
                 converged = False
@@ -88,7 +89,8 @@ def fictitious_play(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_strategy=
             for update_player in players:  # Update the empirical state distributions.
                 update_player.update_empirical_strategies(actions)
 
-            done, br = player.update_strategy()  # Update the current player's policy.
+            done, br = player.update_strategy(epsilon=epsilon,
+                                              global_opt=global_opt)  # Update the current player's policy.
             joint_strategy[player_id] = br  # Update the joint strategy.
             if not done:
                 converged = False
@@ -121,8 +123,11 @@ def fictitious_play(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_strategy=
         print(f'Performing iteration {i}')
         converged, joint_strategy = execute_iteration(joint_strategy)
 
-        if converged and verify:  # If FP converged, and we want to verify, check if it is a Nash equilibrium.
-            nash_equilibrium = verify_nash(monfg, u_tpl, joint_strategy, epsilon=epsilon)
+        if converged:  # If IBR converged, check if we can guarantee a Nash equilibrium.
+            if global_opt:  # If we used a global optimiser, it is guaranteed to be a Nash equilibrium.
+                nash_equilibrium = True
+            elif verify:  # Otherwise check if the user wanted to verify.
+                nash_equilibrium = verify_nash(monfg, u_tpl, joint_strategy, epsilon=epsilon)
             break
 
     return nash_equilibrium, joint_strategy
