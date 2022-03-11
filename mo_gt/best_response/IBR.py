@@ -11,8 +11,8 @@ from mo_gt.best_response.Player import IBRPlayer
 from mo_gt.best_response.best_response import verify_nash
 
 
-def iterated_best_response(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_strategy=None, variant='simultaneous',
-                           verify=True, seed=None):
+def iterated_best_response(monfg, u_tpl, epsilon=0., max_iter=1000, init_joint_strategy=None, variant='simultaneous',
+                           global_opt=True, verify=True, seed=None):
     """Execute the iterated best response algorithm on a given MONFG and utility functions.
 
     There are two variants of the iterated best response algorithm implemented, a simultaneous and alternating variant.
@@ -24,19 +24,20 @@ def iterated_best_response(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_st
         of iterations is reached.
 
     Args:
-      monfg (List[ndarray]): A list of payoff matrices representing the MONFG.
-      u_tpl (Tuple[callable]): A tuple of utility functions.
-      epsilon (float, optional): An optional parameter to allow for approximate Nash equilibria. (Default = 0)
-      max_iter (int, optional): The maximum amount of iterations to run IBR for. (Default value = 1000)
-      init_joint_strategy (List[ndarray], optional): Initial guess for the joint strategy. (Default value = None)
-      variant (str, optional): The variant to use, which is either simultaneous or alternating.
+        monfg (List[ndarray]): A list of payoff matrices representing the MONFG.
+        u_tpl (Tuple[callable]): A tuple of utility functions.
+        epsilon (float, optional): An optional parameter to allow for approximate Nash equilibria. (Default = 0)
+        max_iter (int, optional): The maximum amount of iterations to run IBR for. (Default value = 1000)
+        init_joint_strategy (List[ndarray], optional): Initial guess for the joint strategy. (Default value = None)
+        variant (str, optional): The variant to use, which is either simultaneous or alternating.
         (Default value = 'simultaneous')
-      verify (bool, optional): Verify if a converged joint strategy is a Nash equilibrium. When set to true, this uses
+        global_opt (bool, optional): Whether to use a global optimiser or a local one. (Default = False)
+        verify (bool, optional): Verify if a converged joint strategy is a Nash equilibrium. When set to true, this uses
         a global optimiser and might be computationally expensive. (Default = True)
-      seed (int, optional): The initial seed for the random number generator. (Default value = None)
+        seed (int, optional): The initial seed for the random number generator. (Default value = None)
 
     Returns:
-      Tuple[bool, List[ndarray]]: Whether or not we reached a Nash equilibrium and the final joint strategy.
+        Tuple[bool, List[ndarray]]: Whether or not we reached a Nash equilibrium and the final joint strategy.
 
     """
     rng = np.random.default_rng(seed=seed)
@@ -72,13 +73,16 @@ def iterated_best_response(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_st
         converged = True
 
         for id, player in enumerate(players):
-            done, br = player.update_strategy(update_strategy())  # Use the update strategy.
+            done, br = player.update_strategy(update_strategy(), epsilon=epsilon, global_opt=global_opt)
             new_joint_strategy[id] = br  # Update the joint strategy.
             if not done:
                 converged = False
 
-        if converged and verify:  # If IBR converged, and we want to verify, check if it is a Nash equilibrium.
-            nash_equilibrium = verify_nash(monfg, u_tpl, joint_strategy, epsilon=epsilon)
+        if converged:  # If IBR converged, check if we can guarantee a Nash equilibrium.
+            if global_opt:  # If we used a global optimiser, it is guaranteed to be a Nash equilibrium.
+                nash_equilibrium = True
+            elif verify:  # Otherwise check if the user wanted to verify.
+                nash_equilibrium = verify_nash(monfg, u_tpl, joint_strategy, epsilon=epsilon)
             break
         else:
             joint_strategy = copy.deepcopy(new_joint_strategy)  # Update the joint strategy.
@@ -89,10 +93,10 @@ def iterated_best_response(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_st
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--game', type=str, default='game1', help="which MONFG to play")
-    parser.add_argument('--variant', type=str, default='alternating', choices=['simultaneous', 'alternating'])
+    parser.add_argument('--game', type=str, default='game19', help="which MONFG to play")
+    parser.add_argument('--variant', type=str, default='simultaneous', choices=['simultaneous', 'alternating'])
     parser.add_argument('--iterations', type=int, default=1000, help="The maximum number of iterations.")
-    parser.add_argument('-u', type=str, default=['u1', 'u2'], nargs='+', help="The utility functions to use.")
+    parser.add_argument('-u', type=str, default=['u2', 'u2'], nargs='+', help="The utility functions to use.")
     parser.add_argument('--player_actions', type=int, nargs='+', default=[5, 5],
                         help='The number of actions per player')
     parser.add_argument('--num_objectives', type=int, default=2, help="The number of objectives for the random MONFG.")
