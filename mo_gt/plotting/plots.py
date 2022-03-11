@@ -23,9 +23,9 @@ def save_plot(plot_name, filetype, dpi=300):
     """Save a generated plot with the requested name and filetype.
 
     Args:
-      plot_name (str): The file to save the plot to.
-      filetype (str): The filetype for the figure.
-      dpi (int, optional): The resolution for the final figure. Used when saving as png. (Default value = 300)
+        plot_name (str): The file to save the plot to.
+        filetype (str): The filetype for the figure.
+        dpi (int, optional): The resolution for the final figure. Used when saving as png. (Default value = 300)
 
     Returns:
 
@@ -42,16 +42,16 @@ def plot_returns(path_plots, filetype, game, name, ag1_data, ag2_data, min_x=0, 
     """Plot the returns obtained by both agents in one graph.
 
     Args:
-      path_plots (str): The path for saving the plot.
-      filetype (str): The filetype to save the file under.
-      game (str): The game that was played.
-      name (str): The name of the experiment that was ran.
-      ag1_data (DataFrame): The data for agent 1.
-      ag2_data (DataFrame): The data for agent 2.
-      min_x (float, optional): The minimum value for the x-axis. (Default = 0)
-      max_x (float, optional): The maximum value for the x-axis. (Default = 5000)
-      min_y (float, optional): The minimum value for the y-axis. (Default = 0)
-      max_y (float, optional): The maximum value for the y-axis. (Default = 20)
+        path_plots (str): The path for saving the plot.
+        filetype (str): The filetype to save the file under.
+        game (str): The game that was played.
+        name (str): The name of the experiment that was ran.
+        ag1_data (DataFrame): The data for agent 1.
+        ag2_data (DataFrame): The data for agent 2.
+        min_x (float, optional): The minimum value for the x-axis. (Default value = 0)
+        max_x (float, optional): The maximum value for the x-axis. (Default value = 5000)
+        min_y (float, optional): The minimum value for the y-axis. (Default value = 0)
+        max_y (float, optional): The maximum value for the y-axis. (Default value = 20)
 
     Returns:
 
@@ -79,16 +79,16 @@ def plot_action_probabilities(path_plots, filetype, game, name, agent, data, min
     """Plot the action probabilities for a given agent.
 
     Args:
-      path_plots (str): The path for saving the plot.
-      filetype (str): The filetype to save the file under.
-      game (str): The game that was played.
-      name (str): The name of the experiment that was ran.
-      agent (str): The agent that is being plotted.
-      data (DataFrame): The data for this agent.
-      min_x (float, optional): The minimum value for the x-axis. (Default = 0)
-      max_x (float, optional): The maximum value for the x-axis. (Default = 5000)
-      min_y (float, optional): The minimum value for the y-axis. (Default = 0)
-      max_y (float, optional): The maximum value for the y-axis. (Default = 20)
+        path_plots (str): The path for saving the plot.
+        filetype (str): The filetype to save the file under.
+        game (str): The game that was played.
+        name (str): The name of the experiment that was ran.
+        agent (str): The agent that is being plotted.
+        data (DataFrame): The data for this agent.
+        min_x (float, optional): The minimum value for the x-axis. (Default value = 0)
+        max_x (float, optional): The maximum value for the x-axis. (Default value = 5000)
+        min_y (float, optional): The minimum value for the y-axis. (Default value = 0)
+        max_y (float, optional): The maximum value for the y-axis. (Default value = 20)
 
     Returns:
 
@@ -125,10 +125,10 @@ def plot_joint_action_distribution(path_plots, game, name, data):
     """Plot a heatmap of the joint-action distribution.
 
     Args:
-      path_plots (str): The path for saving the plot.
-      game (str): The game that was played.
-      name (str): The name of the experiment that was ran.
-      data (DataFrame): The state distribution data.
+        path_plots (str): The path for saving the plot.
+        game (str): The game that was played.
+        name (str): The name of the experiment that was ran.
+        data (DataFrame): The state distribution data.
 
     Returns:
 
@@ -164,24 +164,24 @@ def plot_joint_action_distribution(path_plots, game, name, data):
 
 
 def plot_com_probabilities(path_plots, filetype, game, name, agent, data, min_x=0, max_x=5000, min_y=0, max_y=20):
-    """Plot the message probabilities for a given agent.
+    """Plot the commitment or communication probabilities for a given agent.
 
     Args:
-      path_plots (str): The path for saving the plot.
-      filetype (str): The filetype to save the file under.
-      game (str): The game that was played.
-      name (str): The name of the experiment that was ran.
-      agent (str): The agent that is being plotted.
-      data (DataFrame): The data for this agent.
-      min_x (float, optional): The minimum value for the x-axis. (Default = 0)
-      max_x (float, optional): The maximum value for the x-axis. (Default = 5000)
-      min_y (float, optional): The minimum value for the y-axis. (Default = 0)
-      max_y (float, optional): The maximum value for the y-axis. (Default = 20)
+        path_plots (str): The path for saving the plot.
+        filetype (str): The filetype to save the file under.
+        game (str): The game that was played.
+        name (str): The name of the experiment that was ran.
+        agent (str): The agent that is being plotted.
+        data (DataFrame): The data for this agent.
+        min_x (float, optional): The minimum value for the x-axis. (Default value = 0)
+        max_x (float, optional): The maximum value for the x-axis. (Default value = 5000)
+        min_y (float, optional): The minimum value for the y-axis. (Default value = 0)
+        max_y (float, optional): The maximum value for the y-axis. (Default value = 20)
 
     Returns:
 
     """
-    print(f'Plotting message probabilities for agent: {agent}')
+    print(f'Plotting commitment/communication probabilities for agent: {agent}')
 
     ax = sns.lineplot(x='Episode', y='No communication', linewidth=2.0, data=data, ci='sd', label='No Communication')
     ax = sns.lineplot(x='Episode', y='Communication', linewidth=2.0, data=data, ci='sd', label='Communication')
@@ -194,17 +194,17 @@ def plot_com_probabilities(path_plots, filetype, game, name, agent, data, min_x=
     plt.tight_layout()
     save_plot(plot_name, filetype)
 
-    print(f'Finished plotting message probabilities for agent: {agent}')
+    print(f'Finished plotting commitment/communication probabilities for agent: {agent}')
 
 
 def plot_results(games, name, parent_dir=None, filetype='pdf'):
     """Executes the different plotting functions needed for each requested game.
 
     Args:
-      games (List[str]): The games to plot the results for.
-      name (str): The name of the experiment.
-      parent_dir (str, optional): Parent directory for data and plots. (Default = None)
-      filetype (str): The filetype to save the file under.
+        games (List[str]): The games to plot the results for.
+        name (str): The name of the experiment.
+        parent_dir (str, optional): Parent directory for data and plots. (Default value = None)
+        filetype (str): The filetype to save the file under. (Default value = pdf)
 
     Returns:
 
