@@ -93,10 +93,10 @@ def iterated_best_response(monfg, u_tpl, epsilon=0., max_iter=1000, init_joint_s
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--game', type=str, default='game19', help="which MONFG to play")
-    parser.add_argument('--variant', type=str, default='simultaneous', choices=['simultaneous', 'alternating'])
+    parser.add_argument('--game', type=str, default='game1', help="which MONFG to play")
+    parser.add_argument('--variant', type=str, default='alternating', choices=['simultaneous', 'alternating'])
     parser.add_argument('--iterations', type=int, default=1000, help="The maximum number of iterations.")
-    parser.add_argument('-u', type=str, default=['u2', 'u2'], nargs='+', help="The utility functions to use.")
+    parser.add_argument('-u', type=str, default=['u1', 'u2'], nargs='+', help="The utility functions to use.")
     parser.add_argument('--player_actions', type=int, nargs='+', default=[5, 5],
                         help='The number of actions per player')
     parser.add_argument('--num_objectives', type=int, default=2, help="The number of objectives for the random MONFG.")
