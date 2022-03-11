@@ -236,10 +236,10 @@ def get_monfg(game):
     """Get the payoffs for a game from a string.
 
     Args:
-      game (str): The string of the game.
+        game (str): The string of the game.
 
     Returns:
-      List[ndarray]: A list of payoff matrices.
+        List[ndarray]: A list of payoff matrices.
 
     """
     if game == 'game1':
@@ -290,11 +290,11 @@ def scalarise_matrix(payoff_matrix, u):
     """Scalarise a payoff matrix using a given utility function.
 
     Args:
-      payoff_matrix (ndarray): The input payoffs.
-      u (callable): A utility function.
+        payoff_matrix (ndarray): The input payoffs.
+        u (callable): A utility function.
 
     Returns:
-      (ndarray): The scalarised game. This has the same shape except the last dimension which is scalarised.
+        ndarray: The scalarised game. This has the same shape except the last dimension which is scalarised.
 
     """
     player_actions = payoff_matrix.shape[:-1]
@@ -313,14 +313,14 @@ def generate_random_monfg(player_actions=(2, 2), num_objectives=2, reward_min_bo
     """Generate a random MONFG with payoffs from a discrete uniform distribution.
 
     Args:
-      player_actions (Tuple[int], optional): A tuple of actions indexed by player. (Default value = (2, 2))
-      num_objectives (int, optional): The number of objectives in the game. (Default value = 2)
-      reward_min_bound (int, optional): The minimum reward on an objective. (Default value = 0)
-      reward_max_bound (int, optional): The maximum reward on an objective. (Default value = 5)
-      rng (Generator, optional): A random number generator. (Default value = None)
+        player_actions (Tuple[int], optional): A tuple of actions indexed by player. (Default value = (2, 2))
+        num_objectives (int, optional): The number of objectives in the game. (Default value = 2)
+        reward_min_bound (int, optional): The minimum reward on an objective. (Default value = 0)
+        reward_max_bound (int, optional): The maximum reward on an objective. (Default value = 5)
+        rng (Generator, optional): A random number generator. (Default value = None)
 
     Returns:
-      List[ndarray]: A list of payoff matrices representing the MONFG.
+        List[ndarray]: A list of payoff matrices representing the MONFG.
 
     """
     rng = rng if rng is not None else np.random.default_rng()
@@ -334,14 +334,14 @@ def generate_random_monfg(player_actions=(2, 2), num_objectives=2, reward_min_bo
     return payoffs
 
 
-def generate_identity_game(player_actions=(2, 2)):
+def generate_identity_game(player_actions):
     """Generate an identity game.
 
     Args:
-      player_actions (Tuple[int]): A tuple of actions indexed by player. (Default value = (2, 2))
+        player_actions (Tuple[int]): A tuple of actions indexed by player.
 
     Returns:
-      List[ndarray]: A list of payoff matrices representing the identity game.
+        List[ndarray]: A list of payoff matrices representing the identity game.
 
     """
     payoffs = []
