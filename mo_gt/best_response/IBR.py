@@ -11,8 +11,8 @@ from mo_gt.best_response.Player import IBRPlayer
 from mo_gt.best_response.best_response import verify_nash
 
 
-def iterated_best_response(monfg, u_tpl, epsilon=0., max_iter=1000, init_joint_strategy=None, variant='simultaneous',
-                           global_opt=True, verify=True, seed=None):
+def iterated_best_response(monfg, u_tpl, epsilon=0., max_iter=1000, init_joint_strategy=None, variant='alternating',
+                           global_opt=False, verify=True, seed=None):
     """Execute the iterated best response algorithm on a given MONFG and utility functions.
 
     There are two variants of the iterated best response algorithm implemented, a simultaneous and alternating variant.

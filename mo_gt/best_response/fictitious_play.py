@@ -10,7 +10,7 @@ from mo_gt.best_response.Player import FPPlayer
 from mo_gt.best_response.best_response import verify_nash
 
 
-def fictitious_play(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_strategy=None, variant='simultaneous',
+def fictitious_play(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_strategy=None, variant='alternating',
                     global_opt=False, verify=True, seed=None):
     """Execute the fictitious play algorithm on a given MONFG and utility functions.
 
