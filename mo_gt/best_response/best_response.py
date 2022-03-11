@@ -6,8 +6,7 @@ def objective(strategy, expected_returns, u):
     """The objective function in an MONFG under SER.
 
     Implements the objective function for a player in an MONFG under SER. In a best-response calculation, players aim to
-    maximise their utility. However, most often in optimisation we are given minimisers (e.g. SciPy's minimise).
-    The sign of the utility is flipped as the objective to minimise, which effectively maximises the utility.
+    maximise their utility.
 
     Args:
       strategy (ndarray) The current estimate for the best response strategy.
@@ -19,70 +18,70 @@ def objective(strategy, expected_returns, u):
 
     """
     expected_vec = strategy @ expected_returns  # The expected vector of the strategy applied to the expected returns.
-    objective = - u(expected_vec)  # The negative utility.
-    return objective
+    utility = u(expected_vec)
+    return utility
 
 
-def optimise_policy(expected_returns, u, init_strat=None):
-    """Calculate a policy maximising a given utility function.
+def optimise_policy(expected_returns, u, epsilon=0, global_opt=False, init_strat=None, guesses=1):
+    """Optimise a policy given a utility function.
 
     Notes:
-        This function is only guaranteed to find a locally optimal policy.
+        This function is only guaranteed to find a best-response when global_opt is set to True. Otherwise, it will use
+        a local optimiser, which is only guaranteed to find a local optimum.
 
     Args:
         expected_returns (ndarray): The expected returns from the player's actions.
         u (callable): The player's utility function.
+        epsilon (float, optional): Allow epsilon approximate solutions. (Default = 0)
+        global_opt (bool, optional): Whether to use a global optimiser or a local one. We use the sampling method
+         'sobol' by default as we found better empirical results with it than with 'simplicial'. The drawback is that
+         simplicial has much better theoretical convergence guarantees. (Default = False)
         init_strat (ndarray, optional): An initial guess for the optimal policy. (Default = None)
+        guesses (int, optional): The amount of starting guesses to try.
 
     Returns:
-        ndarray: An optimised policy.
+        Tuple[bool, ndarray, float]: Whether the optimisation was successful, the optimised strategy and utility from
+        this strategy.
 
     """
     num_actions = len(expected_returns)
-
-    if init_strat is None:
-        init_strat = np.full(num_actions, 1 / num_actions)  # A uniform strategy as first guess for the optimiser.
-
-    init_strats = [init_strat]
-    for i in range(num_actions):
-        pure_strat = np.zeros(num_actions)
-        pure_strat[i] = 1
-        init_strats.append(pure_strat)  # A pure strategy as initial guess for the optimiser.
-
-    br_strategy = None
-    br_utility = float('inf')
-    for strat in init_strats:
-        bounds = [(0, 1)] * num_actions  # Constrain probabilities to 0 and 1.
-        constraints = {'type': 'eq', 'fun': lambda x: np.sum(x) - 1}  # Equality constraint is equal to zero by default.
-        res = scopt.minimize(lambda x: objective(x, expected_returns, u), strat, bounds=bounds, constraints=constraints)
-
-        if res['fun'] < br_utility:
-            br_utility = res['fun']
-            br_strategy = res['x'] / np.sum(res['x'])  # In case of floating point errors.
-
-    return br_strategy
-
-
-def global_optimise_policy(expected_returns, u):
-    """Optimise a policy using a global optimisation algorithm.
-
-    Args:
-        expected_returns (ndarray): The expected returns from the player's actions.
-        u (callable): The player's utility function.
-
-    Returns:
-        Tuple[bool, ndarray, float]: Whether the optimisation was successful, the globally optimal policy and utility
-        from this policy.
-    """
-    num_actions = len(expected_returns)
-
     bounds = [(0, 1)] * num_actions  # Constrain probabilities to 0 and 1.
     constraints = {'type': 'eq', 'fun': lambda x: np.sum(x) - 1}  # Equality constraint is equal to zero by default.
-    res = scopt.shgo(lambda x: objective(x, expected_returns, u), bounds=bounds, constraints=constraints)
-    success = res['success']
-    br_strategy = res['x'] / np.sum(res['x'])  # In case of floating point errors.
-    br_utility = - objective(br_strategy, expected_returns, u)  # Recalculate the utility to force the same precision.
 
+    if global_opt:
+        options = {}
+        if epsilon > 0:
+            # Set a tolerance for the global optimizer. Note that we don't set a tolerance for each local minimization.
+            # We do this because we want to be in the region of the global best-response and by doing it for each local
+            # optimization we risk missing this strategy.
+            options['f_tol'] = epsilon
+        best_res = scopt.shgo(lambda x: - objective(x, expected_returns, u), bounds=bounds, constraints=constraints,
+                              sampling_method='sobol', options=options)
+    else:
+        guesses = max(1, guesses)  # Perform at least one guess.
+        init_guesses = []
+        if init_strat is not None:
+            init_guesses.append(init_strat)
+            guesses -= 1
+
+        for i in range(guesses):
+            guess = np.random.dirichlet(np.ones(num_actions))  # Random distribution summing to one.
+            init_guesses.append(guess)
+
+        best_res = None
+        for guess in init_guesses:  # Attempt a local minimization for the amount of initial guesses.
+            tol = None
+            if epsilon > 0:
+                tol = epsilon  # Set a specified tolerance.
+            res = scopt.minimize(lambda x: - objective(x, expected_returns, u), guess, bounds=bounds,
+                                 constraints=constraints, tol=tol)
+
+            if best_res is None or res['fun'] < best_res['fun']:  # If this local minimization was better, then use it.
+                best_res = res
+
+    success = best_res['success']
+    br_strategy = best_res['x'] / np.sum(best_res['x'])  # In case of floating point errors.
+    br_utility = objective(br_strategy, expected_returns, u)  # Calculate the utility to force the same precision.
     return success, br_strategy, br_utility
 
 
@@ -125,22 +124,42 @@ def calc_expected_returns(player, payoff_matrix, joint_strategy):
     return expected_returns
 
 
-def calc_best_response(u, player, payoff_matrix, joint_strategy, init_strat=None):
+def calc_utility_from_joint_strat(u, player, payoff_matrix, joint_strategy):
+    """Calculate the utility from a given joint strategy.
+    Args:
+        u (callable): The utility function for this player.
+        player (int): The player to calculate expected returns for.
+        payoff_matrix (ndarray): The payoff matrix for the given player.
+        joint_strategy (List[ndarray]): A list of each player's individual strategy.
+
+    Returns:
+        float: The utility from the joint strategy for this player.
+    """
+    expected_returns = calc_expected_returns(player, payoff_matrix, joint_strategy)
+    strategy = joint_strategy[player]
+    utility = objective(strategy, expected_returns, u)
+    return utility
+
+
+def calc_best_response(u, player, payoff_matrix, joint_strategy, epsilon=0, global_opt=False, init_strat=None):
     """Calculate a best response for a given player to a joint strategy.
 
     Args:
-      u (callable): The utility function for this player.
-      player (int): The player to caculate expected returns for.
-      payoff_matrix (ndarray): The payoff matrix for the given player.
-      joint_strategy (List[ndarray]): A list of each player's individual strategy.
-      init_strat (ndarray, optional): The initial guess for the best response. (Default = None)
+        u (callable): The utility function for this player.
+        player (int): The player to calculate expected returns for.
+        payoff_matrix (ndarray): The payoff matrix for the given player.
+        joint_strategy (List[ndarray]): A list of each player's individual strategy.
+        epsilon (float, optional): Tolerance parameter to calculate an epsilon best-response strategy. (Default = 0)
+        global_opt (bool, optional): Whether to use a global optimiser or a local one. (Default = False)
+        init_strat (ndarray, optional): The initial guess for the best response. (Default = None)
 
     Returns:
-      ndarray: A best response strategy.
+        ndarray: A best response strategy.
 
     """
     expected_returns = calc_expected_returns(player, payoff_matrix, joint_strategy)
-    br_strategy = optimise_policy(expected_returns, u, init_strat=init_strat)
+    _, br_strategy, _ = optimise_policy(expected_returns, u, epsilon=epsilon, global_opt=global_opt,
+                                        init_strat=init_strat)
     return br_strategy
 
 
@@ -164,8 +183,8 @@ def verify_nash(monfg, u_tpl, joint_strat, epsilon=0):
     """
     for player, (payoffs, u, strat) in enumerate(zip(monfg, u_tpl, joint_strat)):
         expected_returns = calc_expected_returns(player, payoffs, joint_strat)
-        utility_from_strat = - objective(strat, expected_returns, u)
-        success, br_strat, br_utility = global_optimise_policy(expected_returns, u)
+        utility_from_strat = objective(strat, expected_returns, u)
+        success, br_strat, br_utility = optimise_policy(expected_returns, u, global_opt=True)
         if not (success and (utility_from_strat + epsilon >= br_utility)):
             return False
     return True
