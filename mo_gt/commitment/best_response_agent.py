@@ -43,8 +43,8 @@ class BestResponseAgent:
         """The objective function for the leader. This is the SER criterion.
 
         Args:
-          theta (ndarray): The policy parameters.
-          q_values (ndarray): The expected returns for the actions.
+            theta (ndarray): The policy parameters.
+            q_values (ndarray): The expected returns for the actions.
 
         Returns:
             float: The utility from the current policy and leader Q-values.
@@ -78,10 +78,10 @@ class BestResponseAgent:
         """Perform an update of the agent. Specifically updates the Q-tables, policies and hyperparameters.
 
         Args:
-          commitment (ndarray): The opponent's committed policy. Unused at this point in time. Still provided to make it
-            compatible with other commitment agents.
-          actions (List[int]): The actions selected in an episode.
-          reward (float): The reward that was obtained by the agent in that episode.
+            commitment (ndarray): The opponent's committed policy. Unused at this point in time. Still provided to make
+                it compatible with other commitment agents.
+            actions (List[int]): The actions selected in an episode.
+            reward (float): The reward that was obtained by the agent in that episode.
 
         Returns:
 
@@ -101,8 +101,8 @@ class BestResponseAgent:
         """Update the leader's Q-table based on their own action and the obtained reward.
 
         Args:
-          own_action (int): The action taken by the leader.
-          reward (float): The reward obtained by this agent.
+            own_action (int): The action taken by the leader.
+            reward (float): The reward obtained by this agent.
 
         Returns:
 
@@ -113,8 +113,8 @@ class BestResponseAgent:
         """Update the joint-action payoffs table.
 
         Args:
-          actions (List[int]): The actions that were taken in an episode.
-          reward (float): The reward obtained by this joint action.
+            actions (List[int]): The actions that were taken in an episode.
+            reward (float): The reward obtained by this joint action.
 
         Returns:
 
@@ -143,10 +143,10 @@ class BestResponseAgent:
         """This method will select an action based on the commitment from the leader.
 
         Args:
-          commitment (ndarray): The commitment from the leader.
+            commitment (ndarray): The commitment from the leader.
 
         Returns:
-          int: The selected action.
+            int: The selected action.
 
         """
         if self.leader:
@@ -158,12 +158,13 @@ class BestResponseAgent:
         """Calculate a best-response policy and sample an action from this policy as response to the commitment.
 
         Args:
-          commitment (ndarray): The commitment from the leader.
-          optimistic (bool, optional): Whether the agent is optimistic or pessimistic. A pessimistic agent will minimise
-            the leader's utility. An optimistic agent will maximise their own utility. (Default value = False)
+            commitment (ndarray): The commitment from the leader.
+            optimistic (bool, optional): Whether the agent is optimistic or pessimistic. A pessimistic agent will
+                minimise the leader's utility. An optimistic agent will maximise their own utility.
+                (Default value = False)
 
         Returns:
-          int: The selected action.
+            int: The selected action.
 
         """
         if not self.calculated:

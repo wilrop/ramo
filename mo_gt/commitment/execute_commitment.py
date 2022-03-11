@@ -14,12 +14,12 @@ def get_leader(agents, episode, alternate=False):
     """Select the leader in the current episode.
 
     Args:
-      agents (List[Agent]): A list of agents.
-      episode (int): The current episode.
-      alternate (bool, optional): Whether to alternate the leader between players of not. (Default = False)
+        agents (List[Agent]): A list of agents.
+        episode (int): The current episode.
+        alternate (bool, optional): Whether to alternate the leader between players of not. (Default value = False)
 
     Returns:
-      Tuple[int, Agent]: The id of the leader and the leader agent itself.
+        Tuple[int, Agent]: The id of the leader and the leader agent itself.
 
     """
     if alternate:
@@ -40,11 +40,11 @@ def select_actions(agents, commitment):
     """Select an action from each agent's policy.
 
     Args:
-      agents (List[Agent]): A list of agents.
-      commitment: The commitment from the leader.
+        agents (List[Agent]): A list of agents.
+        commitment (None | int | ndarray): The commitment from the leader.
 
     Returns:
-      List[int]: A list of selected actions.
+        List[int]: A list of selected actions.
 
     """
     selected = []
@@ -57,10 +57,10 @@ def update(agents, commitment, actions, payoffs):
     """Perform an update for a list of agents.
 
     Args:
-      agents (List[Agent]): A list of agents.
-      commitment (int | ndarray): The commitment from the leader.
-      actions (List[int]): A list of each action that was chosen, indexed by agent.
-      payoffs (List[ndarray]): A list of each payoff that was received, indexed by agent.
+        agents (List[Agent]): A list of agents.
+        commitment (int | ndarray): The commitment from the leader.
+        actions (List[int]): A list of each action that was chosen, indexed by agent.
+        payoffs (List[ndarray]): A list of each payoff that was received, indexed by agent.
 
     Returns:
 
@@ -78,24 +78,26 @@ def execute_commitment(payoff_matrices, u_tpl, experiment='coop_action', runs=10
     Args:
         payoff_matrices (List[ndarray]): A list of payoff matrices representing the MONFG.
         u_tpl (Tuple[str]): A tuple of names of utility functions.
-        experiment (str, optional): The type of commitment experiment to execute. (Default = 'coop_action')
-        runs (int, optional): The number of times to repeat the experiment. (Default = 100)
-        episodes (int, optional): The number of episodes in one run of the experiment. (Default = 100)
-        rollouts (int, optional): The number of Monte-Carlo simulations at each episode. (Default = 100)
-        alternate (bool, optional): Whether to alternate the players between leader and follower. (Default = False)
-        alpha_lq (float, optional): The learning rate for leader Q-values. (Default = 0.01)
-        alpha_ltheta (float, optional): The learning rate for leader policy parameters. (Default = 0.01)
-        alpha_fq (float, optional): The learning rate for follower Q-values. (Default = 0.01)
-        alpha_ftheta (float, optional): The learning rate for follower policy parameters. (Default = 0.01)
-        alpha_cq (float, optional): The learning rate for optional commitment Q-values. (Default = 0.01)
-        alpha_ctheta (float, optional): The learning rate for optional commitment policy parameters. (Default = 0.01)
-        alpha_q_decay (float, optional): The decay for the Q-values learning rate. (Default = 1)
-        alpha_theta_decay (float, optional): The decay for the policy parameters learning rate. (Default = 1)
+        experiment (str, optional): The type of commitment experiment to execute. (Default value = 'coop_action')
+        runs (int, optional): The number of times to repeat the experiment. (Default value = 100)
+        episodes (int, optional): The number of episodes in one run of the experiment. (Default value = 100)
+        rollouts (int, optional): The number of Monte-Carlo simulations at each episode. (Default value = 100)
+        alternate (bool, optional): Whether to alternate the players between leader and follower.
+            (Default value = False)
+        alpha_lq (float, optional): The learning rate for leader Q-values. (Default value = 0.01)
+        alpha_ltheta (float, optional): The learning rate for leader policy parameters. (Default value = 0.01)
+        alpha_fq (float, optional): The learning rate for follower Q-values. (Default value = 0.01)
+        alpha_ftheta (float, optional): The learning rate for follower policy parameters. (Default value = 0.01)
+        alpha_cq (float, optional): The learning rate for optional commitment Q-values. (Default value = 0.01)
+        alpha_ctheta (float, optional): The learning rate for optional commitment policy parameters.
+            (Default value = 0.01)
+        alpha_q_decay (float, optional): The decay for the Q-values learning rate. (Default value = 1)
+        alpha_theta_decay (float, optional): The decay for the policy parameters learning rate. (Default value = 1)
         alpha_com_decay (float, optional): The decay for the commitment strategy learning rate when using optional
-            commitment. (Default = 1)
-        seed (int, optional): The seed for random number generation. (Default = 1)
-        save_mode (str, optional): The save mode for this experiment. (Default = all)
-        path (str, optional): The directory to the save path for experiment data. (Default = .)
+            commitment. (Default value = 1)
+        seed (int, optional): The seed for random number generation. (Default value = 1)
+        save_mode (str, optional): The save mode for this experiment. (Default value = 'all')
+        path (str, optional): The directory to the save path for experiment data. (Default value = '.')
 
     Returns:
         List[Agent]: A list of trained agents.

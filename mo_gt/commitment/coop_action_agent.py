@@ -44,8 +44,8 @@ class CoopActionAgent:
         """The objective function.
 
         Args:
-          theta (ndarray): The policy parameters.
-          q_values (ndarray): Learned Q-values used to calculate the SER from these parameters.
+            theta (ndarray): The policy parameters.
+            q_values (ndarray): Learned Q-values used to calculate the SER from these parameters.
 
         Returns:
             float: The utility from the current parameters theta and Q-values.
@@ -68,9 +68,9 @@ class CoopActionAgent:
         """Perform an update of the agent. Specifically updates the Q-tables, policies and hyperparameters.
 
         Args:
-          commitment (int): The opponent's committed action.
-          actions (List[int]): The actions selected in an episode.
-          reward (float): The reward that was obtained by the agent in that episode.
+            commitment (int): The opponent's committed action.
+            actions (List[int]): The actions selected in an episode.
+            reward (float): The reward that was obtained by the agent in that episode.
 
         Returns:
 
@@ -96,8 +96,8 @@ class CoopActionAgent:
         """Update the joint-action Q-table.
 
         Args:
-          actions (List[int]): The actions taken by the agents.
-          reward (float): The reward obtained by this agent.
+            actions (List[int]): The actions taken by the agents.
+            reward (float): The reward obtained by this agent.
 
         Returns:
 
@@ -132,10 +132,10 @@ class CoopActionAgent:
         """Select an action based on the commitment of the leader.
 
         Args:
-          commitment (int): The message that was sent.
+            commitment (int): The message that was sent.
 
         Returns:
-          int: The selected action.
+            int: The selected action.
 
         """
         if self.leader:
@@ -147,10 +147,10 @@ class CoopActionAgent:
         """Select the correct counter policy and sample an action using this policy.
 
         Args:
-          leader_action (int): The committed pure strategy from the leader.
+            leader_action (int): The committed pure strategy from the leader.
 
         Returns:
-          int: The selected action.
+            int: The selected action.
 
         """
         if not self.calculated:
@@ -163,10 +163,10 @@ class CoopActionAgent:
         """Play the pure strategy that was committed.
 
         Args:
-          leader_action (int): The pure strategy (action) the leader committed to.
+            leader_action (int): The pure strategy (action) the leader committed to.
 
         Returns:
-          int: The committed action.
+            int: The committed action.
 
         """
         return leader_action

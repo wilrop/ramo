@@ -39,8 +39,8 @@ class CompActionAgent:
         """The objective function.
 
         Args:
-          theta (ndarray): The policy parameters.
-          q_values (ndarray): Learned Q-values used to calculate the SER from these parameters.
+            theta (ndarray): The policy parameters.
+            q_values (ndarray): Learned Q-values used to calculate the SER from these parameters.
 
         Returns:
             float: The utility from the current parameters theta and Q-values.
@@ -63,9 +63,9 @@ class CompActionAgent:
         """Perform an update of the agent. Specifically updates the Q-tables, policies and hyperparameters.
 
         Args:
-          commitment (int): The leader's committed action.
-          actions (List[int]): The actions selected in an episode.
-          reward (float): The reward that was obtained by the agent in that episode.
+            commitment (int): The leader's committed action.
+            actions (List[int]): The actions selected in an episode.
+            reward (float): The reward that was obtained by the agent in that episode.
 
         Returns:
 
@@ -87,8 +87,8 @@ class CompActionAgent:
         """Update the leader's Q-table based on their own action and the obtained reward.
 
         Args:
-          action (int): The action taken by the leader.
-          reward (float): The reward obtained by this agent.
+            action (int): The action taken by the leader.
+            reward (float): The reward obtained by this agent.
 
         Returns:
 
@@ -99,8 +99,8 @@ class CompActionAgent:
         """Update the joint-action payoffs table.
 
         Args:
-          actions (List[int]): The actions that were taken in an episode.
-          reward (float): The reward obtained by this joint action.
+            actions (List[int]): The actions that were taken in an episode.
+            reward (float): The reward obtained by this joint action.
 
         Returns:
 
@@ -128,10 +128,10 @@ class CompActionAgent:
         """Select an action based on the commitment of the leader.
 
         Args:
-          commitment (int): The message that was sent.
+            commitment (int): The message that was sent.
 
         Returns:
-          int: The selected action.
+            int: The selected action.
 
         """
         if self.leader:
@@ -143,10 +143,10 @@ class CompActionAgent:
         """Select the correct counter policy and sample an action using this policy.
 
         Args:
-          leader_action (int): The committed pure strategy from the leader.
+            leader_action (int): The committed pure strategy from the leader.
 
         Returns:
-          int: The selected action.
+            int: The selected action.
 
         """
         return self.rng.choice(range(self.num_actions), p=self.follower_policies[leader_action])
@@ -155,10 +155,10 @@ class CompActionAgent:
         """Play the pure strategy that was committed.
 
         Args:
-          leader_action (int): The pure strategy (action) the leader published.
+            leader_action (int): The pure strategy (action) the leader published.
 
         Returns:
-          int: The committed action.
+            int: The committed action.
 
         """
         return leader_action

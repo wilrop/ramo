@@ -35,8 +35,8 @@ class CoopPolicyAgent:
         """The objective function.
 
         Args:
-          theta (ndarray): The policy parameters.
-          q_values (ndarray): Learned Q-values used to calculate the SER from these parameters.
+            theta (ndarray): The policy parameters.
+            q_values (ndarray): Learned Q-values used to calculate the SER from these parameters.
 
         Returns:
             float: The utility from the current parameters theta and Q-values.
@@ -59,9 +59,9 @@ class CoopPolicyAgent:
         """Perform an update of the agent. Specifically updates the Q-tables, policies and hyperparameters.
 
         Args:
-          commitment (int): The opponent's committed action.
-          actions (List[int]): The actions selected in an episode.
-          reward (float): The reward that was obtained by the agent in that episode.
+            commitment (int): The opponent's committed action.
+            actions (List[int]): The actions selected in an episode.
+            reward (float): The reward that was obtained by the agent in that episode.
 
         Returns:
 
@@ -91,8 +91,8 @@ class CoopPolicyAgent:
         """Update the joint-action Q-table.
 
         Args:
-          actions (List[int]): The actions taken by the agents.
-          reward (float): The reward obtained by this agent.
+            actions (List[int]): The actions taken by the agents.
+            reward (float): The reward obtained by this agent.
 
         Returns:
 
@@ -117,10 +117,10 @@ class CoopPolicyAgent:
         """Select an action based on the commitment of the leader.
 
         Args:
-          commitment (int): The message that was sent.
+            commitment (ndarray): The message that was sent.
 
         Returns:
-          int: The selected action.
+            int: The selected action.
 
         """
         if self.leader:
@@ -132,10 +132,10 @@ class CoopPolicyAgent:
         """Perform an update to learn a counter policy and sample an action using this policy.
 
         Args:
-          leader_strategy (ndarray): The committed pure strategy from the leader.
+            leader_strategy (ndarray): The committed pure strategy from the leader.
 
         Returns:
-          int: The selected action.
+            int: The selected action.
 
         """
         joint_policy = make_joint_strat(self.id, self.policy, [leader_strategy])
@@ -148,10 +148,10 @@ class CoopPolicyAgent:
         """Sample an action from the committed strategy.
 
         Args:
-          leader_strategy (ndarray): The mixed strategy the leader committed to.
+            leader_strategy (ndarray): The mixed strategy the leader committed to.
 
         Returns:
-          int: The committed action.
+            int: The committed action.
 
         """
         return self.rng.choice(range(self.num_actions), p=leader_strategy)

@@ -40,8 +40,8 @@ class OptionalComAgent:
         """The objective function.
 
         Args:
-          theta (ndarray): The policy parameters.
-          q_values (ndarray): Learned Q-values used to calculate the SER from these parameters.
+            theta (ndarray): The policy parameters.
+            q_values (ndarray): Learned Q-values used to calculate the SER from these parameters.
 
         Returns:
             float: The utility from the current parameters theta and Q-values.
@@ -64,9 +64,9 @@ class OptionalComAgent:
         """Perform an update of the agent and cascade an update to the lower layer agent.
 
         Args:
-          commitment (int): The leader's non-stationary commitment strategy.
-          actions (List[int]): The actions selected in an episode.
-          reward (float): The reward that was obtained by the agent in that episode.
+            commitment (int): The leader's non-stationary commitment strategy.
+            actions (List[int]): The actions selected in an episode.
+            reward (float): The reward that was obtained by the agent in that episode.
 
         Returns:
 
@@ -121,10 +121,10 @@ class OptionalComAgent:
         """Select an action based on the commitment of the leader. Pass the commitment to the correct layer.
 
         Args:
-          commitment (int | ndarray): The commitment from the leader.
+            commitment (int | ndarray): The commitment from the leader.
 
         Returns:
-          int: The selected action.
+            int: The selected action.
 
         """
         if commitment is None:

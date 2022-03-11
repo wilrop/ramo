@@ -42,11 +42,11 @@ class NonStationaryAgent:
         """The objective function for the leader.
 
         Args:
-          theta (ndarray): The parameters for the commitment policy.
-          q_values (ndarray): The Q-values for committing to actions.
+            theta (ndarray): The parameters for the commitment policy.
+            q_values (ndarray): The Q-values for committing to actions.
 
         Returns:
-          float: The utility from the commitment strategy.
+            float: The utility from the commitment strategy.
 
         """
         policy = softmax(theta)
@@ -58,12 +58,12 @@ class NonStationaryAgent:
         """The objective function for the follower.
 
         Args:
-          thetas (ndarray): A matrix of thetas.
-          q_values (ndarray): Learned Q-values for the joint-actions.
-          leader_policy (ndarray): The committed non-stationary strategy from the leader.
+            thetas (ndarray): A matrix of thetas.
+            q_values (ndarray): Learned Q-values for the joint-actions.
+            leader_policy (ndarray): The committed non-stationary strategy from the leader.
 
         Returns:
-          float: The utility from these parameters.
+            float: The utility from these parameters.
 
         """
         expected_returns = jnp.zeros(self.num_objectives)
@@ -88,7 +88,7 @@ class NonStationaryAgent:
         """Set the number of actions that the opponent can play.
 
         Args:
-            num_actions: The number of actions for the opponent.
+            num_actions (int): The number of actions for the opponent.
 
         Returns:
 
@@ -99,9 +99,9 @@ class NonStationaryAgent:
         """Perform an update of the agent. Specifically updates the Q-tables, policies and hyperparameters.
 
         Args:
-          commitment (int): The leader's non-stationary commitment strategy.
-          actions (List[int]): The actions selected in an episode.
-          reward (float): The reward that was obtained by the agent in that episode.
+            commitment (int): The leader's non-stationary commitment strategy.
+            actions (List[int]): The actions selected in an episode.
+            reward (float): The reward that was obtained by the agent in that episode.
 
         Returns:
 
@@ -132,8 +132,8 @@ class NonStationaryAgent:
         """Update the leader's Q-table based on their own action and the obtained reward.
 
         Args:
-          action (int): The action taken by the leader.
-          reward (float): The reward obtained by this agent.
+            action (int): The action taken by the leader.
+            reward (float): The reward obtained by this agent.
 
         Returns:
 
@@ -144,8 +144,8 @@ class NonStationaryAgent:
         """Update the joint-action payoffs table.
 
         Args:
-          actions (List[int]): The actions that were taken in an episode.
-          reward (float): The reward obtained by this joint action.
+            actions (List[int]): The actions that were taken in an episode.
+            reward (float): The reward obtained by this joint action.
 
         Returns:
 
@@ -171,10 +171,10 @@ class NonStationaryAgent:
         """Select an action based on the commitment of the leader.
 
         Args:
-          commitment (int): The message that was sent.
+            commitment (int): The message that was sent.
 
         Returns:
-          int: The selected action.
+            int: The selected action.
 
         """
         if self.leader:
@@ -186,10 +186,10 @@ class NonStationaryAgent:
         """Select the correct counter policy and sample an action using this policy.
 
         Args:
-          leader_action (int): The committed pure strategy from the leader.
+            leader_action (int): The committed pure strategy from the leader.
 
         Returns:
-          int: The selected action.
+            int: The selected action.
 
         """
         policy = self.follower_policies[leader_action]
@@ -199,10 +199,10 @@ class NonStationaryAgent:
         """Play the pure strategy that was committed.
 
         Args:
-          leader_action (int): The pure strategy (action) the leader published.
+            leader_action (int): The pure strategy (action) the leader published.
 
         Returns:
-          int: The committed action.
+            int: The committed action.
 
         """
         return leader_action
