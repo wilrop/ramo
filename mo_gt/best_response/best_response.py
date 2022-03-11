@@ -26,8 +26,17 @@ def optimise_policy(expected_returns, u, epsilon=0, global_opt=False, init_strat
     """Optimise a policy given a utility function.
 
     Notes:
-        This function is only guaranteed to find a best-response when global_opt is set to True. Otherwise, it will use
-        a local optimiser, which is only guaranteed to find a local optimum.
+        When setting global_opt to True, this will optimise the function using the SHGO algorithm. The algorithm is
+        proven to converge to the global optimum for the general case where ``f(x)`` is non-continuous, non-convex and
+        non-smooth, when using the default simplicial sampling method[1]. We currently use the non-default sobol
+        sampling method as there is a bug in the default method and sobol has shown more reliable in practice.
+
+        When using a local optimiser, the function is only guaranteed to find a local optimum. By default it will use
+        Sequential Least Squares Programming (SLSQP).
+
+    References:
+        [1] Endres, SC, Sandrock, C, Focke, WW (2018) "A simplicial homology algorithm for lipschitz optimization",
+            Journal of Global Optimization.
 
     Args:
         expected_returns (ndarray): The expected returns from the player's actions.
