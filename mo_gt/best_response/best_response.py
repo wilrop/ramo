@@ -28,25 +28,25 @@ def optimise_policy(expected_returns, u, epsilon=0, global_opt=False, init_strat
     Notes:
         When setting global_opt to True, this will optimise the function using the SHGO algorithm. The algorithm is
         proven to converge to the global optimum for the general case where ``f(x)`` is non-continuous, non-convex and
-        non-smooth, when using the default simplicial sampling method[1]. We currently use the non-default sobol
+        non-smooth, when using the default simplicial sampling method [1]_. We currently use the non-default sobol
         sampling method as there is a bug in the default method and sobol has shown more reliable in practice.
 
         When using a local optimiser, the function is only guaranteed to find a local optimum. By default it will use
         Sequential Least Squares Programming (SLSQP).
 
     References:
-        [1] Endres, SC, Sandrock, C, Focke, WW (2018) "A simplicial homology algorithm for lipschitz optimization",
+        .. [1] Endres, SC, Sandrock, C, Focke, WW (2018) "A simplicial homology algorithm for lipschitz optimization",
             Journal of Global Optimization.
 
     Args:
         expected_returns (ndarray): The expected returns from the player's actions.
         u (callable): The player's utility function.
-        epsilon (float, optional): Allow epsilon approximate solutions. (Default = 0)
+        epsilon (float, optional): Allow epsilon approximate solutions. (Default value = 0)
         global_opt (bool, optional): Whether to use a global optimiser or a local one. We use the sampling method
          'sobol' by default as we found better empirical results with it than with 'simplicial'. The drawback is that
-         simplicial has much better theoretical convergence guarantees. (Default = False)
-        init_strat (ndarray, optional): An initial guess for the optimal policy. (Default = None)
-        guesses (int, optional): The amount of starting guesses to try.
+         simplicial has much better theoretical convergence guarantees. (Default value = False)
+        init_strat (ndarray, optional): An initial guess for the optimal policy. (Default value = None)
+        guesses (int, optional): The amount of starting guesses to try. (Default value = 1)
 
     Returns:
         Tuple[bool, ndarray, float]: Whether the optimisation was successful, the optimised strategy and utility from
@@ -135,6 +135,7 @@ def calc_expected_returns(player, payoff_matrix, joint_strategy):
 
 def calc_utility_from_joint_strat(u, player, payoff_matrix, joint_strategy):
     """Calculate the utility from a given joint strategy.
+
     Args:
         u (callable): The utility function for this player.
         player (int): The player to calculate expected returns for.
@@ -158,9 +159,10 @@ def calc_best_response(u, player, payoff_matrix, joint_strategy, epsilon=0, glob
         player (int): The player to calculate expected returns for.
         payoff_matrix (ndarray): The payoff matrix for the given player.
         joint_strategy (List[ndarray]): A list of each player's individual strategy.
-        epsilon (float, optional): Tolerance parameter to calculate an epsilon best-response strategy. (Default = 0)
-        global_opt (bool, optional): Whether to use a global optimiser or a local one. (Default = False)
-        init_strat (ndarray, optional): The initial guess for the best response. (Default = None)
+        epsilon (float, optional): Tolerance parameter to calculate an epsilon best-response strategy.
+            (Default value = 0)
+        global_opt (bool, optional): Whether to use a global optimiser or a local one. (Default value = False)
+        init_strat (ndarray, optional): The initial guess for the best response. (Default value = None)
 
     Returns:
         ndarray: A best response strategy.
@@ -179,7 +181,7 @@ def verify_nash(monfg, u_tpl, joint_strat, epsilon=0):
         monfg (List[ndarray]): A list of payoff matrices.
         u_tpl (Tuple[callable]): A utility function per player.
         joint_strat (List[ndarray]): The joint strategy to verify.
-        epsilon (float, optional): An optional parameter to allow for approximate Nash equilibria. (Default = 0)
+        epsilon (float, optional): An optional parameter to allow for approximate Nash equilibria. (Default value = 0)
 
     Notes:
         A Nash equilibrium occurs whenever all strategies are best-responses to each other. We specifically use a global
