@@ -16,9 +16,9 @@ class TestBestResponse(unittest.TestCase):
 
         expected_returns = np.array([[1, 2], [3, 4], [5, 6]])
         u = uf.u5
-        self.assertEqual(br.objective(unif_strat, expected_returns, u), -37)
-        self.assertEqual(br.objective(pure_strat, expected_returns, u), -37)
-        self.assertEqual(br.objective(random_strat, expected_returns, u), -47.294799999999995)
+        self.assertEqual(br.objective(unif_strat, expected_returns, u), 37)
+        self.assertEqual(br.objective(pure_strat, expected_returns, u), 37)
+        self.assertEqual(br.objective(random_strat, expected_returns, u), 47.294799999999995)
 
     def test_calc_expected_returns(self):
         player = 0
@@ -40,16 +40,11 @@ class TestBestResponse(unittest.TestCase):
         payoff_matrix = games.monfg1[0]
         u = uf.u5
 
-        joint_strategy1 = [np.array([1 / 3, 1 / 3, 1 / 3]), np.array([1 / 3, 1 / 3, 1 / 3])]
-        test1 = np.around(br.calc_best_response(u, player, payoff_matrix, joint_strategy1), decimals=5)
-        correct1 = np.array([0., 0., 1.])
+        joint_strategy = [np.array([1 / 3, 1 / 3, 1 / 3]), np.array([0.25, 0.35, 0.4])]
+        test = np.around(br.calc_best_response(u, player, payoff_matrix, joint_strategy), decimals=5)
+        correct = np.array([0., 0., 1.])
 
-        joint_strategy2 = [np.array([1 / 3, 1 / 3, 1 / 3]), np.array([0.25, 0.35, 0.4])]
-        test2 = np.around(br.calc_best_response(u, player, payoff_matrix, joint_strategy2), decimals=5)
-        correct2 = np.array([0., 0., 1.])
-
-        np.testing.assert_array_equal(test1, correct1)
-        np.testing.assert_array_equal(test2, correct2)
+        np.testing.assert_array_equal(test, correct)
 
 
 if __name__ == '__main__':

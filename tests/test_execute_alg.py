@@ -34,9 +34,10 @@ class TestExecuteAlgorithm(unittest.TestCase):
             u_tpl.append(uf.get_u(u_str[i]))
         u_tpl = tuple(u_tpl)
 
-        test = ea.execute_algorithm(game, u_tpl, algorithm='FP', variant='alternating', seed=self.test_seed)
+        options = {'variant': 'alternating'}
+        test = ea.execute_algorithm(game, u_tpl, algorithm='FP', seed=self.test_seed, options=options)
+
         self.assertTrue(test[0])
-        print(test)
         correct = [np.array([0., 1.]), np.array([0., 1.]), np.array([1., 0.])]
         for idx, strategy in enumerate(test[1]):
             np.testing.assert_array_equal(np.round(strategy, decimals=0), correct[idx])
@@ -51,7 +52,9 @@ class TestExecuteAlgorithm(unittest.TestCase):
             u_tpl.append(uf.get_u(u_str[i]))
         u_tpl = tuple(u_tpl)
 
-        test = ea.execute_algorithm(game, u_tpl, algorithm='IBR', variant='alternating', seed=self.test_seed)
+        options = {'variant': 'alternating'}
+        test = ea.execute_algorithm(game, u_tpl, algorithm='IBR', seed=self.test_seed, options=options)
+
         self.assertTrue(test[0])
         correct = [np.array([0., 1.]), np.array([0., 1.]), np.array([1., 0.])]
         for idx, strategy in enumerate(test[1]):
