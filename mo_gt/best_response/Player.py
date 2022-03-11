@@ -20,12 +20,13 @@ class Player:
         """Update the strategy by calculating a best response to the other players' strategies.
 
         Args:
-          joint_strategy (List[ndarray]): A list of each player's individual strategy.
-          epsilon (float, optional): An optional parameter to allow for approximate Nash equilibria. (Default value = 0)
-          global_opt (bool, optional): Whether to use a global optimiser or a local one. (Default value = False)
+            joint_strategy (List[ndarray]): A list of each player's individual strategy.
+            epsilon (float, optional): An optional parameter to allow for approximate Nash equilibria.
+                (Default value = 0)
+            global_opt (bool, optional): Whether to use a global optimiser or a local one. (Default value = False)
 
         Returns:
-          Tuple[bool, ndarray]: Whether the strategy has converged and the best response strategy.
+            Tuple[bool, ndarray]: Whether the strategy has converged and the best response strategy.
 
         """
         br = calc_best_response(self.u, self.pid, self.payoff_matrix, joint_strategy, epsilon=epsilon,
@@ -69,12 +70,13 @@ class IBRPlayer(Player):
         """Update the strategy by using the super class implementation.
 
         Args:
-          joint_strat (List[ndarray]): A list of each player's individual strategy.
-          epsilon (float, optional): An optional parameter to allow for approximate Nash equilibria. (Default value = 0)
-          global_opt (bool, optional): Whether to use a global optimiser or a local one. (Default value = False)
+            joint_strat (List[ndarray]): A list of each player's individual strategy.
+            epsilon (float, optional): An optional parameter to allow for approximate Nash equilibria.
+                (Default value = 0)
+            global_opt (bool, optional): Whether to use a global optimiser or a local one. (Default value = False)
 
         Returns:
-          Tuple[bool, ndarray]: Whether the strategy has converged and the best response strategy.
+            Tuple[bool, ndarray]: Whether the strategy has converged and the best response strategy.
 
         """
         return super().update(joint_strat, epsilon=epsilon, global_opt=global_opt)
@@ -132,7 +134,7 @@ class FPPlayer(Player):
         """Update the empirical strategy of all players.
 
         Args:
-          actions (List[int]): The actions that were taken by the players.
+            actions (List[int]): The actions that were taken by the players.
 
         """
         for player, action in enumerate(actions):

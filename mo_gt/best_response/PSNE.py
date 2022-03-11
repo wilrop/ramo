@@ -12,11 +12,11 @@ def reduce_monfg(monfg, u_tpl):
     """Reduce an MONFG to an NFG by scalarisation. This is also known as the trade-off game.
 
     Args:
-      monfg (List[ndarray]): An MONFG as a list of payoff matrices.
-      u_tpl (Tuple[callable]): A tuple of utility functions.
+        monfg (List[ndarray]): An MONFG as a list of payoff matrices.
+        u_tpl (Tuple[callable]): A tuple of utility functions.
 
     Returns:
-      List[ndarray]: The scalarised MONFG.
+        List[ndarray]: The scalarised MONFG.
 
     """
     nfg = []  # Collect the payoff matrices for the NFG.
@@ -30,11 +30,11 @@ def calc_nfg_psne(nfg, player_actions):
     """Calculate the PSNE for an NFG using the "underlining" method.
 
     Args:
-      nfg (List[ndarray]): An NFG as a list of payoff matrices.
-      player_actions (Tuple[int]): A tuple of the amount of actions per player.
+        nfg (List[ndarray]): An NFG as a list of payoff matrices.
+        player_actions (Tuple[int]): A tuple of the amount of actions per player.
 
     Returns:
-      ndarray: The pure joint-strategies that are a PSNE.
+        ndarray: The pure joint-strategies that are a PSNE.
 
     """
     best_responses = []  # Collect the best response matrices.
@@ -70,11 +70,11 @@ def calc_all_psne(monfg, u_tpl):
         This algorithm is only guaranteed to be correct when using quasiconvex utility functions.
 
     Args:
-      monfg (List[ndarray]): An MONFG as a list of payoff matrices.
-      u_tpl (Tuple[callable]): A tuple of utility functions.
+        monfg (List[ndarray]): An MONFG as a list of payoff matrices.
+        u_tpl (Tuple[callable]): A tuple of utility functions.
 
     Returns:
-      ndarray: The pure joint-strategies that are a PSNE.
+        ndarray: The pure joint-strategies that are a PSNE.
 
     """
     player_actions = monfg[0].shape[:-1]  # Get the number of actions available to each player.

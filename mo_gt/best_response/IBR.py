@@ -30,7 +30,7 @@ def iterated_best_response(monfg, u_tpl, epsilon=0., max_iter=1000, init_joint_s
         max_iter (int, optional): The maximum amount of iterations to run IBR for. (Default value = 1000)
         init_joint_strategy (List[ndarray], optional): Initial guess for the joint strategy. (Default value = None)
         variant (str, optional): The variant to use, which is either simultaneous or alternating. (Default value =
-            'simultaneous')
+            'alternating')
         global_opt (bool, optional): Whether to use a global optimiser or a local one. (Default value = False)
         verify (bool, optional): Verify if a converged joint strategy is a Nash equilibrium. When set to true, this uses
             a global optimiser and might be computationally expensive. (Default value = True)

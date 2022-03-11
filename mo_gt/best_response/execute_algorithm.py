@@ -12,7 +12,7 @@ def execute_algorithm(monfg, u_tpl, algorithm='PSNE', seed=None, options=None):
         monfg (List[ndarray]): A list of payoff matrices representing the MONFG.
         u_tpl (Tuple[callable]): A tuple of utility functions.
         algorithm (str, optional): The requested algorithm. (Default value = 'PSNE')
-        seed (int, optional): Seed the NumPy generator. If set to None, the system seed is used. (Default = None)
+        seed (int, optional): Seed the NumPy generator. If set to None, the system seed is used. (Default value = None)
         options (Dict, optional): A dictionary of options for the selected algorithm. For a complete overview of the
             arguments per algorithm, see the algorithm documentation. (Default value = None)
 
