@@ -14,10 +14,10 @@ def select_actions(agents):
     """Select an action from each agent's policy.
 
     Args:
-      agents (List[Agent]): A list of agents.
+        agents (List[Agent]): A list of agents.
 
     Returns:
-      List[int]: A list of selected actions.
+        List[int]: A list of selected actions.
 
     """
     selected = []
@@ -30,9 +30,9 @@ def update(agents, actions, payoffs):
     """Perform an update for a list of agents.
 
     Args:
-      agents (List[Agent]): A list of agents.
-      actions (List[int]): A list of each action that was chosen, indexed by agent.
-      payoffs (List[ndarray]): A list of each payoff that was received, indexed by agent.
+        agents (List[Agent]): A list of agents.
+        actions (List[int]): A list of each action that was chosen, indexed by agent.
+        payoffs (List[ndarray]): A list of each payoff that was received, indexed by agent.
 
     Returns:
 
@@ -49,18 +49,18 @@ def execute_learner(payoff_matrices, u_tpl, experiment='coop_action', runs=100, 
     Args:
         payoff_matrices (List[ndarray]): A list of payoff matrices representing the MONFG.
         u_tpl (Tuple[callable]): A tuple of utility functions.
-        experiment (str, optional): The type of commitment experiment to execute. (Default = 'coop_action')
-        runs (int, optional): The number of times to repeat the experiment. (Default = 100)
-        episodes (int, optional): The number of episodes in one run of the experiment. (Default = 100)
-        rollouts (int, optional): The number of Monte-Carlo simulations at each episode. (Default = 100)
-        alpha_q (float, optional): The learning rate for Q-values. (Default = 0.2)
-        alpha_theta (float, optional): The learning rate for policy parameters. (Default = 0.005)
-        alpha_q_decay (float, optional): The decay of the learning rate for Q-values. (Default = 1)
-        alpha_theta_decay (float, optional): The decay for the learning rate of policy parameters. (Default = 1)
-        epsilon (float, optional): The exploration rate for a Q-learner agent. (Default = 1)
-        epsilon_decay (float, optional): The decay for the exploration rate. (Default = 0.995)
-        min_epsilon (float, optional): The minimum value for the exploration rate. (Default = 0.1)
-        seed (int, optional): The seed for random number generation. (Default = 1)
+        experiment (str, optional): The type of commitment experiment to execute. (Default value = 'coop_action')
+        runs (int, optional): The number of times to repeat the experiment. (Default value = 100)
+        episodes (int, optional): The number of episodes in one run of the experiment. (Default value = 100)
+        rollouts (int, optional): The number of Monte-Carlo simulations at each episode. (Default value = 100)
+        alpha_q (float, optional): The learning rate for Q-values. (Default value = 0.2)
+        alpha_theta (float, optional): The learning rate for policy parameters. (Default value = 0.005)
+        alpha_q_decay (float, optional): The decay of the learning rate for Q-values. (Default value = 1)
+        alpha_theta_decay (float, optional): The decay for the learning rate of policy parameters. (Default value = 1)
+        epsilon (float, optional): The exploration rate for a Q-learner agent. (Default value = 1)
+        epsilon_decay (float, optional): The decay for the exploration rate. (Default value = 0.995)
+        min_epsilon (float, optional): The minimum value for the exploration rate. (Default value = 0.1)
+        seed (int, optional): The seed for random number generation. (Default value = 1)
 
     Returns:
         Tuple[Dict, Dict, ndarray, Dict}: A log of payoffs, a log of action probabilities for both agents, a log of the

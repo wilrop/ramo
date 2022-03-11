@@ -9,9 +9,9 @@ def array_slice(array, axis, start, end, step=1):
         axis (int): The axis to slice through.
         start (int): The start index of that axis.
         end (int): The end index of that axis.
-        step (int): The step size of the slice.
+        step (int, optional): The step size of the slice. (Default value = 1)
 
     Returns:
-
+        ndarray: A slice across the correct axis.
     """
     return array[(slice(None),) * (axis % array.ndim) + (slice(start, end, step),)]

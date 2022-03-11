@@ -10,8 +10,8 @@ def print_two_player_monfg(game, name='MONFG', highlight_cells=None):
 
     Args:
         game (List[ndarray]): The list of payoff matrices.
-        name (str, optional): The name of the game. (Default = 'MONFG')
-        highlight_cells (List[array_like], optional): Cell coordinates to highlight. (Default = None)
+        name (str, optional): The name of the game. (Default value = 'MONFG')
+        highlight_cells (List[array_like], optional): Cell coordinates to highlight. (Default value = None)
 
     Returns:
 
@@ -52,8 +52,8 @@ def print_payoff_matrices(game, name='MONFG', highlight_cells=None):
 
     Args:
         game (List[ndarray]): The list of payoff matrices.
-        name (str, optional): The name of the game. (Default = 'MONFG')
-        highlight_cells (List[array_like], optional): Cell coordinates to highlight. (Default = None)
+        name (str, optional): The name of the game. (Default value = 'MONFG')
+        highlight_cells (List[array_like], optional): Cell coordinates to highlight. (Default value = None)
 
     Returns:
 
@@ -99,8 +99,8 @@ def print_monfg(game, name='MONFG', highlight_cells=None):
 
     Args:
         game (List[ndarray]): The list of payoff matrices.
-        name (str, optional): The name of the game. (Default = 'MONFG')
-        highlight_cells (List[array_like], optional): Cell coordinates to highlight. (Default = None)
+        name (str, optional): The name of the game. (Default value = 'MONFG')
+        highlight_cells (List[array_like], optional): Cell coordinates to highlight. (Default value = None)
 
     Returns:
 
@@ -115,9 +115,9 @@ def print_psne(game, psne_lst, name='MONFG'):
     """Pretty print a list of PSNE.
 
     Args:
-      game (ndarray): A payoff matrix.
-      psne_lst (List[ndarray]): A list of PSNE.
-      name (str, optional): The name of the game. (Default = 'MONFG')
+        game (ndarray): A payoff matrix.
+        psne_lst (List[ndarray]): A list of PSNE.
+        name (str, optional): The name of the game. (Default value = 'MONFG')
 
     Returns:
 
@@ -134,8 +134,8 @@ def print_ne(ne, joint_strategy):
     """Pretty print a Nash equilibrium
 
     Args:
-      ne (bool): Whether the joint strategy is a Nash equilibrium.
-      joint_strategy (List[ndarray]: The joint strategy that is a Nash equilibrium.
+        ne (bool): Whether the joint strategy is a Nash equilibrium.
+        joint_strategy (List[ndarray]: The joint strategy that is a Nash equilibrium.
 
     Returns:
 
@@ -151,7 +151,7 @@ def print_all_ne(ne_lst):
     """Pretty print a list of Nash equilibria.
 
     Args:
-      ne_lst (List[List[ndarray]]): A list of Nash equilibria.
+        ne_lst (List[List[ndarray]]): A list of Nash equilibria.
 
     Returns:
 
@@ -165,7 +165,7 @@ def print_start(algorithm):
     """Pretty print the introduction to an algorithm.
 
     Args:
-      algorithm (str): The name of the algorithm.
+        algorithm (str): The name of the algorithm.
 
     Returns:
 

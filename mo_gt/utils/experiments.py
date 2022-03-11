@@ -8,14 +8,14 @@ def create_game_path(content, experiment, game, parent_dir=None, mkdir=True):
     """Create a new directory based on the given parameters.
 
     Args:
-      content (str): The type of content this directory will hold. Most often this is either 'data' or 'plots'.
-      experiment (str): The name of the experiment that is being performed.
-      game (str): The game that is experimented on.
-      parent_dir (str, optional): Parent directory for data and plots. (Default = None)
-      mkdir (bool, optional): Whether to create the directory. (Default = True)
+        content (str): The type of content this directory will hold. Most often this is either 'data' or 'plots'.
+        experiment (str): The name of the experiment that is being performed.
+        game (str): The game that is experimented on.
+        parent_dir (str, optional): Parent directory for data and plots. (Default value = None)
+        mkdir (bool, optional): Whether to create the directory. (Default value = True)
 
     Returns:
-      str: The path that was created.
+        str: The path that was created.
 
     """
     if parent_dir is None:
@@ -63,10 +63,10 @@ def softmax_policy(theta):
     """Take a softmax over an array of parameters.
 
     Args:
-      theta (ndarray): An array of policy parameters.
+        theta (ndarray): An array of policy parameters.
 
     Returns:
-      ndarray: A probability distribution over actions as a policy.
+        ndarray: A probability distribution over actions as a policy.
 
     """
     policy = np.asarray(softmax(theta), dtype=float)
@@ -78,11 +78,11 @@ def get_payoffs(actions, payoff_matrices):
     """Get the payoffs from the payoff matrices from the selected actions.
 
     Args:
-      actions (List[int]): The actions taken by each player.
-      payoff_matrices (List[ndarray]): A list of payoff matrices.
+        actions (List[int]): The actions taken by each player.
+        payoff_matrices (List[ndarray]): A list of payoff matrices.
 
     Returns:
-      List[ndarray]: A list of received payoffs.
+        List[ndarray]: A list of received payoffs.
 
     """
     actions = tuple(actions)
@@ -93,12 +93,12 @@ def calc_returns(payoffs_dict, agents, rollouts):
     """Calculate the scalarised expected returns for each agent.
 
     Args:
-      payoffs_dict (Dict[int]: List[ndarray]): The vectorial payoffs obtained by the agents.
-      agents (List[Agent]): A list of agents.
-      rollouts (int): The amount of rollouts that were performed.
+        payoffs_dict (Dict[int]: List[ndarray]): The vectorial payoffs obtained by the agents.
+        agents (List[Agent]): A list of agents.
+        rollouts (int): The amount of rollouts that were performed.
 
     Returns:
-      List[float]: A list of scalarised expected returns.
+        List[float]: A list of scalarised expected returns.
 
     """
     returns = {}
@@ -114,12 +114,12 @@ def calc_action_probs(actions_dict, player_actions, rollouts):
     """Calculate empirical action probabilities.
 
     Args:
-      actions_dict (Dict[int]: List[int]): The actions performed by each agent over the rollout period.
-      player_actions (Tuple[int]): The number of actions per agent.
-      rollouts (int): The number of rollouts.
+        actions_dict (Dict[int]: List[int]): The actions performed by each agent over the rollout period.
+        player_actions (Tuple[int]): The number of actions per agent.
+        rollouts (int): The number of rollouts.
 
     Returns:
-      List[List[float]]: The action probabilities for each agent.
+        List[List[float]]: The action probabilities for each agent.
 
     """
     all_probs = {}
@@ -136,11 +136,11 @@ def calc_com_probs(commitments, rollouts):
     """Calculate the empirical commitment probabilities.
 
     Args:
-      commitments (List[int | ndarray]): A list of commitments.
-      rollouts (int): The number of rollouts.
+        commitments (List[int | ndarray]): A list of commitments.
+        rollouts (int): The number of rollouts.
 
     Returns:
-      List[float]: The commitment probabilities for each agent.
+        List[float]: The commitment probabilities for each agent.
 
     """
     com = sum(commitment is not None for commitment in commitments)

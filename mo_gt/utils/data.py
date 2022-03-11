@@ -17,6 +17,9 @@ def save_metadata(path, **metadata):
 def load_metadata(path):
     """Load metadata from a directory.
 
+    Args:
+        path (str): The path to load metadata from.
+
     Returns:
         Dict: A dictionary of metadata.
     """
@@ -30,18 +33,18 @@ def save_data(path, name, game, num_agents, player_actions, runs, episodes, retu
     """Save results from an experiment to disk in CSV format.
 
     Args:
-      path (str): The path to the directory in which all files will be saved.
-      name (str): The name of the experiment.
-      game (str): The name of the game that was played.
-      num_agents (int): The number of agents in the experiment.
-      player_actions (Tuple[int]): A tuple with the number of actions per agent.
-      runs (int): The number of runs the experiment was executed.
-      episodes (int): The number of episodes in each run.
-      returns_log (dict, optional): The log for the returns. (Default = None)
-      action_probs_log (dict, optional): The log for the action probabilities. (Default = None)
-      state_dist_log (ndarray, optional): The state distribution log. (Default = None)
-      com_probs_log (dict, optional): The log for the commitment probabilities. (Default = None)
-      mode (str, optional): The Python write mode. (Default = 'w')
+        path (str): The path to the directory in which all files will be saved.
+        name (str): The name of the experiment.
+        game (str): The name of the game that was played.
+        num_agents (int): The number of agents in the experiment.
+        player_actions (Tuple[int]): A tuple with the number of actions per agent.
+        runs (int): The number of runs the experiment was executed.
+        episodes (int): The number of episodes in each run.
+        returns_log (dict, optional): The log for the returns. (Default value = None)
+        action_probs_log (dict, optional): The log for the action probabilities. (Default value = None)
+        state_dist_log (ndarray, optional): The state distribution log. (Default value = None)
+        com_probs_log (dict, optional): The log for the commitment probabilities. (Default value = None)
+        mode (str, optional): The Python write mode. (Default value = 'w')
 
     Returns:
 

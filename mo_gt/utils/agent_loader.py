@@ -22,19 +22,21 @@ def create_agents(experiment, u_tpl, num_agents, player_actions, num_objectives,
         num_agents (int): The number of agents to create.
         player_actions (Tuple[int]): The number of actions per player.
         num_objectives (int): The number of objectives.
-        alpha_q (float, optional): The learning rate for Q-values. (Default = 0.01)
-        alpha_theta (float, optional): The learning rate for policy parameters. (Default = 0.01)
-        alpha_fq (float, optional): The learning rate for follower Q-values. (Default = 0.01)
-        alpha_ftheta (float, optional): The learning rate for follower policy parameters. (Default = 0.01)
-        alpha_cq (float, optional): The learning rate for optional commitment Q-values. (Default = 0.01)
-        alpha_ctheta (float, optional): The learning rate for optional commitment policy parameters. (Default = 0.01)
-        alpha_q_decay (float, optional): The decay for the Q-values learning rate. (Default = 1)
-        alpha_theta_decay (float, optional): The decay for the policy parameters learning rate. (Default = 1)
-        alpha_com_decay (float, optional): The decay for the optional commitment strategy learning rate. (Default = 1)
-        epsilon (float, optional): The exploration rate for a Q-learner agent. (Default = 1)
-        epsilon_decay (float, optional): The decay for the exploration rate. (Default = 0.995)
-        min_epsilon (float, optional): The minimum value for the exploration rate. (Default = 0.1)
-        rng (Generator, optional): A random number generator. (Default = None)
+        alpha_q (float, optional): The learning rate for Q-values. (Default value = 0.01)
+        alpha_theta (float, optional): The learning rate for policy parameters. (Default value = 0.01)
+        alpha_fq (float, optional): The learning rate for follower Q-values. (Default value = 0.01)
+        alpha_ftheta (float, optional): The learning rate for follower policy parameters. (Default value = 0.01)
+        alpha_cq (float, optional): The learning rate for optional commitment Q-values. (Default value = 0.01)
+        alpha_ctheta (float, optional): The learning rate for optional commitment policy parameters.
+            (Default value = 0.01)
+        alpha_q_decay (float, optional): The decay for the Q-values learning rate. (Default value = 1)
+        alpha_theta_decay (float, optional): The decay for the policy parameters learning rate. (Default value = 1)
+        alpha_com_decay (float, optional): The decay for the optional commitment strategy learning rate.
+            (Default value = 1)
+        epsilon (float, optional): The exploration rate for a Q-learner agent. (Default value = 1)
+        epsilon_decay (float, optional): The decay for the exploration rate. (Default value = 0.995)
+        min_epsilon (float, optional): The minimum value for the exploration rate. (Default value = 0.1)
+        rng (Generator, optional): A random number generator. (Default value = None)
 
     Returns:
         List[Agent]: A list of agents.

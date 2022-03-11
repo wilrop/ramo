@@ -204,7 +204,7 @@ def plot_results(games, name, parent_dir=None, filetype='pdf'):
         games (List[str]): The games to plot the results for.
         name (str): The name of the experiment.
         parent_dir (str, optional): Parent directory for data and plots. (Default value = None)
-        filetype (str): The filetype to save the file under. (Default value = pdf)
+        filetype (str): The filetype to save the file under. (Default value = 'pdf')
 
     Returns:
 
