@@ -9,10 +9,14 @@ from mo_gt.utils.helpers import array_slice
 
 
 class CoopActionAgent:
-    """An agent that optimises a single optimal policy from pure strategy commitment.
+    """An agent that optimises a single optimal policy from pure strategy commitment [1].
 
     This is mostly intended to be used in an alternating Stackelberg setting, such that players optimise a single
     optimal joint policy.
+
+    References:
+        .. [1] Willem Röpke, Diederik M. Roijers, Ann Nowé, & Roxana Rădulescu. (2021). Preference Communication in
+            Multi-Objective Normal-Form Games.
 
     """
 

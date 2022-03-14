@@ -28,7 +28,7 @@ def optimise_policy(expected_returns, u, epsilon=0, global_opt=False, init_strat
     Notes:
         When setting global_opt to True, this will optimise the function using the SHGO algorithm. The algorithm is
         proven to converge to the global optimum for the general case where :math:`f(x)` is non-continuous, non-convex
-        and non-smooth, when using the default simplicial sampling method [1]_. We currently use the non-default sobol
+        and non-smooth, when using the default simplicial sampling method [1]. We currently use the non-default sobol
         sampling method as there is a bug in the default method and sobol has shown more reliable in practice.
 
         When using a local optimiser, the function is only guaranteed to find a local optimum. By default it will use

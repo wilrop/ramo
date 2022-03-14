@@ -4,7 +4,15 @@ from mo_gt.best_response.best_response import optimise_policy
 
 
 class IndependentQAgent:
-    """An independent learner using Q-learning for the SER criterion."""
+    """An independent learner using Q-learning for the SER criterion.
+
+    This implementation is based on the multi-objective Q-learning algorithm proposed in [1].
+
+    References:
+        .. [1] Rădulescu, R., Mannion, P., Zhang, Y., Roijers, D., & Nowé, A. (2020). A utility-based analysis of
+            equilibria in multi-objective normal-form games. The Knowledge Engineering Review, 35, e32.
+
+    """
 
     def __init__(self, u, num_actions, num_objectives, alpha_q=0.01, alpha_q_decay=1, epsilon=0.01, epsilon_decay=1,
                  min_epsilon=0.01, rng=None):

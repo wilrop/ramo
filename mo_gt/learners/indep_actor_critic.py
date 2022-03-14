@@ -7,7 +7,17 @@ from mo_gt.utils.experiments import softmax_policy
 
 
 class IndependentActorCriticAgent:
-    """An independent learner using the multi-objective actor-critic algorithm for the SER criterion."""
+    """An independent learner using the multi-objective actor-critic algorithm for the SER criterion.
+
+    This implementation is based on the multi-objective actor-critic algorithm proposed in [1].
+
+    References:
+        .. [1] Zhang, Y., Rădulescu, R., Mannion, P., Roijers, D., & Nowé, A. (2020). Opponent Modelling for
+            Reinforcement Learning in Multi-Objective Normal Form Games. In Proceedings of the 19th International
+            Conference on Autonomous Agents and MultiAgent Systems (pp. 2080–2082). International Foundation for
+            Autonomous Agents and Multiagent Systems.
+
+    """
 
     def __init__(self, u, num_actions, num_objectives, alpha_q=0.01, alpha_theta=0.01, alpha_q_decay=1,
                  alpha_theta_decay=1, rng=None):

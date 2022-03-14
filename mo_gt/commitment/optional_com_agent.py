@@ -6,10 +6,15 @@ from mo_gt.utils.experiments import softmax_policy
 
 
 class OptionalComAgent:
-    """An agent that learns when to commit through a two layer system.
+    """An agent that learns when to commit through a two layer system [1].
 
     This is implemented through learning two additional agents, one used when committing and another used when not
     committing.
+
+    References:
+        .. [1] Willem Röpke, Diederik M. Roijers, Ann Nowé, & Roxana Rădulescu. (2021). Preference Communication in
+            Multi-Objective Normal-Form Games.
+
     """
 
     def __init__(self, no_com_agent, com_agent, id, u, num_actions, num_objectives, alpha_q=0.01, alpha_theta=0.01,

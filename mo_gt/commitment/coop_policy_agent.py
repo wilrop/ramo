@@ -8,7 +8,13 @@ from mo_gt.utils.experiments import make_joint_strat, softmax_policy
 
 
 class CoopPolicyAgent:
-    """An agent that optimises a single optimal policy from mixed strategy commitment."""
+    """An agent that optimises a single optimal policy from mixed strategy commitment [1].
+
+    References:
+        .. [1] Willem Röpke, Diederik M. Roijers, Ann Nowé, & Roxana Rădulescu. (2021). Preference Communication in
+            Multi-Objective Normal-Form Games.
+
+    """
 
     def __init__(self, id, u, num_actions, num_objectives, alpha_q=0.01, alpha_theta=0.01, alpha_q_decay=1,
                  alpha_theta_decay=1, rng=None):

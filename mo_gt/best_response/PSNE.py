@@ -64,10 +64,14 @@ def calc_nfg_psne(nfg, player_actions):
 
 
 def calc_all_psne(monfg, u_tpl):
-    """Calculate all Pure Strategy Nash Equilibria (PSNE) for a given MONFG with quasiconvex utility functions.
+    """Calculate all Pure Strategy Nash Equilibria (PSNE) for a given MONFG with quasiconvex utility functions [1].
 
     Note:
         This algorithm is only guaranteed to be correct when using quasiconvex utility functions.
+
+    References:
+        .. [1] Willem Röpke, Diederik M. Roijers, Ann Nowé, & Roxana Rădulescu. (2021). On Nash Equilibria in
+            Normal-Form Games With Vectorial Payoffs.
 
     Args:
         monfg (List[ndarray]): An MONFG as a list of payoff matrices.

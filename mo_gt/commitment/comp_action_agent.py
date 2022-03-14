@@ -8,7 +8,13 @@ from mo_gt.utils.helpers import array_slice
 
 
 class CompActionAgent:
-    """An agent that learns a best-response policy to each pure-strategy commitment from the leader."""
+    """An agent that learns a best-response policy to each pure-strategy commitment from the leader [1].
+
+    References:
+        .. [1] Willem Röpke, Diederik M. Roijers, Ann Nowé, & Roxana Rădulescu. (2021). Preference Communication in
+            Multi-Objective Normal-Form Games.
+
+    """
 
     def __init__(self, id, u, num_actions, num_objectives, alpha_lq=0.01, alpha_ltheta=0.01, alpha_fq=0.01,
                  alpha_ftheta=0.01, alpha_q_decay=1, alpha_theta_decay=1, rng=None):
