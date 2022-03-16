@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def u1(vector):
     """Calculate the utility from: :math:`u(x, y) = x^2 + y^2`. This is a convex function.
 
@@ -83,7 +86,7 @@ def u6(vector):
 
 
 def u7(vector):
-    """Calculate the utility from: :math:`x + y^2`. This is a convex function.
+    """Calculate the utility from: :math:`u(x, y) = x + y^2`. This is a convex function.
 
     Args:
         vector (ndarray): A payoff vector.
@@ -94,6 +97,32 @@ def u7(vector):
     """
     utility = vector[0] + vector[1] ** 2
     return utility
+
+
+def sum_u(vector):
+    """Calculate the utility from: :math:`u(\overrightarrow{p}) = \sum p_i`.
+
+    Args:
+        vector (ndarray): A payoff vector.
+
+    Returns:
+        float: The scalar utility for this vector.
+
+    """
+    return np.sum(vector)
+
+
+def product_u(vector):
+    """Calculate the utility from: :math:`u(\overrightarrow{p}) = \prod p_i`.
+
+    Args:
+        vector (ndarray): A payoff vector.
+
+    Returns:
+        float: The scalar utility for this vector.
+
+    """
+    return np.prod(vector)
 
 
 def get_u(u_str):
@@ -120,5 +149,9 @@ def get_u(u_str):
         return u6
     elif u_str == 'u7':
         return u7
+    elif u_str == 'sum_u':
+        return sum_u
+    elif u_str == 'product_u':
+        return product_u
     else:
         raise Exception(f'The provided utility function "{u_str}" does not exist.')
