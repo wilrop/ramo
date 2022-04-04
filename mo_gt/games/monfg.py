@@ -225,7 +225,7 @@ monfg19 = [np.array([[(7, 12), (3, 4)],
                      [(11, 7), (7, 3)]], dtype=float),
            np.array([[(6, 2), (5, 4)],
                      [(2, 8), (7, 2)]], dtype=float)]
-"""List[ndarray]: Game 18 - A 2-action 2-player game with individual rewards.
+"""List[ndarray]: Game 19 - A 2-action 2-player game with individual rewards.
 
 This game has a NE of {(0.75, 0.25), (0.5, 0.5)} using u2 for both players. 
 It is used to test the correctness of the FP and IBR algorithms.
