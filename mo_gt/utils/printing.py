@@ -130,21 +130,24 @@ def print_psne(game, psne_lst, name='MONFG'):
     print_monfg(game, name, highlight_cells=psne_lst)
 
 
-def print_ne(ne, joint_strategy):
+def print_ne(ne, joint_strategy, decimals=None):
     """Pretty print a Nash equilibrium
 
     Args:
         ne (bool): Whether the joint strategy is a Nash equilibrium.
         joint_strategy (List[ndarray]: The joint strategy that is a Nash equilibrium.
+        decimals (int, optional): Round the mixed strategies to a given number of decimals.
 
     Returns:
 
     """
-    printable_strat = list(map(list, joint_strategy))
+    if decimals is not None:
+        joint_strategy = [np.around(strat, decimals=decimals) for strat in joint_strategy]
+
     if ne:
-        print(f'The Nash equilibrium that was found is the joint strategy: {printable_strat}')
+        print(f'The Nash equilibrium that was found is the joint strategy: {joint_strategy}')
     else:
-        print(f'No Nash equilibrium was found, but the final joint strategy was: {printable_strat}.')
+        print(f'No Nash equilibrium was found, but the final joint strategy was: {joint_strategy}.')
 
 
 def print_all_ne(ne_lst):
