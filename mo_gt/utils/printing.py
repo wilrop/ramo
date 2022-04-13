@@ -136,7 +136,7 @@ def print_ne(ne, joint_strategy, decimals=None):
     Args:
         ne (bool): Whether the joint strategy is a Nash equilibrium.
         joint_strategy (List[ndarray]: The joint strategy that is a Nash equilibrium.
-        decimals (int, optional): Round the mixed strategies to a given number of decimals.
+        decimals (int, optional): Round the mixed strategies to a given number of decimals. (Default value = None)
 
     Returns:
 
