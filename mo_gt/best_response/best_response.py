@@ -173,7 +173,7 @@ def calc_best_response(u, player, payoff_matrix, joint_strategy, epsilon=0, glob
     return br_strategy
 
 
-def verify_nash(monfg, u_tpl, joint_strat, epsilon=0):
+def verify_nash(monfg, u_tpl, joint_strat, epsilon=0, tol=1e-12):
     """Verify whether the joint strategy is a Nash equilibrium
 
     Args:
@@ -181,6 +181,8 @@ def verify_nash(monfg, u_tpl, joint_strat, epsilon=0):
         u_tpl (Tuple[callable]): A utility function per player.
         joint_strat (List[ndarray]): The joint strategy to verify.
         epsilon (float, optional): An optional parameter to allow for approximate Nash equilibria. (Default value = 0)
+        tol (float, optional): The tolerance in the utility calculation. The default is set to the shgo default from
+        SciPy. (Default value = 1e-12)
 
     Notes:
         A Nash equilibrium occurs whenever all strategies are best-responses to each other. We specifically use a global
@@ -195,6 +197,6 @@ def verify_nash(monfg, u_tpl, joint_strat, epsilon=0):
         expected_returns = calc_expected_returns(player, payoffs, joint_strat)
         utility_from_strat = objective(strat, expected_returns, u)
         success, br_strat, br_utility = optimise_policy(expected_returns, u, global_opt=True)
-        if not (success and (utility_from_strat + epsilon >= br_utility)):
+        if not (success and (utility_from_strat + epsilon + tol >= br_utility)):
             return False
     return True
