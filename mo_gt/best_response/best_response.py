@@ -200,3 +200,23 @@ def verify_nash(monfg, u_tpl, joint_strat, epsilon=0, tol=1e-12):
         if not (success and (utility_from_strat + epsilon + tol >= br_utility)):
             return False
     return True
+
+
+def verify_all_nash(monfg, u_tpl, joint_strats, epsilon=0, tol=1e-12):
+    """Globally verify if each joint strategy in a list is a Nash equilibrium.
+
+    Args:
+        monfg (List[ndarray]): An MONFG as a list of payoff matrices.
+        u_tpl (Tuple[callable]): A tuple of utility functions.
+        joint_strats (List[ndarray]): A list of joint strategies to check.
+        epsilon (float, optional): An optional parameter to allow for approximate Nash equilibria. (Default value = 0)
+        tol (float, optional): The tolerance in the utility calculation. The default is set to the shgo default from
+        SciPy. (Default value = 1e-12)
+
+    Returns:
+        bool: Whether the joint_strategies in the list are actually Nash equilibria.
+    """
+    for joint_strat in joint_strats:
+        if not verify_nash(monfg, u_tpl, joint_strat, epsilon=epsilon, tol=tol):
+            return False
+    return True
