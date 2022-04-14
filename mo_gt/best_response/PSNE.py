@@ -3,9 +3,11 @@ import time
 
 import numpy as np
 
-import mo_gt.games.monfg as games
-import mo_gt.games.utility_functions as uf
+import mo_gt.envs.monfgs.examples as games
+import mo_gt.utility_functions.examples as uf
 import mo_gt.utils.printing as pt
+
+from mo_gt.envs.monfgs.generators import scalarised_game
 
 
 def reduce_monfg(monfg, u_tpl):
@@ -19,10 +21,7 @@ def reduce_monfg(monfg, u_tpl):
         List[ndarray]: The scalarised MONFG.
 
     """
-    nfg = []  # Collect the payoff matrices for the NFG.
-    for payoff_matrix, u in zip(monfg, u_tpl):
-        scalarised_payoff = games.scalarise_matrix(payoff_matrix, u)  # Scalarise each payoff matrix.
-        nfg.append(scalarised_payoff)
+    nfg = scalarised_game(monfg, u_tpl)
     return nfg
 
 
@@ -38,13 +37,11 @@ def calc_nfg_psne(nfg, player_actions):
 
     """
     best_responses = []  # Collect the best response matrices.
-    num_strategies = np.prod(player_actions)  # The number of possible pure strategies.
 
     for player, payoffs in enumerate(nfg):
         best_response_matrix = np.zeros(player_actions, dtype=bool)  # Initialise a new boolean best response matrix.
         maxima = np.amax(nfg[player], axis=player)  # The payoffs of the best responses to all other players strategies.
-        for i in range(num_strategies):  # Loop over all joint strategies.
-            idx = np.unravel_index(i, player_actions)  # Get the correctly shaped index of this strategy.
+        for idx in np.ndindex(player_actions):  # Loop over all joint strategies.
             opp_strat = list(idx)  # Turn the index into a list for the next operation.
             del opp_strat[player]  # Find the opponent strategy that corresponds with this joint strategy.
             opp_strat = tuple(opp_strat)  # Turn it back into a tuple.

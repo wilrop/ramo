@@ -4,7 +4,7 @@ from mo_gt.commitment.coop_action_agent import CoopActionAgent
 from mo_gt.commitment.coop_policy_agent import CoopPolicyAgent
 from mo_gt.commitment.non_stationary_agent import NonStationaryAgent
 from mo_gt.commitment.optional_com_agent import OptionalComAgent
-from mo_gt.games.utility_functions import get_u
+from mo_gt.utility_functions.examples import get_u
 from mo_gt.learners.indep_actor_critic import IndependentActorCriticAgent
 from mo_gt.learners.indep_q import IndependentQAgent
 from mo_gt.learners.ja_actor_critic import JointActionActorCriticAgent

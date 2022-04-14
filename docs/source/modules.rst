@@ -1,5 +1,5 @@
-mo-game-theory
-==============
+mo_gt
+=====
 
 .. toctree::
    :maxdepth: 4

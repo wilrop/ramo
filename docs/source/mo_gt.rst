@@ -9,9 +9,10 @@ Subpackages
 
    mo_gt.best_response
    mo_gt.commitment
-   mo_gt.games
+   mo_gt.envs
    mo_gt.learners
    mo_gt.plotting
+   mo_gt.utility_functions
    mo_gt.utils
 
 Module contents
