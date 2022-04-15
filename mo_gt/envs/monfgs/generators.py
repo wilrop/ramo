@@ -1,6 +1,38 @@
 import numpy as np
 
 
+def random_payoffs(rng, shape, distribution, **kwargs):
+    """Draw random payoffs of a given shape from a distribution.
+
+    Args:
+        rng (Generator): A random number generator.
+        shape (Tuple[int]): The shape of the payoffs.
+        distribution (str): The distribution to draw payoffs from.
+        **kwargs: A dictionary of keyword arguments to use in the generator function.
+
+    Returns:
+        ndarray: A numpy array of payoffs
+
+    Raises:
+        Exception: Raises an exception when the distribution is unknown.
+    """
+    if distribution == 'discrete uniform':
+        low = kwargs['low']
+        high = kwargs['high']
+        payoffs = rng.integers(low=low, high=high, size=shape)
+    elif distribution == 'uniform':
+        low = kwargs['low']
+        high = kwargs['high']
+        payoffs = rng.uniform(low=low, high=high, size=shape)
+    elif distribution == 'normal':
+        loc = kwargs['loc']
+        scale = kwargs['scale']
+        payoffs = rng.uniform(low=loc, high=scale, size=shape)
+    else:
+        raise Exception(f'The distribution "{distribution}" is not currently supported')
+    return payoffs
+
+
 def random_monfg(player_actions=(2, 2), num_objectives=2, reward_min_bound=0, reward_max_bound=5, rng=None):
     """Generate a random MONFG with payoffs from a discrete uniform distribution.
 
@@ -20,7 +52,8 @@ def random_monfg(player_actions=(2, 2), num_objectives=2, reward_min_bound=0, re
     payoffs_shape = player_actions + tuple([num_objectives])  # Define the shape of the payoff matrices.
 
     for _ in range(len(player_actions)):
-        payoff_matrix = rng.integers(low=reward_min_bound, high=reward_max_bound, size=payoffs_shape)
+        payoff_matrix = random_payoffs(rng, payoffs_shape, 'discrete uniform', low=reward_min_bound,
+                                       high=reward_max_bound)
         payoffs.append(payoff_matrix)
 
     return payoffs
