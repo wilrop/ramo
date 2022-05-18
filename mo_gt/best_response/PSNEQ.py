@@ -7,7 +7,7 @@ import mo_gt.envs.monfgs.examples as games
 import mo_gt.utility_functions.examples as uf
 import mo_gt.utils.printing as pt
 
-from mo_gt.envs.monfgs.generators import scalarised_game
+from mo_gt.envs.monfgs.generators import scalarised_game, random_monfg
 
 
 def reduce_monfg(monfg, u_tpl):
@@ -101,7 +101,7 @@ if __name__ == '__main__':
 
     if args.game == 'random':
         player_actions = args.player_actions
-        monfg = games.generate_random_monfg(player_actions, args.num_objectives, args.lower_bound, args.upper_bound)
+        monfg = random_monfg(player_actions, args.num_objectives, args.lower_bound, args.upper_bound)
     else:
         monfg = games.get_monfg(args.game)
 
