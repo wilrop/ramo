@@ -2,9 +2,9 @@ import unittest
 
 import numpy as np
 
-import mo_gt.best_response.PSNE as psne
-import mo_gt.games.monfg as games
-import mo_gt.games.utility_functions as uf
+import mo_gt.best_response.PSNEQ as psne
+import mo_gt.envs.monfgs.examples as games
+import mo_gt.utility_functions.examples as uf
 
 
 class TestPSNE(unittest.TestCase):
