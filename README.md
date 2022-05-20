@@ -1,4 +1,4 @@
-# Multi-Objective Game Theory
+# Ramo
 A collection of algorithms and utilities for calculating or learning (approximate) equilibria in multi-objective games.
 
 
