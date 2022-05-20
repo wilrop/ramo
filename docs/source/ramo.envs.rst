@@ -1,5 +1,5 @@
-mo\_gt.envs package
-===================
+ramo.envs package
+=================
 
 Subpackages
 -----------
@@ -7,12 +7,12 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   mo_gt.envs.monfgs
+   ramo.envs.monfgs
 
 Module contents
 ---------------
 
-.. automodule:: mo_gt.envs
+.. automodule:: ramo.envs
    :members:
    :undoc-members:
    :show-inheritance:

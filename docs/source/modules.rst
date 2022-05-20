@@ -1,7 +1,7 @@
-mo_gt
-=====
+ramo
+====
 
 .. toctree::
    :maxdepth: 4
 
-   mo_gt
+   ramo
