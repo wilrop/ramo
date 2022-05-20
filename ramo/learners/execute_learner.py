@@ -4,10 +4,10 @@ from collections import defaultdict
 
 import numpy as np
 
-import mo_gt.envs.monfgs.examples as games
-from mo_gt.utils.data import save_metadata, save_data
-from mo_gt.utils.agent_loader import create_agents
-from mo_gt.utils.experiments import create_game_path, calc_returns, calc_action_probs, get_payoffs
+import ramo.envs.monfgs.examples as games
+from ramo.utils.data import save_metadata, save_data
+from ramo.utils.agent_loader import create_agents
+from ramo.utils.experiments import create_game_path, calc_returns, calc_action_probs, get_payoffs
 
 
 def select_actions(agents):

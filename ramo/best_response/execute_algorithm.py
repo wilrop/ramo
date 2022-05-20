@@ -1,8 +1,8 @@
 import time
 
-from mo_gt.best_response.IBR import iterated_best_response
-from mo_gt.best_response.PSNEQ import calc_all_psne
-from mo_gt.best_response.fictitious_play import fictitious_play
+from ramo.best_response.IBR import iterated_best_response
+from ramo.best_response.PSNEQ import calc_all_psne
+from ramo.best_response.fictitious_play import fictitious_play
 
 
 def execute_algorithm(monfg, u_tpl, algorithm='PSNEQ', seed=None, options=None):

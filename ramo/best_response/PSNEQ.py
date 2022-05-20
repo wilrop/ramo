@@ -3,11 +3,11 @@ import time
 
 import numpy as np
 
-import mo_gt.envs.monfgs.examples as games
-import mo_gt.utility_functions.examples as uf
-import mo_gt.utils.printing as pt
+import ramo.envs.monfgs.examples as games
+import ramo.utility_functions.examples as uf
+import ramo.utils.printing as pt
 
-from mo_gt.envs.monfgs.generators import scalarised_game, random_monfg
+from ramo.envs.monfgs.generators import scalarised_game, random_monfg
 
 
 def reduce_monfg(monfg, u_tpl):

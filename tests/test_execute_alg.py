@@ -2,9 +2,9 @@ import unittest
 
 import numpy as np
 
-import mo_gt.best_response.execute_algorithm as ea
-import mo_gt.envs.monfgs.examples as games
-import mo_gt.utility_functions.examples as uf
+import ramo.best_response.execute_algorithm as ea
+import ramo.envs.monfgs.examples as games
+import ramo.utility_functions.examples as uf
 
 
 class TestExecuteAlgorithm(unittest.TestCase):

@@ -3,11 +3,11 @@ import time
 
 import numpy as np
 
-import mo_gt.envs.monfgs.examples as games
-import mo_gt.utility_functions.examples as uf
-import mo_gt.utils.printing as pt
-from mo_gt.best_response.Player import FPPlayer
-from mo_gt.best_response.best_response import verify_nash
+import ramo.envs.monfgs.examples as games
+import ramo.utility_functions.examples as uf
+import ramo.utils.printing as pt
+from ramo.best_response.Player import FPPlayer
+from ramo.best_response.best_response import verify_nash
 
 
 def fictitious_play(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_strategy=None, variant='alternating',

@@ -1,14 +1,14 @@
-from mo_gt.commitment.best_response_agent import BestResponseAgent
-from mo_gt.commitment.comp_action_agent import CompActionAgent
-from mo_gt.commitment.coop_action_agent import CoopActionAgent
-from mo_gt.commitment.coop_policy_agent import CoopPolicyAgent
-from mo_gt.commitment.non_stationary_agent import NonStationaryAgent
-from mo_gt.commitment.optional_com_agent import OptionalComAgent
-from mo_gt.utility_functions.examples import get_u
-from mo_gt.learners.indep_actor_critic import IndependentActorCriticAgent
-from mo_gt.learners.indep_q import IndependentQAgent
-from mo_gt.learners.ja_actor_critic import JointActionActorCriticAgent
-from mo_gt.learners.ja_q import JointActionQAgent
+from ramo.commitment.best_response_agent import BestResponseAgent
+from ramo.commitment.comp_action_agent import CompActionAgent
+from ramo.commitment.coop_action_agent import CoopActionAgent
+from ramo.commitment.coop_policy_agent import CoopPolicyAgent
+from ramo.commitment.non_stationary_agent import NonStationaryAgent
+from ramo.commitment.optional_com_agent import OptionalComAgent
+from ramo.utility_functions.examples import get_u
+from ramo.learners.indep_actor_critic import IndependentActorCriticAgent
+from ramo.learners.indep_q import IndependentQAgent
+from ramo.learners.ja_actor_critic import JointActionActorCriticAgent
+from ramo.learners.ja_q import JointActionQAgent
 
 
 def create_agents(experiment, u_tpl, num_agents, player_actions, num_objectives, alpha_q=0.01, alpha_theta=0.01,

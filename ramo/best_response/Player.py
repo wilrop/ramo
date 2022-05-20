@@ -1,6 +1,6 @@
 import numpy as np
 
-from mo_gt.best_response.best_response import calc_best_response, calc_utility_from_joint_strat
+from ramo.best_response.best_response import calc_best_response, calc_utility_from_joint_strat
 
 
 class Player:

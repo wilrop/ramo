@@ -2,9 +2,9 @@ import unittest
 
 import numpy as np
 
-import mo_gt.best_response.best_response as br
-import mo_gt.envs.monfgs.examples as games
-import mo_gt.utility_functions.examples as uf
+import ramo.best_response.best_response as br
+import ramo.envs.monfgs.examples as games
+import ramo.utility_functions.examples as uf
 
 
 class TestBestResponse(unittest.TestCase):

@@ -3,7 +3,7 @@ import numpy as np
 from jax import grad, jit
 from jax.nn import softmax
 
-from mo_gt.utils.experiments import softmax_policy
+from ramo.utils.experiments import softmax_policy
 
 
 class IndependentActorCriticAgent:
