@@ -7,7 +7,7 @@ The main focus of this repository is to develop and maintain different algorithm
 
 | Algorithm                            | Type        | Equilibrium                   |
 |--------------------------------------|-------------|-------------------------------|
-| PSNE                                 | Calculating | Pure-strategy Nash equilibria |
+| PSNEQ                                | Calculating | Pure-strategy Nash equilibria |
 | Iterated best-response               | Learning    | Nash equilibrium              |
 | Fictitious play                      | Learning    | Nash equilibrium              |
 | Independent Q-learners               | Learning    | Nash equilibrium              |
