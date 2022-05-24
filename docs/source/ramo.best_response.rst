@@ -12,14 +12,6 @@ ramo.best\_response.IBR module
    :undoc-members:
    :show-inheritance:
 
-ramo.best\_response.PSNEQ module
---------------------------------
-
-.. automodule:: ramo.best_response.PSNEQ
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 ramo.best\_response.Player module
 ---------------------------------
 
@@ -48,6 +40,14 @@ ramo.best\_response.fictitious\_play module
 -------------------------------------------
 
 .. automodule:: ramo.best_response.fictitious_play
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramo.best\_response.moqups module
+---------------------------------
+
+.. automodule:: ramo.best_response.moqups
    :members:
    :undoc-members:
    :show-inheritance:
