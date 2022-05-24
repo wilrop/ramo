@@ -10,7 +10,7 @@ import ramo.utility_functions.examples as uf
 class TestExecuteAlgorithm(unittest.TestCase):
     test_seed = 42
 
-    def test_execute_PSNEQ(self):
+    def test_execute_MOQUPS(self):
         game_str = 'game15'
         u_str = ('u1', 'u5', 'u6')
 
@@ -20,7 +20,7 @@ class TestExecuteAlgorithm(unittest.TestCase):
             u_tpl.append(uf.get_u(u_str[i]))
         u_tpl = tuple(u_tpl)
 
-        test = ea.execute_algorithm(game, u_tpl, algorithm='PSNEQ', seed=self.test_seed)
+        test = ea.execute_algorithm(game, u_tpl, algorithm='MOQUPS', seed=self.test_seed)
         correct = np.array([[0, 1, 1], [1, 0, 2], [1, 1, 0]])
         np.testing.assert_array_equal(test, correct)
 

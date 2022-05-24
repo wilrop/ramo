@@ -60,11 +60,12 @@ def calc_nfg_psne(nfg, player_actions):
     return psne
 
 
-def calc_all_psne(monfg, u_tpl):
-    """Calculate all Pure Strategy Nash Equilibria (PSNE) for a given MONFG with quasiconvex utility functions [1].
+def moqups(monfg, u_tpl):
+    """Compute all Pure Strategy Nash Equilibria (PSNE) for a given MONFG with quasiconvex utility functions [1].
 
     Note:
-        This algorithm is only guaranteed to be correct when using quasiconvex utility functions.
+        MOQUPS, Multi-Objective and Quasiconvex Utilities for Pure Strategies, is only guaranteed to be correct when
+        using quasiconvex utility functions.
 
     References:
         .. [1] Willem Röpke, Diederik M. Roijers, Ann Nowé, & Roxana Rădulescu. (2021). On Nash Equilibria in
@@ -107,7 +108,7 @@ if __name__ == '__main__':
 
     u_tpl = tuple([uf.get_u(u_str) for u_str in args.u])  # These must be quasiconvex to ensure correctness.
 
-    psne_lst = calc_all_psne(monfg, u_tpl)
+    psne_lst = moqups(monfg, u_tpl)
     pt.print_psne(monfg, psne_lst, name=args.game)
 
     end = time.time()

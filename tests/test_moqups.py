@@ -2,9 +2,9 @@ import unittest
 
 import numpy as np
 
-import ramo.best_response.PSNEQ as psne
 import ramo.envs.monfgs.examples as games
 import ramo.utility_functions.examples as uf
+from ramo.best_response.moqups import moqups
 
 
 class TestPSNE(unittest.TestCase):
@@ -19,7 +19,7 @@ class TestPSNE(unittest.TestCase):
             u_tpl.append(uf.get_u(u_str[i]))
         u_tpl = tuple(u_tpl)
 
-        test = psne.calc_all_psne(game, u_tpl)
+        test = moqups(game, u_tpl)
         correct = np.array([[0, 0], [1, 1]])
         np.testing.assert_array_equal(test, correct)
 
@@ -33,7 +33,7 @@ class TestPSNE(unittest.TestCase):
             u_tpl.append(uf.get_u(u_str[i]))
         u_tpl = tuple(u_tpl)
 
-        test = psne.calc_all_psne(game, u_tpl)
+        test = moqups(game, u_tpl)
         correct = np.array([[0, 1, 1], [1, 0, 1]])
         np.testing.assert_array_equal(test, correct)
 
@@ -47,7 +47,7 @@ class TestPSNE(unittest.TestCase):
             u_tpl.append(uf.get_u(u_str[i]))
         u_tpl = tuple(u_tpl)
 
-        test = psne.calc_all_psne(game, u_tpl)
+        test = moqups(game, u_tpl)
         correct = np.array([[0, 1, 1], [1, 0, 2], [1, 1, 0]])
         np.testing.assert_array_equal(test, correct)
 
