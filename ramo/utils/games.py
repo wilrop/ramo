@@ -10,18 +10,14 @@ def get_player_actions(monfg):
     return monfg[0].shape[:-1]
 
 
-def get_num_objectives(monfg, individual=False):
+def get_num_objectives(monfg, player=0):
     """
 
     Args:
         monfg (List[ndarray]): An MONFG as a list of payoff matrices.
-        individual (bool, optional): Whether to assume players have the same number of objectives.
-        (Default value = False)
+        player (int, optional): The player to get the number of objectives for. (Default value = 0)
 
     Returns:
-        int | Tuple[int]: An integer with the number of objectives or a tuple with the number of objectives per player.
+        int: The number of objectives in the game for the given player.
     """
-    if individual:
-        return tuple([payoff_matrix.shape[-1] for payoff_matrix in monfg])
-    else:
-        return monfg[0].shape[-1]
+    return monfg[player].shape[-1]
