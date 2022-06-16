@@ -1,8 +1,6 @@
-import time
-
 from ramo.best_response.IBR import iterated_best_response
-from ramo.best_response.moqups import moqups
 from ramo.best_response.fictitious_play import fictitious_play
+from ramo.best_response.moqups import moqups
 
 
 def execute_algorithm(monfg, u_tpl, algorithm='MOQUPS', seed=None, options=None):
@@ -23,22 +21,13 @@ def execute_algorithm(monfg, u_tpl, algorithm='MOQUPS', seed=None, options=None)
         Exception: When the requested algorithm is unknown.
 
     """
-    start = time.time()  # Start measuring the time.
-
     if algorithm == 'MOQUPS':
         psne_lst = moqups(monfg, u_tpl)
         results = psne_lst
     elif algorithm == 'IBR':
-        ne, final_strategy = iterated_best_response(monfg, u_tpl, seed=seed, **options)
-        results = ne, final_strategy
+        results = iterated_best_response(monfg, u_tpl, seed=seed, **options)
     elif algorithm == 'FP':
-        ne, final_strategy = fictitious_play(monfg, u_tpl, seed=seed, **options)
-        results = ne, final_strategy
+        results = fictitious_play(monfg, u_tpl, seed=seed, **options)
     else:
         raise Exception(f'The requested algorithm "{algorithm}" does not exist')
-
-    end = time.time()
-    elapsed_secs = (end - start)
-    print("Seconds elapsed: " + str(elapsed_secs))
-
     return results
