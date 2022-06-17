@@ -71,9 +71,9 @@ def iterated_best_response(monfg, u_tpl, epsilon=0., max_iter=1000, init_joint_s
     for i in range(max_iter):
         converged = True
 
-        for id, player in enumerate(players):
+        for player_id, player in enumerate(players):
             done, br = player.update_strategy(update_strategy(), epsilon=epsilon, global_opt=global_opt)
-            new_joint_strategy[id] = br  # Update the joint strategy.
+            new_joint_strategy[player_id] = br  # Update the joint strategy.
             if not done:
                 converged = False
 
