@@ -11,7 +11,7 @@ from ramo.best_response.best_response import verify_nash
 
 
 def fictitious_play(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_strategy=None, variant='alternating',
-                    global_opt=False, verify=True, seed=None):
+                    global_opt=False, verify=True, early_stop=None, seed=None):
     """Execute the fictitious play algorithm on a given MONFG and utility functions.
 
     There are two variants of the fictitious play algorithm implemented, simultaneous and alternating fictitious play.
@@ -33,6 +33,8 @@ def fictitious_play(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_strategy=
         global_opt (bool, optional): Whether to use a global optimiser or a local one. (Default value = False)
         verify (bool, optional): Verify if a converged joint strategy is a Nash equilibrium. When set to true, this uses
             a global optimiser and might be computationally expensive. (Default value = True)
+        early_stop (int, optional): The number of iterations the joint strategy has to be the same to allow an early
+            stop. (Default value = None)
         seed (int, optional): The initial seed for the random number generator. (Default value = None)
 
     Returns:
@@ -97,8 +99,6 @@ def fictitious_play(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_strategy=
 
         return converged, joint_strategy
 
-    pt.print_start('Fictitious Play')
-
     player_actions = monfg[0].shape[:-1]  # Get the number of actions available to each player.
     players = []  # A list to hold all the players.
     joint_strategy = []  # A list to hold the current joint strategy.
@@ -113,6 +113,9 @@ def fictitious_play(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_strategy=
         joint_strategy.append(player.strategy)
 
     nash_equilibrium = False  # The current joint strategy is not known to be a Nash equilibrium at this point.
+    if early_stop is None:
+        early_stop = max_iter
+    num_same = 0
 
     if variant == 'simultaneous':
         execute_iteration = simultaneous_variant
@@ -120,15 +123,16 @@ def fictitious_play(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_strategy=
         execute_iteration = alternating_variant
 
     for i in range(max_iter):
-        print(f'Performing iteration {i}')
+        if num_same >= early_stop:
+            break
+
         converged, joint_strategy = execute_iteration(joint_strategy)
 
-        if converged:  # If IBR converged, check if we can guarantee a Nash equilibrium.
-            if global_opt:  # If we used a global optimiser, it is guaranteed to be a Nash equilibrium.
-                nash_equilibrium = True
-            elif verify:  # Otherwise check if the user wanted to verify.
-                nash_equilibrium = verify_nash(monfg, u_tpl, joint_strategy, epsilon=epsilon)
-            break
+        if converged:  # If FP converged, check if we can guarantee a Nash equilibrium.
+            num_same += 1
+
+    if verify:  # Check if the user wanted to verify.
+        nash_equilibrium = verify_nash(monfg, u_tpl, joint_strategy, epsilon=epsilon)
 
     return nash_equilibrium, joint_strategy
 

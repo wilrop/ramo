@@ -41,7 +41,6 @@ def iterated_best_response(monfg, u_tpl, epsilon=0., max_iter=1000, init_joint_s
 
     """
     rng = np.random.default_rng(seed=seed)
-    pt.print_start('Iterated Best Response')
 
     player_actions = monfg[0].shape[:-1]  # Get the number of actions available to each player.
     players = []  # A list to hold all the players.
@@ -59,6 +58,7 @@ def iterated_best_response(monfg, u_tpl, epsilon=0., max_iter=1000, init_joint_s
 
     nash_equilibrium = False  # The current joint strategy is not known to be a Nash equilibrium at this point.
     new_joint_strategy = copy.deepcopy(joint_strategy)
+
     if variant == 'simultaneous':
         def update_strategy():
             """Hide the strategy updates of other players until everyone is finished for the simultaneous update."""
@@ -69,7 +69,6 @@ def iterated_best_response(monfg, u_tpl, epsilon=0., max_iter=1000, init_joint_s
             return new_joint_strategy
 
     for i in range(max_iter):
-        print(f'Performing iteration {i}')
         converged = True
 
         for id, player in enumerate(players):
