@@ -1,31 +1,15 @@
 # Ramo
 Ramo is an algorithmic game theory framework offering a collection of algorithms and utilities for computing or learning (approximate) equilibria in multi-objective games.
 
-Please visit [Ramo's docs](https://ramo.readthedocs.io/) for a complete overview of the framework and its capabilities.
+Please visit [Ramo's docs](https://ramo.readthedocs.io/en/latest/) for a complete overview of the framework and its capabilities.
 
-## Features
-The main focus of this repository is to develop and maintain different algorithms for learning or computing equilibria in Multi-Objective Normal-Form Games (MONFGs). 
+## Installation
+Installing Ramo is as easy as typing
+````python
+pip install ramo
+````
 
-Below we provide a handy table giving an overview of our current algorithms, their type and the equilibrium concept they aim to find.
-
-| Algorithm                            | Type  | Equilibrium                   |
-|--------------------------------------|-------|-------------------------------|
-| MOQUPS                               | Compute | Pure-strategy Nash equilibria |
-| Iterated best-response               | Learn | Nash equilibrium              |
-| Fictitious play                      | Learn | Nash equilibrium              |
-| Independent Q-learners               | Learn | Nash equilibrium              |
-| Independent actor-critic learners    | Learn | Nash equilibrium              |
-| Joint-action Q-learners              | Learn | Nash equilibrium              |
-| Joint-action actor-critic learners   | Learn | Nash equilibrium              |
-| Cooperative action communication     | Learn | Nash equilibrium              |
-| Self-interested action communication | Learn | Nash equilibrium              |
-| Cooperative policy communication     | Learn | Nash equilibrium              |
-| Hierarchical communication           | Learn | Nash equilibrium              |
-| Non-stationary agent                 | Learn | Leadership equilibrium        |
-| Best-response agent                  | Learn | Leadership equilibrium        |
-
-We also provide a number of handy utilities. For example, this repository comes with a number of known and pre-analysed example games and utility functions. There are also helper functions to generate random games, scalarise games, etc. In addition, there is functionality to save and plot data resulting from experiments
-and a bunch more, with even more on the way!
+If you would like to install from source, simply download this project as a zip file and place the folder at your desired location.
 
 ## Contributing
 We are attempting to build a library containing the state of the art in multi-objective game theory. If you are working on similar stuff and want to get it included, contributions are very welcome! If you are considering this, please send me a message (willem.ropke@vub.be) so we can discuss how to move forward.
