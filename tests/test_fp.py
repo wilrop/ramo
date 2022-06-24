@@ -4,7 +4,7 @@ import numpy as np
 
 import ramo.best_response.fictitious_play as fp
 import ramo.envs.monfgs.examples as games
-import ramo.utility_functions.examples as uf
+import ramo.utility_functions.functions as uf
 
 
 class TestFictitiousPlay(unittest.TestCase):

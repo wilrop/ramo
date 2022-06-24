@@ -4,7 +4,7 @@ import numpy as np
 
 import ramo.best_response.execute_algorithm as ea
 import ramo.envs.monfgs.examples as games
-import ramo.utility_functions.examples as uf
+import ramo.utility_functions.functions as uf
 
 
 class TestExecuteAlgorithm(unittest.TestCase):

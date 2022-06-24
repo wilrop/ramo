@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 
 import ramo.envs.monfgs.examples as games
-import ramo.utility_functions.examples as uf
+import ramo.utility_functions.functions as uf
 from ramo.best_response.moqups import moqups
 
 
