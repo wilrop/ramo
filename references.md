@@ -1,5 +1,5 @@
 # References
-This framework contains a number of state of the art algorithms that have been independently developed by other researchers. We present here a link to the original resources and citations.
+Ramo contains a number of state of the art algorithms that have been independently developed by other researchers. We present here a link to the original resources and citations.
 
 ## Preference Communication in Multi-Objective Normal-Form Games
 This work developed several communication protocols. Specifically:
@@ -22,9 +22,9 @@ This work developed several communication protocols. Specifically:
 ```
 
 ## On Nash Equilibria in Normal-Form Games With Vectorial Payoffs
-This work developed the *PSNE* algorithm for finding all pure-strategy Nash equilibria in games with quasiconvex utility functions.
+This work developed the *MOQUPS* algorithm for finding all pure-strategy Nash equilibria in games with quasiconvex utility functions.
 
-[paper](https://arxiv.org/abs/2112.06500) | [repo](https://github.com/wilrop/Nash-Equilibria-MONFG)
+[paper](https://arxiv.org/abs/2112.06500) | [repo](https://github.com/wilrop/MOQUPS)
 
 ```
 @misc{ropke2021nash,
@@ -40,9 +40,20 @@ This work developed the *PSNE* algorithm for finding all pure-strategy Nash equi
 ## Commitment and Cyclic Strategies in Multi-Objective Games
 This work developed the non-stationary commitment and best-response learners.
 
-[repo](https://github.com/wilrop/Cyclic-Equilibria-MONFG)
+[paper](https://ala2022.github.io/papers/ALA2022_paper_25.pdf) | [repo](https://github.com/wilrop/Cyclic-Equilibria-MONFG)
 
-*No citation available yet.*
+```
+@inproceedings{ropke2022commitment,
+  title = {Commitment and {{Cyclic Strategies}} in {{Multi-Objective Games}}},
+  booktitle = {Proceedings of the {{Adaptive}} and {{Learning Agents Workshop}} ({{ALA}} 2022)},
+  author = {R{\"o}pke, Willem and Radulescu, Roxana and Now{\'e}, Ann and Roijers, Diederik M.},
+  editor = {Cruz, Francisco and Hayes, Conor F. and {da Silva}, Felipe Leno and Santos, Fernando P.},
+  year = {2022},
+  month = may,
+  pages = {9},
+  address = {{Online, \url{https://ala2022.github.io/}}}
+}
+```
 
 ## A utility-based analysis of equilibria in multi-objective normal-form games
 The first work to introduce independent multi-objective Q-learners.

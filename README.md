@@ -1,9 +1,12 @@
 # Ramo
-A collection of algorithms and utilities for computing or learning (approximate) equilibria in multi-objective games.
+Ramo is an algorithmic game theory framework offering a collection of algorithms and utilities for computing or learning (approximate) equilibria in multi-objective games.
 
+Please visit [Ramo's docs](https://ramo.readthedocs.io/) for a complete overview of the framework and its capabilities.
 
 ## Features
-The main focus of this repository is to develop and maintain different algorithms for learning or computing equilibria in Multi-Objective Normal-Form Games (MONFGs). Below we provide a handy table giving an overview of our current algorithms, their type and the equilibrium concept they aim to find.
+The main focus of this repository is to develop and maintain different algorithms for learning or computing equilibria in Multi-Objective Normal-Form Games (MONFGs). 
+
+Below we provide a handy table giving an overview of our current algorithms, their type and the equilibrium concept they aim to find.
 
 | Algorithm                            | Type  | Equilibrium                   |
 |--------------------------------------|-------|-------------------------------|
@@ -43,3 +46,4 @@ This repository contains (derivatives of) original work that has been published 
 
 ## License
 This project is licensed under the terms of the MIT license.
+
