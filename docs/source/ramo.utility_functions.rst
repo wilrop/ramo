@@ -12,10 +12,10 @@ ramo.utility\_functions.checking module
    :undoc-members:
    :show-inheritance:
 
-ramo.utility\_functions.examples module
----------------------------------------
+ramo.utility\_functions.functions module
+----------------------------------------
 
-.. automodule:: ramo.utility_functions.examples
+.. automodule:: ramo.utility_functions.functions
    :members:
    :undoc-members:
    :show-inheritance:

@@ -9,7 +9,7 @@ Subpackages
 
    ramo.best_response
    ramo.commitment
-   ramo.envs
+   ramo.game
    ramo.learners
    ramo.plotting
    ramo.utility_functions
