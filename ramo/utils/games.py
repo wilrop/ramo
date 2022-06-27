@@ -21,3 +21,15 @@ def get_num_objectives(monfg, player=0):
         int: The number of objectives in the game for the given player.
     """
     return monfg[player].shape[-1]
+
+
+def get_num_players(monfg):
+    """Get the number of players in an MONFG.
+
+    Args:
+        monfg (List[ndarray]): An MONFG as a list of payoff matrices.
+
+    Returns:
+        int: The number of players in the MONFG.
+    """
+    return len(monfg)
