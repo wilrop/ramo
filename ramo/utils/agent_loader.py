@@ -1,14 +1,14 @@
-from ramo.commitment.best_response_agent import BestResponseAgent
-from ramo.commitment.comp_action_agent import CompActionAgent
-from ramo.commitment.coop_action_agent import CoopActionAgent
-from ramo.commitment.coop_policy_agent import CoopPolicyAgent
-from ramo.commitment.non_stationary_agent import NonStationaryAgent
-from ramo.commitment.optional_com_agent import OptionalComAgent
-from ramo.utility_functions.examples import get_u
+from ramo.commitment.best_response import BestResponseAgent
+from ramo.commitment.comp_action import CompActionAgent
+from ramo.commitment.coop_action import CoopActionAgent
+from ramo.commitment.coop_policy import CoopPolicyAgent
+from ramo.commitment.non_stationary import NonStationaryAgent
+from ramo.commitment.optional_com import OptionalComAgent
 from ramo.learners.indep_actor_critic import IndependentActorCriticAgent
 from ramo.learners.indep_q import IndependentQAgent
 from ramo.learners.ja_actor_critic import JointActionActorCriticAgent
 from ramo.learners.ja_q import JointActionQAgent
+from ramo.utility_functions.functions import get_u
 
 
 def create_agents(experiment, u_tpl, num_agents, player_actions, num_objectives, alpha_q=0.01, alpha_theta=0.01,
@@ -18,7 +18,7 @@ def create_agents(experiment, u_tpl, num_agents, player_actions, num_objectives,
 
     Args:
         experiment (str): The type of experiment that is run. This is used to determine which agents to create.
-        u_tpl (Tuple[str]): A tuple of utility functions.
+        u_tpl (Tuple[callable]): A tuple of utility functions.
         num_agents (int): The number of agents to create.
         player_actions (Tuple[int]): The number of actions per player.
         num_objectives (int): The number of objectives.
@@ -46,23 +46,23 @@ def create_agents(experiment, u_tpl, num_agents, player_actions, num_objectives,
 
     """
     agents = []
-    for ag, u_str, num_actions in zip(range(num_agents), u_tpl, player_actions):
-        u = get_u(u_str)
+    for ag, u, num_actions in zip(range(num_agents), u_tpl, player_actions):
         if experiment == 'indep_ac':
             new_agent = IndependentActorCriticAgent(u, num_actions, num_objectives, alpha_q=alpha_q,
                                                     alpha_theta=alpha_theta, alpha_q_decay=alpha_q_decay,
-                                                    alpha_theta_decay=alpha_theta_decay)
+                                                    alpha_theta_decay=alpha_theta_decay, rng=rng)
         elif experiment == 'indep_q':
             new_agent = IndependentQAgent(u, num_actions, num_objectives, alpha_q=alpha_q, alpha_q_decay=alpha_q_decay,
-                                          epsilon=epsilon, epsilon_decay=epsilon_decay, min_epsilon=min_epsilon)
+                                          epsilon=epsilon, epsilon_decay=epsilon_decay, min_epsilon=min_epsilon,
+                                          rng=rng)
         elif experiment == 'ja_ac':
             new_agent = JointActionActorCriticAgent(ag, u, num_actions, num_objectives, player_actions, alpha_q=alpha_q,
                                                     alpha_theta=alpha_theta, alpha_q_decay=alpha_q_decay,
-                                                    alpha_theta_decay=alpha_theta_decay)
+                                                    alpha_theta_decay=alpha_theta_decay, rng=rng)
         elif experiment == 'ja_q':
             new_agent = JointActionQAgent(ag, u, num_actions, num_objectives, player_actions, alpha_q=alpha_q,
                                           alpha_q_decay=alpha_q_decay, epsilon=epsilon, epsilon_decay=epsilon_decay,
-                                          min_epsilon=min_epsilon)
+                                          min_epsilon=min_epsilon, rng=rng)
         elif experiment == 'coop_action':
             new_agent = CoopActionAgent(ag, u, num_actions, num_objectives, alpha_q=alpha_q, alpha_theta=alpha_theta,
                                         alpha_q_decay=alpha_q_decay, alpha_theta_decay=alpha_theta_decay, rng=rng)
