@@ -1,13 +1,8 @@
-import argparse
-import time
-
 import numpy as np
 
-import ramo.envs.monfgs.examples as games
-import ramo.utility_functions.examples as uf
-import ramo.utils.printing as pt
 from ramo.best_response.Player import FPPlayer
 from ramo.best_response.best_response import verify_nash
+from ramo.utils.games import get_player_actions
 
 
 def fictitious_play(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_strategy=None, variant='alternating',
@@ -99,7 +94,7 @@ def fictitious_play(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_strategy=
 
         return converged, joint_strategy
 
-    player_actions = monfg[0].shape[:-1]  # Get the number of actions available to each player.
+    player_actions = get_player_actions(monfg)  # Get the number of actions available to each player.
     players = []  # A list to hold all the players.
     joint_strategy = []  # A list to hold the current joint strategy.
 
@@ -135,38 +130,3 @@ def fictitious_play(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_strategy=
         nash_equilibrium = verify_nash(monfg, u_tpl, joint_strategy, epsilon=epsilon)
 
     return nash_equilibrium, joint_strategy
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument('--game', type=str, default='game1', help="which MONFG to play")
-    parser.add_argument('--variant', type=str, default='alternating', choices=['simultaneous', 'alternating'])
-    parser.add_argument('--iterations', type=int, default=1000, help="The maximum number of iterations.")
-    parser.add_argument('-u', type=str, default=['u1', 'u2'], nargs='+', help="The utility functions to use.")
-    parser.add_argument('--player_actions', type=int, nargs='+', default=[5, 5],
-                        help='The number of actions per player')
-    parser.add_argument('--num_objectives', type=int, default=2, help="The number of objectives for the random MONFG.")
-    parser.add_argument('--lower_bound', type=int, default=0, help='The lower reward bound.')
-    parser.add_argument('--upper_bound', type=int, default=5, help='The upper reward bound.')
-
-    args = parser.parse_args()
-
-    start = time.time()  # Start measuring the time.
-
-    if args.game == 'random':
-        player_actions = tuple(args.player_actions)
-        monfg = games.generate_random_monfg(player_actions, args.num_objectives, args.lower_bound, args.upper_bound)
-    else:
-        monfg = games.get_monfg(args.game)
-
-    u_tpl = tuple([uf.get_u(u_str) for u_str in args.u])
-    variant = args.variant
-    iterations = args.iterations
-
-    ne, final_strategy = fictitious_play(monfg, u_tpl, max_iter=iterations, variant=variant)
-    pt.print_ne(ne, final_strategy)
-
-    end = time.time()
-    elapsed_secs = (end - start)
-    print("Seconds elapsed: " + str(elapsed_secs))

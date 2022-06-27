@@ -1,13 +1,6 @@
-import argparse
-import time
-
 import numpy as np
 
-import ramo.envs.monfgs.examples as games
-import ramo.utility_functions.examples as uf
-import ramo.utils.printing as pt
-
-from ramo.envs.monfgs.generators import scalarised_game, random_monfg
+from ramo.game.generators import scalarised_game
 
 
 def reduce_monfg(monfg, u_tpl):
@@ -83,34 +76,3 @@ def moqups(monfg, u_tpl):
     nfg = reduce_monfg(monfg, u_tpl)  # Reduce the MONFG to an NFG.
     psne_lst = calc_nfg_psne(nfg, player_actions)  # Calculate the PSNE from these payoff matrices.
     return psne_lst
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument('--game', type=str, default='game1', help="which MONFG to play")
-    parser.add_argument('-u', type=str, default=['u1', 'u5'], nargs='+', help="The utility functions to use.")
-    parser.add_argument('--player_actions', type=int, nargs='+', default=[3, 3],
-                        help='The number of actions per agent')
-    parser.add_argument('--num_objectives', type=int, default=2, help="The number of objectives for the random MONFG")
-    parser.add_argument('--lower_bound', type=int, default=0, help='The lower reward bound.')
-    parser.add_argument('--upper_bound', type=int, default=5, help='The upper reward bound.')
-
-    args = parser.parse_args()
-
-    start = time.time()  # Start measuring the time.
-
-    if args.game == 'random':
-        player_actions = args.player_actions
-        monfg = random_monfg(player_actions, args.num_objectives, args.lower_bound, args.upper_bound)
-    else:
-        monfg = games.get_monfg(args.game)
-
-    u_tpl = tuple([uf.get_u(u_str) for u_str in args.u])  # These must be quasiconvex to ensure correctness.
-
-    psne_lst = moqups(monfg, u_tpl)
-    pt.print_psne(monfg, psne_lst, name=args.game)
-
-    end = time.time()
-    elapsed_secs = (end - start)
-    print(f'Seconds elapsed: {str(elapsed_secs)}')
