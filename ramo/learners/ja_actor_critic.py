@@ -4,7 +4,7 @@ from jax import grad, jit
 from jax.nn import softmax
 
 from ramo.best_response.best_response import calc_expected_returns
-from ramo.utils.experiments import softmax_policy
+from ramo.utils.learners import softmax_policy
 
 
 class JointActionActorCriticAgent:

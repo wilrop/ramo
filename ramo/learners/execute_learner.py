@@ -1,13 +1,10 @@
-import argparse
-import time
 from collections import defaultdict
 
 import numpy as np
 
-import ramo.envs.monfgs.examples as games
-from ramo.utils.data import save_metadata, save_data
 from ramo.utils.agent_loader import create_agents
-from ramo.utils.experiments import create_game_path, calc_returns, calc_action_probs, get_payoffs
+from ramo.utils.experiments import calc_returns, calc_action_probs, get_payoffs
+from ramo.utils.games import get_player_actions, get_num_objectives, get_num_players
 
 
 def select_actions(agents):
@@ -63,7 +60,7 @@ def execute_learner(payoff_matrices, u_tpl, experiment='coop_action', runs=100, 
         seed (int, optional): The seed for random number generation. (Default value = 1)
 
     Returns:
-        Tuple[Dict, Dict, ndarray, Dict}: A log of payoffs, a log of action probabilities for both agents, a log of the
+        Tuple[Dict, Dict, ndarray, Dict]: A log of payoffs, a log of action probabilities for both agents, a log of the
             state distribution and a log of the commitment probabilities.
 
     Raises:
@@ -72,8 +69,9 @@ def execute_learner(payoff_matrices, u_tpl, experiment='coop_action', runs=100, 
     """
     rng = np.random.default_rng(seed=seed)  # Initialise a random number generator.
 
-    player_actions = payoff_matrices[0].shape[:-1]
-    num_objectives = payoff_matrices[0].shape[-1]
+    player_actions = get_player_actions(payoff_matrices)
+    num_objectives = get_num_objectives(payoff_matrices)
+    num_agents = get_num_players(payoff_matrices)
 
     # Set up logging data structures.
     returns_log = defaultdict(list)
@@ -95,8 +93,6 @@ def execute_learner(payoff_matrices, u_tpl, experiment='coop_action', runs=100, 
         'min_epsilon': min_epsilon,
         'seed': seed
     }
-
-    start = time.time()
 
     for run in range(runs):
         print("Starting run: ", run)
@@ -144,46 +140,4 @@ def execute_learner(payoff_matrices, u_tpl, experiment='coop_action', runs=100, 
                 state_dist /= rollouts
                 state_dist_log += state_dist
 
-    end = time.time()
-    elapsed_mins = (end - start) / 60.0
-    print("Minutes elapsed: " + str(elapsed_mins))
-
     return returns_log, action_probs_log, state_dist_log, metadata
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument('--game', type=str, default='game1', help="which MONFG game to play")
-    parser.add_argument('--u', type=str, default=['u1', 'u2'], nargs='+',
-                        help="Which utility functions to use per player")
-    parser.add_argument('--experiment', type=str, default='indep_ac', help='The experiment to run.')
-    parser.add_argument('--runs', type=int, default=100, help="number of trials")
-    parser.add_argument('--episodes', type=int, default=5000, help="number of episodes")
-    parser.add_argument('--rollouts', type=int, default=100, help="Rollout period for the policies")
-    parser.add_argument('--dir', type=str, default='/Users/willemropke/Documents/mo-game-theory',
-                        help='Parent directory for data and plots.')
-
-    args = parser.parse_args()
-
-    # Extracting the arguments.
-    game = args.game
-    u = args.u
-    experiment = args.experiment
-    runs = args.runs
-    episodes = args.episodes
-    rollouts = args.rollouts
-    parent_dir = args.dir
-
-    # Starting the experiments.
-    payoff_matrices = games.get_monfg(game)
-    data = execute_learner(payoff_matrices, u, experiment=experiment, runs=runs, episodes=episodes, rollouts=rollouts)
-    returns_log, action_probs_log, state_dist_log, metadata = data
-
-    # Writing the data to disk.
-    num_agents = len(payoff_matrices)
-    player_actions = tuple(payoff_matrices[0].shape[:-1])
-    path = create_game_path('data', experiment, game, parent_dir=parent_dir)
-    save_metadata(path, **metadata)
-    save_data(path, experiment, game, num_agents, player_actions, runs, episodes, returns_log=returns_log,
-              action_probs_log=action_probs_log, state_dist_log=state_dist_log)
