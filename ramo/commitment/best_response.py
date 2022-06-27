@@ -4,7 +4,8 @@ from jax import grad, jit
 from jax.nn import softmax
 
 from ramo.best_response.best_response import calc_best_response
-from ramo.utils.experiments import make_joint_strat, softmax_policy
+from ramo.utils.strategies import make_joint_strat
+from ramo.utils.learners import softmax_policy
 
 
 class BestResponseAgent:
