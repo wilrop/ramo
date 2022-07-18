@@ -69,7 +69,7 @@ def update(agents, commitment, actions, payoffs):
 def execute_commitment(payoff_matrices, u_tpl, experiment='coop_action', runs=100, episodes=5000, rollouts=100,
                        alternate=False, alpha_lq=0.01, alpha_ltheta=0.01, alpha_fq=0.01, alpha_ftheta=0.01,
                        alpha_cq=0.01, alpha_ctheta=0.01, alpha_q_decay=1, alpha_theta_decay=1, alpha_com_decay=1,
-                       seed=1):
+                       seed=None):
     """Execute a commitment experiment.
 
     Args:
@@ -77,7 +77,7 @@ def execute_commitment(payoff_matrices, u_tpl, experiment='coop_action', runs=10
         u_tpl (Tuple[callable]): A tuple of utility functions.
         experiment (str, optional): The type of commitment experiment to execute. (Default value = 'coop_action')
         runs (int, optional): The number of times to repeat the experiment. (Default value = 100)
-        episodes (int, optional): The number of episodes in one run of the experiment. (Default value = 100)
+        episodes (int, optional): The number of episodes in one run of the experiment. (Default value = 5000)
         rollouts (int, optional): The number of Monte-Carlo simulations at each episode. (Default value = 100)
         alternate (bool, optional): Whether to alternate the players between leader and follower.
             (Default value = False)
@@ -92,9 +92,7 @@ def execute_commitment(payoff_matrices, u_tpl, experiment='coop_action', runs=10
         alpha_theta_decay (float, optional): The decay for the policy parameters learning rate. (Default value = 1)
         alpha_com_decay (float, optional): The decay for the commitment strategy learning rate when using optional
             commitment. (Default value = 1)
-        seed (int, optional): The seed for random number generation. (Default value = 1)
-        save_mode (str, optional): The save mode for this experiment. (Default value = 'all')
-        path (str, optional): The directory to the save path for experiment data. (Default value = '.')
+        seed (int, optional): The seed for random number generation. (Default value = None)
 
     Returns:
         List[Agent]: A list of trained agents.
