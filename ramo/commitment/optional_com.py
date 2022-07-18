@@ -61,10 +61,14 @@ class OptionalComAgent:
     def make_leader(self):
         """Make this agent the leader."""
         self.leader = True
+        self.com_agent.leader = True
+        self.no_com_agent.leader = True
 
     def make_follower(self):
         """Make this agent the follower."""
         self.leader = False
+        self.com_agent.leader = False
+        self.no_com_agent.leader = False
 
     def update(self, commitment, actions, reward):
         """Perform an update of the agent and cascade an update to the lower layer agent.
