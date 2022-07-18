@@ -23,7 +23,7 @@ def select_actions(agents):
     return selected
 
 
-def update(agents, actions, payoffs):
+def update(agents, actions, payoffs, experiment):
     """Perform an update for a list of agents.
 
     Args:
@@ -34,13 +34,17 @@ def update(agents, actions, payoffs):
     Returns:
 
     """
-    for agent, payoff in zip(agents, payoffs):
-        agent.update(actions, payoff)
+    if experiment.startswith('indep'):
+        for agent, action, payoff in zip(agents, actions, payoffs):
+            agent.update(action, payoff)
+    else:
+        for agent, payoff in zip(agents, payoffs):
+            agent.update(actions, payoff)
 
 
-def execute_learner(payoff_matrices, u_tpl, experiment='coop_action', runs=100, episodes=5000, rollouts=100,
+def execute_learner(payoff_matrices, u_tpl, experiment='indep_ac', runs=100, episodes=5000, rollouts=100,
                     alpha_q=0.01, alpha_theta=0.01, alpha_q_decay=1, alpha_theta_decay=1, epsilon=1,
-                    epsilon_decay=0.995, min_epsilon=0.1, seed=1):
+                    epsilon_decay=0.995, min_epsilon=0.1, seed=None):
     """Execute a commitment experiment.
 
     Args:
@@ -57,7 +61,7 @@ def execute_learner(payoff_matrices, u_tpl, experiment='coop_action', runs=100, 
         epsilon (float, optional): The exploration rate for a Q-learner agent. (Default value = 1)
         epsilon_decay (float, optional): The decay for the exploration rate. (Default value = 0.995)
         min_epsilon (float, optional): The minimum value for the exploration rate. (Default value = 0.1)
-        seed (int, optional): The seed for random number generation. (Default value = 1)
+        seed (int, optional): The seed for random number generation. (Default value = None)
 
     Returns:
         Tuple[Dict, Dict, ndarray, Dict]: A log of payoffs, a log of action probabilities for both agents, a log of the
@@ -119,7 +123,7 @@ def execute_learner(payoff_matrices, u_tpl, experiment='coop_action', runs=100, 
             # We use the last action and payoff to update the agent.
             last_actions = np.array([ep_actions[ag][-1] for ag in range(num_agents)])
             last_payoffs = np.array([ep_payoffs[ag][-1] for ag in range(num_agents)])
-            update(agents, last_actions, last_payoffs)  # Update the agents.
+            update(agents, last_actions, last_payoffs, experiment)  # Update the agents.
 
             # Get the necessary results from this episode.
             action_probs = calc_action_probs(ep_actions, player_actions, rollouts)
