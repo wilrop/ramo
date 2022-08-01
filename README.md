@@ -1,6 +1,4 @@
 # Ramo
-*Rational Agents with Multiple Objectives*
-
 Ramo is an algorithmic game theory framework offering a collection of algorithms and utilities for computing or learning (approximate) equilibria in multi-objective games.
 
 Please visit [Ramo's docs](https://ramo.readthedocs.io/en/latest/) for a complete overview of the framework and its capabilities.
