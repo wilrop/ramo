@@ -15,7 +15,7 @@ The following table gives an overview of the current algorithms for computing eq
 
 Learning Algorithms
 -----------------
-This table show the learning algorithms currently included in Ramo. Please note that only the iterated best-response and fictitious play algorithms get access to their individual payoff matrices. All other algorithms have to learn the payoffs together with an optimal strategy.
+This table show the learning algorithms currently included in Ramo. Please note that only the iterated best-response and fictitious play algorithms get access to their full individual payoff matrices. All other algorithms have to learn the payoffs together with an optimal strategy.
 
 +--------------------------------------+-------------------------------+-------------------+
 | Algorithm                            | Equilibrium                   | Utility functions |
