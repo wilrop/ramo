@@ -4,11 +4,11 @@ from ramo.commitment.coop_action import CoopActionAgent
 from ramo.commitment.coop_policy import CoopPolicyAgent
 from ramo.commitment.non_stationary import NonStationaryAgent
 from ramo.commitment.optional_com import OptionalComAgent
-from ramo.learners.indep_actor_critic import IndependentActorCriticAgent
-from ramo.learners.indep_q import IndependentQAgent
-from ramo.learners.ja_actor_critic import JointActionActorCriticAgent
-from ramo.learners.ja_q import JointActionQAgent
-from ramo.utility_functions.functions import get_u
+from ramo.learner.indep_actor_critic import IndependentActorCriticAgent
+from ramo.learner.indep_q import IndependentQAgent
+from ramo.learner.ja_actor_critic import JointActionActorCriticAgent
+from ramo.learner.ja_q import JointActionQAgent
+from ramo.utility_function.functions import get_u
 
 
 def create_agents(experiment, u_tpl, num_agents, player_actions, num_objectives, alpha_q=0.01, alpha_theta=0.01,

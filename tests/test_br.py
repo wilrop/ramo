@@ -4,7 +4,7 @@ import numpy as np
 
 import ramo.best_response.best_response as br
 import ramo.game.monfgs as monfgs
-import ramo.utility_functions.functions as uf
+import ramo.utility_function.functions as uf
 
 
 class TestBestResponse(unittest.TestCase):

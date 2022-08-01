@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 
 import ramo.game.monfgs as monfgs
-import ramo.utility_functions.functions as uf
+import ramo.utility_function.functions as uf
 from ramo.commitment.execute_commitment import execute_commitment
 
 

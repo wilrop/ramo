@@ -2,7 +2,7 @@ import unittest
 
 from sympy.abc import x, y
 
-from ramo.utility_functions.checking import *
+from ramo.utility_function.checking import *
 
 
 class TestUtilityFunctionChecking(unittest.TestCase):

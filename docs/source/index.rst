@@ -3,66 +3,44 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Ramo's documentation!
+Ramo
 ================================
+Welcome to the documentation for Ramo: Rational Agents with Multiple Objectives.
 
-The main focus of this repository is to develop and maintain different algorithms for learning or computing equilibria in Multi-Objective Normal-Form Games (MONFGs).
-
-Below we provide a handy table giving an overview of our current algorithms, their type and the equilibrium concept they aim to find.
-
-+--------------------------------------+---------+-------------------------------+
-| Algorithm                            | Type    | Equilibrium                   |
-+======================================+=========+===============================+
-| MOQUPS                               | Compute | Pure-strategy Nash equilibria |
-+--------------------------------------+---------+-------------------------------+
-| Iterated best-response               | Learn   | Nash equilibrium              |
-+--------------------------------------+---------+-------------------------------+
-| Fictitious play                      | Learn   | Nash equilibrium              |
-+--------------------------------------+---------+-------------------------------+
-| Independent Q-learners               | Learn   | Nash equilibrium              |
-+--------------------------------------+---------+-------------------------------+
-| Independent actor-critic learners    | Learn   | Nash equilibrium              |
-+--------------------------------------+---------+-------------------------------+
-| Joint-action Q-learners              | Learn   | Nash equilibrium              |
-+--------------------------------------+---------+-------------------------------+
-| Joint-action actor-critic learners   | Learn   | Nash equilibrium              |
-+--------------------------------------+---------+-------------------------------+
-| Cooperative action communication     | Learn   | Nash equilibrium              |
-+--------------------------------------+---------+-------------------------------+
-| Self-interested action communication | Learn   | Nash equilibrium              |
-+--------------------------------------+---------+-------------------------------+
-| Cooperative policy communication     | Learn   | Nash equilibrium              |
-+--------------------------------------+---------+-------------------------------+
-| Hierarchical communication           | Learn   | Nash equilibrium              |
-+--------------------------------------+---------+-------------------------------+
-| Non-stationary agent                 | Learn   | Leadership equilibrium        |
-+--------------------------------------+---------+-------------------------------+
-| Best-response agent                  | Learn   | Leadership equilibrium        |
-+--------------------------------------+---------+-------------------------------+
+Ramo is an algorithmic game theory framework offering a collection of algorithms and utilities for computing or learning (approximate) equilibria in multi-objective games.
+As of now, the framework supports only Multi-Objective Normal-Form Games (MONFGs), which are the multi-objective counterpart to normal-form games.
 
 We also provide a number of handy utilities. For example, this repository comes with a number of known and pre-analysed example games and utility functions. There are also helper functions to generate random games, scalarise games, etc. In addition, there is functionality to save and plot data resulting from experiments
 and a bunch more, with even more on the way!
+
 
 .. toctree::
    :maxdepth: 1
    :caption: User Guide
 
-   Installation
-   Getting started
-   Examples
-   Citation
+   Installation <ramo.game.rst>
+   Getting Started <ramo.game.rst>
+   Examples <ramo.game.rst>
+   Citation <ramo.game.rst>
+
 
 .. toctree::
    :maxdepth: 1
    :caption: Algorithms
 
-   ramo.best_response
+   Overview <algorithms.rst>
+   Best Response <ramo.game.rst>
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 1
+   :caption: Utilities
 
-   modules
+   Overview <ramo.game.rst>
+   Game <ramo.game.rst>
+   Utility Functions <ramo.game.rst>
+   Plotting <ramo.game.rst>
+   Other <ramo.game.rst>
+
 
 Indices and tables
 ==================

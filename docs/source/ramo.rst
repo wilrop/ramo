@@ -12,7 +12,7 @@ Subpackages
    ramo.game
    ramo.learners
    ramo.plotting
-   ramo.utility_functions
+   ramo.utility_function
    ramo.utils
 
 Module contents
