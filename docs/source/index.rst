@@ -18,10 +18,8 @@ and a bunch more, with even more on the way!
    :maxdepth: 1
    :caption: User Guide
 
-   Installation <ramo.game.rst>
-   Getting Started <ramo.game.rst>
-   Examples <ramo.game.rst>
-   Citation <ramo.game.rst>
+   Introduction <introduction.rst>
+   Examples <examples.rst>
 
 
 .. toctree::
