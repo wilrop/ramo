@@ -113,5 +113,126 @@ Below, we show an example where we make use of the non-stationary learning algor
 
 Example 3: Hypothesis testing
 ----------------------------------
-We've now shown some of the most basic use cases that will be useful. However, one of the main selling points of Ramo is the fact that it is a full API. It allows you to pick and choose useful parts in order to test some hypothesis that you have. Below we'll run you through an example.
+We've now shown some of the most basic use cases that will be useful. However, one of the main selling points of Ramo is the fact that it is a full API. It allows you to pick and choose useful parts in order to test some hypothesis that you have and analyse it to completion. Below we'll run you through an example.
 
+Let's first define two custom utility function. A utility function can be any Python function you want, given that it returns a scalar value.
+
+.. code-block:: Python
+
+    def u1(vec):
+        x, y = vec
+        return x ** 2 + y
+
+    def u2(vec):
+        x, y = vec
+        return x ** 2 + x * y + y ** 2
+
+    u_tpl = (u1, u2)
+
+Ramo comes with a module which allows you to analyse (utility) functions. This is useful when certain algorithms or properties only work for a specific class of functions. Ramo can test for (strict) convexity and concavity as well as (multi)linearity.
+
+.. warning::
+    Function checking is currently in an experimental stage and we do not encourage using it without performing additional analysis. We are investigating possible updates for the future.
+
+In order for Ramo to check your function, you have to define your function with Sage. Below, we'll redefine the same utility functions as below and confirm that the first is a convex function while the second is a strictly convex function.
+
+.. code-block:: Python
+
+    from sympy.abc import x, y
+    from ramo.utility_function.checking import is_convex, is_strictly_convex
+
+    symb_u1 = x ** 2 + y
+    res1 = is_convex(symb_u1)
+    print(res1)
+
+    symb_u2 = x ** 2 + x * y + y ** 2
+    res2 = is_strictly_convex(symb_u2)
+    print(res2)
+
+For good measure we can also check whether utility function 1 is strictly convex, which should return :code:`False` as it isn't.
+
+.. code-block:: Python
+
+    res3 = is_strictly_convex(symb_u1)
+    print(res3)
+
+
+Next we also define a custom MONFG. MONFGs in Ramo are defined as a list with a payoff matrix per player. Similar to the functionality for utility functions, we can also check some properties of our games. One property that is often annoying in games is when they are *degenerate*. Ramo allows you to check if a game is degenerate *in pure strategies*.
+
+.. code-block:: Python
+
+    # Define MONFG
+    import numpy as np
+    from ramo.game.checking import is_degenerate_pure
+
+    game = [np.array([[(1, 2), (2, 1)],
+                      [(1, 2), (1, 2)]], dtype=float),
+            np.array([[(1, 2), (2, 1)],
+                      [(2, 1), (1, 2)]], dtype=float)]
+    res = is_degenerate_pure(game)
+    print(res)
+
+It turns out that this game is in fact degenerate, which is unfortunate. However, we can quickly resolve this by changing the payoffs for player 1 and rechecking for degeneracy in pure strategies.
+
+.. code-block:: Python
+
+    game = [np.array([[(1, 2), (2, 1)],
+                      [(2, 1), (1, 2)]], dtype=float),
+            np.array([[(1, 2), (2, 1)],
+                      [(2, 1), (1, 2)]], dtype=float)]
+
+    res = is_degenerate_pure(game)
+    print(res)
+
+
+A sensible first step at this point would be to check what the pure strategy Nash equilibria are in this game. Given that both utility functions are convex, we can use the *MOQUPS* algorithm for this purpose.
+
+.. code-block:: Python
+
+    # First some exploring
+    from ramo.best_response.execute_algorithm import execute_algorithm
+
+    psne = execute_algorithm(game, u_tpl)
+    print(psne)
+
+It turns out there are two: :code:`[[array([1., 0.]), array([0., 1.])], [array([0., 1.]), array([1., 0.])]]`. However, when inspecting the payoffs there appears to be a sort of symmetry which might allow for mixed strategy Nash equilibria to exist as well. Let's conjecture for a second that :math:`s_1 = \left(\frac{1}{2}, \frac{1}{2}\right)` and :math:`s_2 = \left(\frac{1}{2}, \frac{1}{2}\right)` is a Nash equilibrium. We can encode this strategy by doing:
+
+.. code-block:: Python
+
+    strat1 = np.array([0.5, 0.5])
+    strat2 = np.array([0.5, 0.5])
+    joint_strat = [strat1, strat2]
+
+
+We can now check the expected vectorial payoff for both players by calling a function on the correct payoff matrix and joint strategy.
+
+.. code-block:: Python
+
+    from ramo.best_response.best_response import calc_expected_returns
+
+    exp1 = calc_expected_returns(0, game[0], joint_strat)
+    print(exp1)
+
+    exp2 = calc_expected_returns(1, game[1], joint_strat)
+    print(exp2)
+
+The output from this function should look like below.
+
+::
+
+    [[1.5 1.5]
+     [1.5 1.5]]
+    [[1.5 1.5]
+     [1.5 1.5]]
+
+This indicates that for both players, the expected payoff for their two actions are exactly the same. You can actually show that this implies that the joint strategy is a Nash equilibrium. We can verify that this is a Nash equilibrium by calling a verification function on the game with the joint strategy.
+
+.. code-block:: Python
+
+    from ramo.best_response.best_response import verify_nash
+
+    is_ne = verify_nash(game, u_tpl, joint_strat)
+    print(is_ne)
+
+
+Under the hood, the verification algorithm runs a global optimisation routine to check that no player can change their strategy and still obtain a higher utility. The return from our verification is :code:`True`, meaning that the strategy is indeed a Nash equilibrium and shows the exploratory power of Ramo!
