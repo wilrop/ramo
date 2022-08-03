@@ -23,7 +23,7 @@ def execute_algorithm(monfg, u_tpl, algorithm='MOQUPS', seed=None, options=None)
     """
     if algorithm == 'MOQUPS':
         psne_lst = moqups(monfg, u_tpl)
-        results = psne_lst
+        results = list(psne_lst)
     elif algorithm == 'IBR':
         results = iterated_best_response(monfg, u_tpl, seed=seed, **options)
     elif algorithm == 'FP':
