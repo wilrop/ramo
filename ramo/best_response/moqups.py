@@ -89,7 +89,7 @@ def moqups(monfg, u_tpl):
         u_tpl (Tuple[callable]): A tuple of utility functions.
 
     Returns:
-        ndarray: The pure joint-strategies that are a PSNE.
+        List[List[ndarray]]: A list of pure joint strategies that are Nash equilibria.
 
     """
     player_actions = monfg[0].shape[:-1]  # Get the number of actions available to each player.
