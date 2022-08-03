@@ -1,7 +1,7 @@
 import numpy as np
 
 from ramo.game.generators import scalarised_game
-
+from ramo.utils.strategies import make_strat_from_action
 
 def reduce_monfg(monfg, u_tpl):
     """Reduce an MONFG to an NFG by scalarisation. This is also known as the trade-off game.
@@ -49,8 +49,28 @@ def calc_nfg_psne(nfg, player_actions):
         nash_equilibria = np.logical_and(nash_equilibria,
                                          best_responses[i])  # Best response to all best responses is a NE.
 
-    psne = np.argwhere(nash_equilibria)  # Get the action profiles that result in these PSNE.
+    psne = np.argwhere(nash_equilibria).tolist()  # Get the action profiles that result in these PSNE.
     return psne
+
+
+def psne_to_strats(psne_lst, player_actions):
+    """Convert the pure strategy Nash equilibria as action profiles to joint strategies.
+
+    Args:
+        psne_lst (List[ndarray]): A list of pure strategy Nash equilibria as action profiles.
+        player_actions (Tuple[int]): The number of actions per player.
+
+    Returns:
+        List[List[ndarray]]: A list of joint strategies.
+    """
+    psne_strats = []
+    for psne in psne_lst:
+        joint_strat = []
+        for action, num_actions in zip(psne, player_actions):
+            strat = make_strat_from_action(action, num_actions)
+            joint_strat.append(strat)
+        psne_strats.append(joint_strat)
+    return psne_strats
 
 
 def moqups(monfg, u_tpl):
@@ -75,4 +95,5 @@ def moqups(monfg, u_tpl):
     player_actions = monfg[0].shape[:-1]  # Get the number of actions available to each player.
     nfg = reduce_monfg(monfg, u_tpl)  # Reduce the MONFG to an NFG.
     psne_lst = calc_nfg_psne(nfg, player_actions)  # Calculate the PSNE from these payoff matrices.
-    return psne_lst
+    psne_strats = psne_to_strats(psne_lst, player_actions)
+    return psne_strats
