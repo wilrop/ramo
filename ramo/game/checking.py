@@ -18,7 +18,7 @@ def is_degenerate_pure(game):
         for opp_strat in np.ndindex(*opp_actions):
             slice_idx = opp_strat[:player] + (slice(0, num_actions),) + opp_strat[player:]
             payoffs = payoff_matrix[slice_idx]
-            unique_count = len(np.unique(payoffs, axis=0, return_counts=True))
+            unique_count = len(np.unique(payoffs, axis=0))
 
             if unique_count != num_actions:
                 return True
