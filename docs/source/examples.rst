@@ -193,7 +193,21 @@ A sensible first step at this point would be to check what the pure strategy Nas
     psne = execute_algorithm(game, u_tpl)
     print(psne)
 
-It turns out there are two: :code:`[[array([1., 0.]), array([0., 1.])], [array([0., 1.]), array([1., 0.])]]`. However, when inspecting the payoffs there appears to be a sort of symmetry which might allow for mixed strategy Nash equilibria to exist as well. Let's conjecture for a second that :math:`s_1 = \left(\frac{1}{2}, \frac{1}{2}\right)` and :math:`s_2 = \left(\frac{1}{2}, \frac{1}{2}\right)` is a Nash equilibrium. We can encode this strategy by doing:
+It turns out there are two: :code:`[[array([1., 0.]), array([0., 1.])], [array([0., 1.]), array([1., 0.])]]`. We can visualise these equilibria on the payoff matrices to get a better feel of the structure.
+
+.. code-block:: Python
+
+    from ramo.utils.printing import print_monfg
+    from ramo.utils.strategies import make_profile_from_pure_joint_strat
+
+    action_profiles = [make_profile_from_pure_joint_strat(ne) for ne in psne]
+    print_monfg(game, 'Special Game', action_profiles)
+
+This returns you a nice overview that should look as the image below.
+
+.. image:: ../images/special-game-ne.svg
+
+When inspecting these payoffs, there appears to be a sort of symmetry which might allow for mixed strategy Nash equilibria to exist as well. Let's conjecture for a second that :math:`s_1 = \left(\frac{1}{2}, \frac{1}{2}\right)` and :math:`s_2 = \left(\frac{1}{2}, \frac{1}{2}\right)` is a Nash equilibrium. We can encode this strategy by doing:
 
 .. code-block:: Python
 
