@@ -19,6 +19,30 @@ def make_strat_from_action(action, num_actions):
     return strat
 
 
+def make_action_from_pure_strat(strat):
+    """Make an action from a pure strategy.
+
+    Args:
+        strat (ndarray): A strategy.
+
+    Returns:
+        int: The closest matching action to this strategy.
+    """
+    return np.argmax(strat)
+
+
+def make_profile_from_pure_joint_strat(joint_strat):
+    """Make an action profile from a pure joint strategy.
+
+    Args:
+        joint_strat (List[ndarray]): A list of pure strategies.
+
+    Returns:
+        ndarray: An action profile.
+    """
+    return np.array([make_action_from_pure_strat(strat) for strat in joint_strat])
+
+
 def make_joint_strat(player_id, player_strat, opp_strat):
     """Make joint strategy from the opponent strategy and player strategy.
 
