@@ -36,13 +36,16 @@ Ramo comes with a collection of games and utility functions that are frequently 
 
     import ramo.best_response.execute_algorithm as ea
     u_tpl = (u1, u2)
-    ne = ea.execute_algorithm(game, u_tpl, algorithm='MOQUPS')
-    print(ne)
+    psne = ea.execute_algorithm(game, u_tpl, algorithm='MOQUPS')
+    print(psne)
 
-This prints the list :code:`[array([0, 0]), array([2, 2])]` denoting that both players choosing action 0 or both players choosing action 2 are pure strategy Nash equilibria. Again, we can visualise this by utilising Ramo's printing functionality:
+This prints the list :code:`[[array([1., 0., 0.]), array([1., 0., 0.])], [array([0., 0., 1.]), array([0., 0., 1.])]]`. Again, we can visualise this by utilising Ramo's printing functionality:
 
 .. code-block:: Python
-    pt.print_monfg(game, 'Game 1', highlight_cells=ne)
+
+    from ramo.utils.strategies import make_profile_from_pure_joint_strat
+    action_profiles = [make_profile_from_pure_joint_strat(joint_strat) for joint_strat in psne]
+    pt.print_monfg(game, 'Game 1', highlight_cells=action_profiles)
 
 This draws the same game as before but highlights the Nash equilibria in the game.
 
@@ -111,4 +114,4 @@ Below, we show an example where we make use of the non-stationary learning algor
 Example 3: Hypothesis testing
 -----------------
 We've now shown some of the most basic use cases that will be useful. However, one of the main selling points of Ramo is the fact that it is a full API. It allows you to pick and choose useful parts in order to test some hypothesis that you have. Below we'll run you through an example.
-The following table gives an overview of the current algorithms for computing equilibria from a given MONFG and utility functions.
+
