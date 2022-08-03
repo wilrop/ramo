@@ -6,7 +6,7 @@ Ramo allows game theory researchers to quickly verify novel ideas, run experimen
     If you believe that a critical use case is not covered in these examples, please do not hesitate to `open an issue <https://github.com/wilrop/ramo/issues>`_.
 
 Example 1: Solving a game
------------------
+---------------------------
 The most basic use for Ramo is to solve a game. Solving a game might entail computing a sample equilibrium, retrieving all equilibria or letting us know that no equilibrium exists. Some of these questions are still active areas of research and can as such not be easily answered. However, we can (partially) address most of them directly from within Ramo.
 
 To begin, let us import a predefined game and utility functions.
@@ -60,7 +60,7 @@ We can use exactly the same setup as described here to find a sample mixed strat
 
 
 Example 2: Running baseline algorithms
------------------
+----------------------------------------
 When doing research or writing papers, it is often important to benchmark your algorithms to existing state of the art. This process is made tedious by a lack of standard baseline implementations and environments, requiring everyone to come up with their own. Luckily in Ramo, we provide several learning algorithms which work out of the box on all our games and utility functions.
 
 Let's first define your experimental setup. We gan generate some random game from the :code:`game.generators` module. This will generate a game with payoffs randomly drawn from a discrete uniform distribution.
@@ -112,6 +112,6 @@ Below, we show an example where we make use of the non-stationary learning algor
     returns_log, action_probs_log, state_dist_log, com_probs_log, metadata = data
 
 Example 3: Hypothesis testing
------------------
+----------------------------------
 We've now shown some of the most basic use cases that will be useful. However, one of the main selling points of Ramo is the fact that it is a full API. It allows you to pick and choose useful parts in order to test some hypothesis that you have. Below we'll run you through an example.
 

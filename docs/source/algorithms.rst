@@ -3,7 +3,7 @@ Algorithms
 Ramo currently contains more than 10 different algorithms capable of computing or learning (approximate) equilibria in multi-objective games. The following tables give an overview of our current algorithms, the equilibria they aim to find and the utility functions they support.
 
 Computing Equilibria
------------------
+----------------------
 The following table gives an overview of the current algorithms for computing equilibria from a given MONFG and utility functions.
 
 +--------------------------------------+-------------------------------+-------------------+
@@ -14,7 +14,7 @@ The following table gives an overview of the current algorithms for computing eq
 
 
 Learning Algorithms
------------------
+---------------------
 This table show the learning algorithms currently included in Ramo. Please note that only the iterated best-response and fictitious play algorithms get access to their full individual payoff matrices. All other algorithms have to learn the payoffs together with an optimal strategy.
 
 +--------------------------------------+-------------------------------+-------------------+

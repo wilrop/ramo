@@ -10,7 +10,7 @@ Subpackages
    ramo.best_response
    ramo.commitment
    ramo.game
-   ramo.learners
+   ramo.learner
    ramo.plotting
    ramo.utility_function
    ramo.utils

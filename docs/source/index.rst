@@ -28,16 +28,18 @@ and a bunch more, with even more on the way!
 
    Overview <algorithms.rst>
    Best Response <ramo.game.rst>
+   Learners <ramo.learner.rst>
+   Commitment <ramo.commitment.rst>
 
 .. toctree::
    :maxdepth: 1
    :caption: Utilities
 
-   Overview <ramo.game.rst>
+   Overview <modules.rst>
    Game <ramo.game.rst>
-   Utility Functions <ramo.game.rst>
-   Plotting <ramo.game.rst>
-   Other <ramo.game.rst>
+   Utility Functions <ramo.utility_function.rst>
+   Plotting <ramo.plotting.rst>
+   Other <ramo.utils.rst>
 
 
 Indices and tables
