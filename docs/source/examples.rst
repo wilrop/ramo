@@ -161,7 +161,6 @@ Next we also define a custom MONFG. MONFGs in Ramo are defined as a list with a 
 
 .. code-block:: Python
 
-    # Define MONFG
     import numpy as np
     from ramo.game.checking import is_degenerate_pure
 
@@ -189,7 +188,6 @@ A sensible first step at this point would be to check what the pure strategy Nas
 
 .. code-block:: Python
 
-    # First some exploring
     from ramo.best_response.execute_algorithm import execute_algorithm
 
     psne = execute_algorithm(game, u_tpl)
