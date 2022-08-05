@@ -80,7 +80,7 @@ def execute_learner(payoff_matrices, u_tpl, experiment='indep_ac', runs=100, epi
     # Set up logging data structures.
     returns_log = defaultdict(list)
     action_probs_log = defaultdict(list)
-    state_dist_log = np.zeros(player_actions)
+    joint_action_log = []
     metadata = {
         'payoff_matrices': list(map(lambda x: x.tolist(), payoff_matrices)),
         'u_tpl': u_tpl,
@@ -135,13 +135,6 @@ def execute_learner(payoff_matrices, u_tpl, experiment='indep_ac', runs=100, epi
                 prob_log = [run, episode] + action_probs[idx].tolist()
                 action_probs_log[idx].append(prob_log)
 
-            # If we are in the last 10% of episodes we build up a state distribution log.
-            # This code is specific to two player games.
-            if episode >= 0.9 * episodes:
-                state_dist = np.zeros(player_actions)
-                for a1, a2 in zip(ep_actions[0], ep_actions[1]):
-                    state_dist[a1, a2] += 1
-                state_dist /= rollouts
-                state_dist_log += state_dist
+            joint_action_log.append([run, episode] + last_actions.tolist())
 
-    return returns_log, action_probs_log, state_dist_log, metadata
+    return returns_log, action_probs_log, joint_action_log, metadata
