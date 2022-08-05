@@ -20,8 +20,10 @@ class TestPSNE(unittest.TestCase):
         u_tpl = tuple(u_tpl)
 
         test = moqups(game, u_tpl)
-        correct = np.array([[0, 0], [1, 1]])
-        np.testing.assert_array_equal(test, correct)
+        correct = [[np.array([1., 0., 0.]), np.array([1., 0., 0.])], [np.array([0., 1., 0.]), np.array([0., 1., 0.])]]
+        for test_joint_strat, correct_joint_strat in zip(test, correct):
+            for test_strat, correct_strat in zip(test_joint_strat, correct_joint_strat):
+                np.testing.assert_array_equal(test_strat, correct_strat)
 
     def test_medium_game(self):
         game_str = 'game14'
@@ -34,8 +36,11 @@ class TestPSNE(unittest.TestCase):
         u_tpl = tuple(u_tpl)
 
         test = moqups(game, u_tpl)
-        correct = np.array([[0, 1, 1], [1, 0, 1]])
-        np.testing.assert_array_equal(test, correct)
+        correct = [[np.array([1., 0.]), np.array([0., 1.]), np.array([0., 1.])],
+                   [np.array([0., 1.]), np.array([1., 0.]), np.array([0., 1.])]]
+        for test_joint_strat, correct_joint_strat in zip(test, correct):
+            for test_strat, correct_strat in zip(test_joint_strat, correct_joint_strat):
+                np.testing.assert_array_equal(test_strat, correct_strat)
 
     def test_large_game(self):
         game_str = 'game15'
@@ -48,8 +53,12 @@ class TestPSNE(unittest.TestCase):
         u_tpl = tuple(u_tpl)
 
         test = moqups(game, u_tpl)
-        correct = np.array([[0, 1, 1], [1, 0, 2], [1, 1, 0]])
-        np.testing.assert_array_equal(test, correct)
+        correct = [[np.array([1., 0., 0.]), np.array([0., 1.]), np.array([0., 1., 0.])],
+                   [np.array([0., 1., 0.]), np.array([1., 0.]), np.array([0., 0., 1.])],
+                   [np.array([0., 1., 0.]), np.array([0., 1.]), np.array([1., 0., 0.])]]
+        for test_joint_strat, correct_joint_strat in zip(test, correct):
+            for test_strat, correct_strat in zip(test_joint_strat, correct_joint_strat):
+                np.testing.assert_array_equal(test_strat, correct_strat)
 
 
 if __name__ == '__main__':

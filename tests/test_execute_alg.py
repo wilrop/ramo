@@ -21,8 +21,12 @@ class TestExecuteAlgorithm(unittest.TestCase):
         u_tpl = tuple(u_tpl)
 
         test = ea.execute_algorithm(game, u_tpl, algorithm='MOQUPS', seed=self.test_seed)
-        correct = np.array([[0, 1, 1], [1, 0, 2], [1, 1, 0]])
-        np.testing.assert_array_equal(test, correct)
+        correct = [[np.array([1., 0., 0.]), np.array([0., 1.]), np.array([0., 1., 0.])],
+                   [np.array([0., 1., 0.]), np.array([1., 0.]), np.array([0., 0., 1.])],
+                   [np.array([0., 1., 0.]), np.array([0., 1.]), np.array([1., 0., 0.])]]
+        for test_joint_strat, correct_joint_strat in zip(test, correct):
+            for test_strat, correct_strat in zip(test_joint_strat, correct_joint_strat):
+                np.testing.assert_array_equal(test_strat, correct_strat)
 
     def test_execute_fp(self):
         game_str = 'game14'
@@ -39,8 +43,8 @@ class TestExecuteAlgorithm(unittest.TestCase):
 
         self.assertTrue(is_ne)
         correct = [np.array([0., 1.]), np.array([0., 1.]), np.array([1., 0.])]
-        for idx, strategy in enumerate(joint_strat):
-            np.testing.assert_almost_equal(strategy, correct[idx])
+        for test_strat, correct_strat in zip(joint_strat, correct):
+            np.testing.assert_almost_equal(test_strat, correct_strat)
 
     def test_execute_ibr(self):
         game_str = 'game14'
@@ -57,8 +61,8 @@ class TestExecuteAlgorithm(unittest.TestCase):
 
         self.assertTrue(is_ne)
         correct = [np.array([0., 1.]), np.array([0., 1.]), np.array([1., 0.])]
-        for idx, strategy in enumerate(joint_strat):
-            np.testing.assert_almost_equal(strategy, correct[idx])
+        for test_strat, correct_strat in zip(joint_strat, correct):
+            np.testing.assert_almost_equal(test_strat, correct_strat)
 
 
 if __name__ == '__main__':
