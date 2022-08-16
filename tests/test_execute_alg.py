@@ -39,7 +39,7 @@ class TestExecuteAlgorithm(unittest.TestCase):
         u_tpl = tuple(u_tpl)
 
         options = {'variant': 'alternating'}
-        is_ne, joint_strat = ea.execute_algorithm(game, u_tpl, algorithm='FP', seed=self.test_seed, options=options)
+        is_ne, joint_strat, _ = ea.execute_algorithm(game, u_tpl, algorithm='FP', seed=self.test_seed, options=options)
 
         self.assertTrue(is_ne)
         correct = [np.array([0., 1.]), np.array([0., 1.]), np.array([1., 0.])]

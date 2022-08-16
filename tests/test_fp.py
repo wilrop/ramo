@@ -20,7 +20,7 @@ class TestFictitiousPlay(unittest.TestCase):
             u_tpl.append(uf.get_u(u_str[i]))
         u_tpl = tuple(u_tpl)
 
-        is_ne, joint_strat = fp.fictitious_play(game, u_tpl, variant='alternating', seed=self.test_seed)
+        is_ne, joint_strat, _ = fp.fictitious_play(game, u_tpl, variant='alternating', seed=self.test_seed)
 
         self.assertTrue(is_ne)
         correct = [np.array([0., 1.]), np.array([0., 1.]), np.array([1., 0.])]
@@ -37,7 +37,7 @@ class TestFictitiousPlay(unittest.TestCase):
             u_tpl.append(uf.get_u(u_str[i]))
         u_tpl = tuple(u_tpl)
 
-        is_ne, joint_strat = fp.fictitious_play(game, u_tpl, variant='simultaneous', seed=self.test_seed)
+        is_ne, joint_strat, _ = fp.fictitious_play(game, u_tpl, variant='simultaneous', seed=self.test_seed)
 
         self.assertTrue(is_ne)
         correct = [np.array([0., 1.]), np.array([0., 1.]), np.array([1., 0.])]
