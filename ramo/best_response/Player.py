@@ -29,7 +29,8 @@ class Player:
             Tuple[bool, ndarray]: Whether the strategy has converged and the best response strategy.
 
         """
-        br = calc_best_response(self.u, self.pid, self.payoff_matrix, joint_strategy, epsilon=epsilon, global_opt=global_opt, init_strat=self.strategy)
+        br = calc_best_response(self.u, self.pid, self.payoff_matrix, joint_strategy, epsilon=epsilon,
+                                global_opt=global_opt, init_strat=self.strategy)
 
         converged = self.check_converged(br, joint_strategy, epsilon=epsilon)
         if not converged:
