@@ -7,7 +7,7 @@ import ramo.utility_function.functions as uf
 from ramo.best_response.moqups import moqups
 
 
-class TestPSNE(unittest.TestCase):
+class TestMOQUPS(unittest.TestCase):
 
     def test_small_game(self):
         game_str = 'game5'
