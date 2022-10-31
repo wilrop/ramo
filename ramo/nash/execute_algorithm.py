@@ -21,6 +21,9 @@ def execute_algorithm(monfg, u_tpl, algorithm='MOQUPS', seed=None, options=None)
         Exception: When the requested algorithm is unknown.
 
     """
+    if options is None:
+        options = {}
+
     if algorithm == 'MOQUPS':
         results = moqups(monfg, u_tpl)
     elif algorithm == 'IBR':
