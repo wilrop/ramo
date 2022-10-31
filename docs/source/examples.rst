@@ -23,7 +23,7 @@ Due to Ramo's printing module, we can visualise the payoffs of this game to get 
 
 .. code-block:: Python
 
-    import ramo.utils.printing as pt
+    import ramo.printing as pt
     pt.print_monfg(game, 'Game 1')
 
 This results in a game matrix that should look like this:
@@ -34,7 +34,7 @@ Ramo comes with a collection of games and utility functions that are frequently 
 
 .. code-block:: Python
 
-    import ramo.best_response.execute_algorithm as ea
+    import ramo.nash.execute_algorithm as ea
     u_tpl = (u1, u2)
     psne = ea.execute_algorithm(game, u_tpl, algorithm='MOQUPS')
     print(psne)
@@ -43,7 +43,7 @@ This prints the list :code:`[[array([1., 0., 0.]), array([1., 0., 0.])], [array(
 
 .. code-block:: Python
 
-    from ramo.utils.strategies import make_profile_from_pure_joint_strat
+    from ramo.strategy.operations import make_profile_from_pure_joint_strat
     action_profiles = [make_profile_from_pure_joint_strat(joint_strat) for joint_strat in psne]
     pt.print_monfg(game, 'Game 1', highlight_cells=action_profiles)
 
@@ -67,13 +67,12 @@ Let's first define your experimental setup. We gan generate some random game fro
 
 .. code-block:: Python
 
-    from ramo.game.generators import random_monfg
+    from ramo.game.generators import discrete_uniform_monfg
     from ramo.utility_function.functions import get_u
 
-    game = random_monfg(player_actions=(3, 3), num_objectives=2, reward_min_bound=0, reward_max_bound=5)
+    game = discrete_uniform_monfg(player_actions=(3, 3), num_objectives=2, reward_min_bound=0, reward_max_bound=5)
     u1, u2 = get_u('u1'), get_u('u1')
     u_tpl = (u1, u2)
-
 
 After having defined your setup, running an experiment with one of the algorithms is as simply as defining the parameters and calling the executor:
 
@@ -110,6 +109,7 @@ Below, we show an example where we make use of the non-stationary learning algor
 
     data = execute_commitment(game, u_tpl, experiment=experiment, runs=runs, episodes=episodes, rollouts=rollouts, alternate=alternate)
     returns_log, action_probs_log, state_dist_log, com_probs_log, metadata = data
+
 
 Example 3: Hypothesis testing
 ----------------------------------
@@ -156,7 +156,6 @@ For good measure we can also check whether utility function 1 is strictly convex
     res3 = is_strictly_convex(symb_u1)
     print(res3)
 
-
 Next we also define a custom MONFG. MONFGs in Ramo are defined as a list with a payoff matrix per player. Similar to the functionality for utility functions, we can also check some properties of our games. One property that is often annoying in games is when they are *degenerate*. Ramo allows you to check if a game is degenerate *in pure strategies*.
 
 .. code-block:: Python
@@ -183,12 +182,11 @@ It turns out that this game is in fact degenerate, which is unfortunate. However
     res = is_degenerate_pure(game)
     print(res)
 
-
 A sensible first step at this point would be to check what the pure strategy Nash equilibria are in this game. Given that both utility functions are convex, we can use the *MOQUPS* algorithm for this purpose.
 
 .. code-block:: Python
 
-    from ramo.best_response.execute_algorithm import execute_algorithm
+    from ramo.nash.execute_algorithm import execute_algorithm
 
     psne = execute_algorithm(game, u_tpl)
     print(psne)
@@ -197,8 +195,8 @@ It turns out there are two: :code:`[[array([1., 0.]), array([0., 1.])], [array([
 
 .. code-block:: Python
 
-    from ramo.utils.printing import print_monfg
-    from ramo.utils.strategies import make_profile_from_pure_joint_strat
+    from ramo.printing import print_monfg
+    from ramo.strategy.operations import make_profile_from_pure_joint_strat
 
     action_profiles = [make_profile_from_pure_joint_strat(ne) for ne in psne]
     print_monfg(game, 'Special Game', action_profiles)
@@ -215,12 +213,11 @@ When inspecting these payoffs, there appears to be a sort of symmetry which migh
     strat2 = np.array([0.5, 0.5])
     joint_strat = [strat1, strat2]
 
-
 We can now check the expected vectorial payoff for both players by calling a function on the correct payoff matrix and joint strategy.
 
 .. code-block:: Python
 
-    from ramo.best_response.best_response import calc_expected_returns
+    from ramo.strategy.best_response import calc_expected_returns
 
     exp1 = calc_expected_returns(0, game[0], joint_strat)
     print(exp1)
@@ -241,10 +238,9 @@ This indicates that for both players, the expected payoff for their two actions 
 
 .. code-block:: Python
 
-    from ramo.best_response.best_response import verify_nash
+    from ramo.nash.verify import verify_nash
 
     is_ne = verify_nash(game, u_tpl, joint_strat)
     print(is_ne)
-
 
 Under the hood, the verification algorithm runs a global optimisation routine to check that no player can change their strategy and still obtain a higher utility. The return from our verification is :code:`True`, meaning that the strategy is indeed a Nash equilibrium and shows the exploratory power of Ramo!
