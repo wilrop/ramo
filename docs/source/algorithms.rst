@@ -9,6 +9,8 @@ The following table gives an overview of the current algorithms for computing eq
 +--------------------------------------+-------------------------------+-------------------+
 | Algorithm                            | Equilibrium                   | Utility functions |
 +======================================+===============================+===================+
+| MOSE                                 | Pure-strategy Nash equilibria | All               |
++--------------------------------------+-------------------------------+-------------------+
 | MOQUPS                               | Pure-strategy Nash equilibria | Quasiconvex       |
 +--------------------------------------+-------------------------------+-------------------+
 
