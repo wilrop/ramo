@@ -1,39 +1,9 @@
 import numpy as np
 
-
-def random_payoffs(rng, shape, distribution, **kwargs):
-    """Draw random payoffs of a given shape from a distribution.
-
-    Args:
-        rng (Generator): A random number generator.
-        shape (Tuple[int]): The shape of the payoffs.
-        distribution (str): The distribution to draw payoffs from.
-        **kwargs: A dictionary of keyword arguments to use in the generator function.
-
-    Returns:
-        ndarray: A numpy array of payoffs
-
-    Raises:
-        Exception: Raises an exception when the distribution is unknown.
-    """
-    if distribution == 'discrete uniform':
-        low = kwargs['low']
-        high = kwargs['high']
-        payoffs = rng.integers(low=low, high=high, size=shape)
-    elif distribution == 'uniform':
-        low = kwargs['low']
-        high = kwargs['high']
-        payoffs = rng.uniform(low=low, high=high, size=shape)
-    elif distribution == 'normal':
-        loc = kwargs['loc']
-        scale = kwargs['scale']
-        payoffs = rng.uniform(low=loc, high=scale, size=shape)
-    else:
-        raise Exception(f'The distribution "{distribution}" is not currently supported')
-    return payoffs
+from ramo.utils.games import get_player_actions
 
 
-def random_monfg(player_actions=(2, 2), num_objectives=2, reward_min_bound=0, reward_max_bound=5, rng=None):
+def discrete_uniform_monfg(player_actions=(2, 2), num_objectives=2, reward_min_bound=0, reward_max_bound=5, rng=None):
     """Generate a random MONFG with payoffs from a discrete uniform distribution.
 
     Args:
@@ -48,15 +18,94 @@ def random_monfg(player_actions=(2, 2), num_objectives=2, reward_min_bound=0, re
 
     """
     rng = rng if rng is not None else np.random.default_rng()
-    payoffs = []
+    monfg = []
     payoffs_shape = player_actions + tuple([num_objectives])  # Define the shape of the payoff matrices.
 
     for _ in range(len(player_actions)):
-        payoff_matrix = random_payoffs(rng, payoffs_shape, 'discrete uniform', low=reward_min_bound,
-                                       high=reward_max_bound)
-        payoffs.append(payoff_matrix)
+        payoff_matrix = rng.integers(low=reward_min_bound, high=reward_max_bound, size=payoffs_shape)
+        monfg.append(payoff_matrix)
 
-    return payoffs
+    return monfg
+
+
+def uniform_monfg(player_actions=(2, 2), num_objectives=2, reward_min_bound=0, reward_max_bound=5, rng=None):
+    """Generate a random MONFG with payoffs from a uniform distribution.
+
+    Args:
+        player_actions (Tuple[int], optional): A tuple of actions indexed by player. (Default value = (2, 2))
+        num_objectives (int, optional): The number of objectives in the game. (Default value = 2)
+        reward_min_bound (int, optional): The minimum reward on an objective. (Default value = 0)
+        reward_max_bound (int, optional): The maximum reward on an objective. (Default value = 5)
+        rng (Generator, optional): A random number generator. (Default value = None)
+
+    Returns:
+        List[ndarray]: A list of payoff matrices representing the MONFG.
+
+    """
+    rng = rng if rng is not None else np.random.default_rng()
+    monfg = []
+    payoffs_shape = player_actions + tuple([num_objectives])  # Define the shape of the payoff matrices.
+
+    for _ in range(len(player_actions)):
+        payoff_matrix = rng.uniform(low=reward_min_bound, high=reward_max_bound, size=payoffs_shape)
+        monfg.append(payoff_matrix)
+
+    return monfg
+
+
+def normal_distributed_monfg(player_actions=(2, 2), num_objectives=2, mean=0, std=1, rng=None):
+    """Generate a random MONFG with payoffs from a normal distribution.
+
+    Args:
+        player_actions (Tuple[int], optional): A tuple of actions indexed by player. (Default value = (2, 2))
+        num_objectives (int, optional): The number of objectives in the game. (Default value = 2)
+        mean (float, optional): The mean of the normal distribution. (Default value = 0)
+        std (float, optional): The standard deviation of the normal distribution. (Default value = 1)
+        rng (Generator, optional): A random number generator. (Default value = None)
+
+    Returns:
+        List[ndarray]: A list of payoff matrices representing the MONFG.
+
+    """
+    rng = rng if rng is not None else np.random.default_rng()
+    monfg = []
+    payoffs_shape = player_actions + tuple([num_objectives])  # Define the shape of the payoff matrices.
+
+    for _ in range(len(player_actions)):
+        payoff_matrix = rng.normal(loc=mean, scale=std, size=payoffs_shape)
+        monfg.append(payoff_matrix)
+
+    return monfg
+
+
+def covariance_monfg(player_actions=(2, 2), num_objectives=2, mean=0, std=1, rho=0, rng=None):
+    """Generate a random MONFG with payoffs from a normal distribution and given covariance.
+
+    Args:
+        player_actions (Tuple[int], optional): A tuple of actions indexed by player. (Default value = (2, 2))
+        num_objectives (int, optional): The number of objectives in the game. (Default value = 2)
+        mean (float, optional): The mean of the normal distribution. (Default value = 0)
+        std (float, optional): The standard deviation of the normal distribution. (Default value = 1)
+        rho (float, optional): The covariance between the players. (Default value = 0)
+        rng (Generator, optional): A random number generator. (Default value = None)
+
+    Returns:
+        List[ndarray]: A list of payoff matrices representing the MONFG.
+
+    """
+    rng = rng if rng is not None else np.random.default_rng()
+    num_players = len(player_actions)
+    mean_arr = np.full(num_players, mean)
+    std_arr = np.full(num_players, std)
+    cov_matrix = np.full((num_players, num_players), rho)
+    np.fill_diagonal(cov_matrix, std_arr)
+    payoffs_shape = player_actions + tuple([num_objectives])  # Define the shape of the payoff matrices.
+    all_payoffs = rng.multivariate_normal(mean_arr, cov_matrix, payoffs_shape)
+    monfg = [all_payoffs[..., -1:].reshape(payoffs_shape)]  # Set payoffs for the first player
+    for player in range(1, num_players):
+        payoffs = all_payoffs[..., -player - 1:-player].reshape(payoffs_shape)
+        monfg.append(payoffs)
+    return monfg
 
 
 def identity_game(player_actions):
@@ -106,7 +155,7 @@ def scalarised_game(monfg, u_tpl):
         dimension which is removed due to the scalarisation.
 
     """
-    player_actions = monfg[0].shape[:-1]
+    player_actions = get_player_actions(monfg)
     scalarised = []
 
     for payoff_matrix, u in zip(monfg, u_tpl):
@@ -118,3 +167,58 @@ def scalarised_game(monfg, u_tpl):
 
         scalarised.append(scalarised_payoffs)
     return scalarised
+
+
+def unique_ps_game(player_actions=(2, 2), num_objectives=2, reward_min_bound=0, reward_max_bound=5, rng=None):
+    """Generate a random single-objective game where pure strategy payoffs for each opponent pure strategy are forced to
+     be different.
+
+     This generator makes a game where pure strategies have different payoffs for each opponent pure strategy. Note that
+     this does not imply all payoffs are unique. The intention of this generator is to create a generic/non-degenerate
+     game. In two-player two-action games this condition is sufficient. In all other games, this condition is necessary
+     but not sufficient.
+
+    Note:
+        The current implementation samples a point, which is then hashed into a dictionary. When the dictionary reaches
+        the correct length, there are enough unique payoffs.
+
+    Args:
+        player_actions (Tuple[int], optional): A tuple of actions indexed by player. (Default value = (2, 2))
+        num_objectives (int, optional): The number of objectives in the game. (Default value = 2)
+        reward_min_bound (int, optional): The minimum reward on an objective. (Default value = 0)
+        reward_max_bound (int, optional): The maximum reward on an objective. (Default value = 5)
+        rng (Generator, optional): A random number generator. (Default value = None)
+
+    Returns:
+        List[ndarray]: A game with unique pure strategy payoffs for each opponent pure strategy.
+
+    Raises:
+        Exception: When the generic game is impossible to create. This can happen when the action space of a player is
+        larger than the reward space. This would imply the same reward for different actions, making the game
+        non-generic.
+    """
+    if max(player_actions) > (reward_max_bound - reward_min_bound):
+        raise Exception('The action space is larger than the reward space')
+
+    rng = rng if rng is not None else np.random.default_rng()
+    game = []
+    game_shape = player_actions + (num_objectives,)
+
+    for player, num_actions in enumerate(player_actions):  # Generate generic payoffs for each player.
+        payoff_matrix = np.zeros(game_shape)
+        opp_actions = player_actions[:player] + player_actions[player + 1:]
+
+        for opp_strat in np.ndindex(opp_actions):  # Loop over opponent joint actions.
+            payoffs_dict = {}
+
+            while len(payoffs_dict) < num_actions:
+                payoff = rng.integers(low=reward_min_bound, high=reward_max_bound, size=(1, num_objectives))
+                payoff_str = np.array2string(payoff)
+                payoffs_dict[payoff_str] = payoff
+
+            for action, payoff in enumerate(payoffs_dict.values()):  # Insert the payoffs at the correct index.
+                idx = opp_strat[:player] + (action,) + opp_strat[player:]
+                payoff_matrix[idx] = payoff
+
+        game.append(payoff_matrix)
+    return game
