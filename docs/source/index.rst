@@ -37,8 +37,8 @@ and a bunch more, with even more on the way!
 
    Overview <modules.rst>
    Game <ramo.game.rst>
+   Strategy <ramo.strategy.rst>
    Utility Functions <ramo.utility_function.rst>
-   Plotting <ramo.plotting.rst>
    Other <ramo.utils.rst>
 
 

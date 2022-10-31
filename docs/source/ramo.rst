@@ -7,11 +7,13 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   ramo.best_response
    ramo.commitment
    ramo.game
    ramo.learner
-   ramo.plotting
+   ramo.nash
+   ramo.pareto
+   ramo.printing
+   ramo.strategy
    ramo.utility_function
    ramo.utils
 

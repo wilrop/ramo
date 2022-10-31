@@ -28,42 +28,10 @@ ramo.utils.experiments module
    :undoc-members:
    :show-inheritance:
 
-ramo.utils.games module
------------------------
-
-.. automodule:: ramo.utils.games
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 ramo.utils.helpers module
 -------------------------
 
 .. automodule:: ramo.utils.helpers
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-ramo.utils.learners module
---------------------------
-
-.. automodule:: ramo.utils.learners
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-ramo.utils.printing module
---------------------------
-
-.. automodule:: ramo.utils.printing
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-ramo.utils.strategies module
-----------------------------
-
-.. automodule:: ramo.utils.strategies
    :members:
    :undoc-members:
    :show-inheritance:

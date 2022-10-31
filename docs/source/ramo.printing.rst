@@ -1,13 +1,13 @@
-ramo.plotting package
+ramo.printing package
 =====================
 
 Submodules
 ----------
 
-ramo.plotting.plots module
---------------------------
+ramo.printing.printing module
+-----------------------------
 
-.. automodule:: ramo.plotting.plots
+.. automodule:: ramo.printing.printing
    :members:
    :undoc-members:
    :show-inheritance:
@@ -15,7 +15,7 @@ ramo.plotting.plots module
 Module contents
 ---------------
 
-.. automodule:: ramo.plotting
+.. automodule:: ramo.printing
    :members:
    :undoc-members:
    :show-inheritance:

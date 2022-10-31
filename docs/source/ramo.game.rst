@@ -28,6 +28,14 @@ ramo.game.monfgs module
    :undoc-members:
    :show-inheritance:
 
+ramo.game.properties module
+---------------------------
+
+.. automodule:: ramo.game.properties
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 
