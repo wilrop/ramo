@@ -1,8 +1,8 @@
 import numpy as np
 
-from ramo.utils.strategies import make_strat_from_action
-from ramo.utils.games import get_player_actions
-from ramo.best_response.best_response import verify_nash
+from ramo.game.properties import get_player_actions
+from ramo.nash.verify import verify_nash
+from ramo.strategy.operations import make_strat_from_action
 
 
 def mose(monfg, u_tpl):

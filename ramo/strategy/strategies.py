@@ -2,7 +2,7 @@ import numpy as np
 from jax.nn import softmax
 
 
-def softmax_policy(theta):
+def softmax_strategy(theta):
     """Take a softmax over an array of parameters.
 
     Args:

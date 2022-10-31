@@ -3,7 +3,7 @@ import numpy as np
 from jax import grad, jit
 from jax.nn import softmax
 
-from ramo.utils.learners import softmax_policy
+from ramo.strategy.strategies import softmax_strategy
 from ramo.utils.helpers import array_slice
 
 
@@ -80,13 +80,13 @@ class CompActionAgent:
         if self.leader:
             self.update_leader_q_table(own_action, reward)
             self.leader_theta += self.alpha_ltheta * self.grad(self.leader_theta, self.leader_q_table)
-            self.leader_policy = softmax_policy(self.leader_theta)
+            self.leader_policy = softmax_strategy(self.leader_theta)
         else:
             self.update_payoffs_table(actions, reward)
             q = array_slice(self.payoffs_table, abs(1 - self.id), commitment, commitment + 1)
             q = q.reshape(self.num_actions, self.num_objectives)
             self.follower_thetas[commitment] += self.alpha_ftheta * self.grad(self.follower_thetas[commitment], q)
-            self.follower_policies[commitment] = softmax_policy(self.follower_thetas[commitment])
+            self.follower_policies[commitment] = softmax_strategy(self.follower_thetas[commitment])
         self.update_parameters()
 
     def update_leader_q_table(self, action, reward):

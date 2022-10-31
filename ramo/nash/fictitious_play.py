@@ -1,8 +1,7 @@
 import numpy as np
 
-from ramo.best_response.Player import FPPlayer
-from ramo.best_response.best_response import verify_nash
-from ramo.utils.games import get_player_actions
+from ramo.nash.Player import FPPlayer
+from ramo.nash.verify import verify_nash
 
 
 def simultaneous_variant(players, epsilon=0, global_opt=False):

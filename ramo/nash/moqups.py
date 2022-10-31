@@ -1,7 +1,8 @@
 import numpy as np
 
 from ramo.game.generators import scalarised_game
-from ramo.utils.strategies import make_strat_from_action
+from ramo.strategy.operations import make_strat_from_action
+
 
 def reduce_monfg(monfg, u_tpl):
     """Reduce an MONFG to an NFG by scalarisation. This is also known as the trade-off game.

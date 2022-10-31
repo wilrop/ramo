@@ -1,6 +1,6 @@
 import numpy as np
 
-from ramo.best_response.best_response import optimise_policy
+from ramo.strategy.best_response import optimise_policy
 
 
 class IndependentQAgent:

@@ -1,6 +1,6 @@
 import numpy as np
 
-from ramo.utils.games import get_player_actions
+from ramo.game.properties import get_player_actions
 
 
 def discrete_uniform_monfg(player_actions=(2, 2), num_objectives=2, reward_min_bound=0, reward_max_bound=5, rng=None):

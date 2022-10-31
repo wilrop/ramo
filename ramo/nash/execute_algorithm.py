@@ -1,6 +1,6 @@
-from ramo.best_response.IBR import iterated_best_response
-from ramo.best_response.fictitious_play import fictitious_play
-from ramo.best_response.moqups import moqups
+from ramo.nash.IBR import iterated_best_response
+from ramo.nash.fictitious_play import fictitious_play
+from ramo.nash.moqups import moqups
 
 
 def execute_algorithm(monfg, u_tpl, algorithm='MOQUPS', seed=None, options=None):

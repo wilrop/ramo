@@ -3,8 +3,8 @@ import numpy as np
 from jax import grad, jit
 from jax.nn import softmax
 
-from ramo.best_response.best_response import calc_expected_returns
-from ramo.utils.learners import softmax_policy
+from ramo.strategy.best_response import calc_expected_returns
+from ramo.strategy.strategies import softmax_strategy
 
 
 class JointActionActorCriticAgent:
@@ -63,7 +63,7 @@ class JointActionActorCriticAgent:
         self.update_policies()
         q_values = calc_expected_returns(self.id, self.q_table, self.joint_policy)
         self.theta += self.alpha_theta * self.grad(self.q_table, q_values)
-        self.policy = softmax_policy(self.theta)
+        self.policy = softmax_strategy(self.theta)
         self.update_parameters()
 
     def update_q_table(self, actions, reward):

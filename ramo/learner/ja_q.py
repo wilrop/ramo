@@ -1,6 +1,6 @@
 import numpy as np
 
-from ramo.best_response.best_response import calc_best_response
+from ramo.strategy.best_response import calc_best_response
 
 
 class JointActionQAgent:

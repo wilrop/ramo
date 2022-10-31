@@ -2,9 +2,9 @@ from collections import defaultdict
 
 import numpy as np
 
+from ramo.game.properties import get_player_actions, get_num_objectives, get_num_players
 from ramo.utils.agent_loader import create_agents
 from ramo.utils.experiments import calc_returns, calc_action_probs, get_payoffs
-from ramo.utils.games import get_player_actions, get_num_objectives, get_num_players
 
 
 def select_actions(agents):

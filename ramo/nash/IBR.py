@@ -2,9 +2,9 @@ import copy
 
 import numpy as np
 
-from ramo.best_response.Player import IBRPlayer
-from ramo.best_response.best_response import verify_nash
-from ramo.utils.games import get_player_actions
+from ramo.game.properties import get_player_actions
+from ramo.nash.Player import IBRPlayer
+from ramo.nash.verify import verify_nash
 
 
 def iterated_best_response(monfg, u_tpl, epsilon=0., max_iter=1000, init_joint_strategy=None, variant='alternating',

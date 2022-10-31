@@ -5,8 +5,8 @@ import numpy as np
 from jax import grad, jit
 from jax.nn import softmax
 
+from ramo.strategy.strategies import softmax_strategy
 from ramo.utils.helpers import array_slice
-from ramo.utils.learners import softmax_policy
 
 
 class NonStationaryAgent:
@@ -112,7 +112,7 @@ class NonStationaryAgent:
         if self.leader:
             self.update_leader_q_table(own_action, reward)
             self.leader_theta += self.alpha_theta * self.grad_leader(self.leader_theta, self.leader_q_table)
-            self.leader_policy = softmax_policy(self.leader_theta)
+            self.leader_policy = softmax_strategy(self.leader_theta)
         else:
             # Get the correct view of the payoffs table for this player.
             q_values = array_slice(self.payoffs_table, abs(1 - self.id), 0, self.num_opponent_actions)
@@ -124,7 +124,7 @@ class NonStationaryAgent:
             # Update the follower policies that make up their non-stationary policy.
             self.follower_thetas += self.alpha_theta * self.grad_follower(self.follower_thetas, q_values, opp_policy)
             for idx, theta in enumerate(self.follower_thetas):
-                self.follower_policies[idx] = softmax_policy(theta)
+                self.follower_policies[idx] = softmax_strategy(theta)
 
         self.update_parameters()
 

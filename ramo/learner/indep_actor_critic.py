@@ -3,7 +3,7 @@ import numpy as np
 from jax import grad, jit
 from jax.nn import softmax
 
-from ramo.utils.learners import softmax_policy
+from ramo.strategy.strategies import softmax_strategy
 
 
 class IndependentActorCriticAgent:
@@ -34,7 +34,7 @@ class IndependentActorCriticAgent:
 
         self.q_table = np.zeros((num_actions, num_objectives))
         self.theta = np.zeros(num_actions)
-        self.policy = softmax_policy(self.theta)
+        self.policy = softmax_strategy(self.theta)
 
     def objective_function(self, theta, q_values):
         """The objective function for the agent. This is the SER criterion.
@@ -64,7 +64,7 @@ class IndependentActorCriticAgent:
         """
         self.update_q_table(action, reward)
         self.theta += self.alpha_theta * self.grad(self.theta, self.q_table)
-        self.policy = softmax_policy(self.theta)
+        self.policy = softmax_strategy(self.theta)
         self.update_parameters()
 
     def update_q_table(self, action, reward):

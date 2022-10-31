@@ -3,7 +3,7 @@ import numpy as np
 from jax import grad, jit
 from jax.nn import softmax
 
-from ramo.utils.learners import softmax_policy
+from ramo.strategy.strategies import softmax_strategy
 
 
 class OptionalComAgent:
@@ -38,7 +38,7 @@ class OptionalComAgent:
 
         self.q_table = np.zeros((self.num_options, num_objectives))
         self.theta = np.zeros(self.num_options)
-        self.policy = softmax_policy(self.theta)
+        self.policy = softmax_strategy(self.theta)
 
         self.leader = False
 
@@ -84,7 +84,7 @@ class OptionalComAgent:
         self.update_q_table(commitment, reward)
 
         self.theta += self.alpha_theta * self.grad(self.theta, self.q_table)
-        self.policy = softmax_policy(self.theta)
+        self.policy = softmax_strategy(self.theta)
 
         if commitment is None:
             self.no_com_agent.update(actions[self.id], reward)

@@ -3,9 +3,9 @@ import numpy as np
 from jax import grad, jit
 from jax.nn import softmax
 
-from ramo.best_response.best_response import calc_best_response
-from ramo.utils.strategies import make_joint_strat
-from ramo.utils.learners import softmax_policy
+from ramo.strategy.best_response import calc_best_response
+from ramo.strategy.operations import make_joint_strat
+from ramo.strategy.strategies import softmax_strategy
 
 
 class BestResponseAgent:
@@ -34,7 +34,7 @@ class BestResponseAgent:
         self.payoffs_table = np.zeros((num_actions, num_actions, num_objectives))
         self.leader_q_table = np.zeros((num_actions, num_objectives))
         self.leader_theta = np.zeros(num_actions)
-        self.leader_policy = softmax_policy(self.leader_theta)
+        self.leader_policy = softmax_strategy(self.leader_theta)
         self.best_response_policy = np.full(num_actions, 1 / num_actions)
 
         self.leader = False

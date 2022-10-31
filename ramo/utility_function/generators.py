@@ -7,6 +7,8 @@ def constant_u(k):
     Returns:
         callable: The generated utility function.
     """
+
     def u(x):
         return k
+
     return u
