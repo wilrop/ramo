@@ -5,15 +5,15 @@ from ramo.utility_function.functions import get_u
 game = get_monfg('game1')  # Get a predefined game.
 u1, u2 = get_u('u1'), get_u('u1')  # Get a utility function.
 
-import ramo.utils.printing as pt
+import ramo.printing as pt
 pt.print_monfg(game, 'Game 1')
 
-import ramo.best_response.execute_algorithm as ea
+import ramo.nash.execute_algorithm as ea
 u_tpl = (u1, u2)
 psne = ea.execute_algorithm(game, u_tpl, algorithm='MOQUPS')
 print(psne)
 
-from ramo.utils.strategies import make_profile_from_pure_joint_strat
+from ramo.strategy.operations import make_profile_from_pure_joint_strat
 action_profiles = [make_profile_from_pure_joint_strat(joint_strat) for joint_strat in psne]
 pt.print_monfg(game, 'Game 1', highlight_cells=action_profiles)
 
@@ -22,10 +22,10 @@ ne_ibr = ea.execute_algorithm(game, u_tpl, algorithm='IBR')
 
 
 # Example 2: Running baseline algorithms
-from ramo.game.generators import random_monfg
+from ramo.game.generators import discrete_uniform_monfg
 from ramo.utility_function.functions import get_u
 
-game = random_monfg(player_actions=(3, 3), num_objectives=2, reward_min_bound=0, reward_max_bound=5)
+game = discrete_uniform_monfg(player_actions=(3, 3), num_objectives=2, reward_min_bound=0, reward_max_bound=5)
 u1, u2 = get_u('u1'), get_u('u1')
 u_tpl = (u1, u2)
 
@@ -93,13 +93,13 @@ game = [np.array([[(1, 2), (2, 1)],
 res = is_degenerate_pure(game)
 print(res)
 
-from ramo.best_response.execute_algorithm import execute_algorithm
+from ramo.nash.execute_algorithm import execute_algorithm
 
 psne = execute_algorithm(game, u_tpl)
 print(psne)
 
-from ramo.utils.printing import print_monfg
-from ramo.utils.strategies import make_profile_from_pure_joint_strat
+from ramo.printing import print_monfg
+from ramo.strategy.operations import make_profile_from_pure_joint_strat
 
 action_profiles = [make_profile_from_pure_joint_strat(ne) for ne in psne]
 print_monfg(game, 'Special Game', action_profiles)
@@ -108,7 +108,7 @@ strat1 = np.array([0.5, 0.5])
 strat2 = np.array([0.5, 0.5])
 joint_strat = [strat1, strat2]
 
-from ramo.best_response.best_response import calc_expected_returns
+from ramo.strategy.best_response import calc_expected_returns
 
 exp1 = calc_expected_returns(0, game[0], joint_strat)
 print(exp1)
@@ -116,7 +116,7 @@ print(exp1)
 exp2 = calc_expected_returns(1, game[1], joint_strat)
 print(exp2)
 
-from ramo.best_response.best_response import verify_nash
+from ramo.nash.verify import verify_nash
 
 is_ne = verify_nash(game, u_tpl, joint_strat)
 print(is_ne)
