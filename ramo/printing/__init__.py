@@ -1,4 +1,4 @@
-from printing import *
+from ramo.printing.printing import *
 
 __all__ = ['print_two_player_monfg',
            'print_payoff_matrices',
