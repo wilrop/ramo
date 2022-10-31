@@ -4,7 +4,7 @@ import numpy as np
 
 import ramo.game.monfgs as monfgs
 import ramo.utility_function.functions as uf
-from ramo.best_response.moqups import moqups
+from ramo.nash.moqups import moqups
 
 
 class TestMOQUPS(unittest.TestCase):

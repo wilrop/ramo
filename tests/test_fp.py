@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-import ramo.best_response.fictitious_play as fp
+import ramo.nash.fictitious_play as fp
 import ramo.game.monfgs as monfgs
 import ramo.utility_function.functions as uf
 

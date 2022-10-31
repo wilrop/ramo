@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-import ramo.best_response.execute_algorithm as ea
+import ramo.nash.execute_algorithm as ea
 import ramo.game.monfgs as monfgs
 import ramo.utility_function.functions as uf
 

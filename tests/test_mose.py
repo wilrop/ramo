@@ -4,7 +4,7 @@ import numpy as np
 
 import ramo.game.monfgs as monfgs
 import ramo.utility_function.functions as uf
-from ramo.best_response.mose import mose
+from ramo.nash.mose import mose
 
 
 class TestMOSE(unittest.TestCase):

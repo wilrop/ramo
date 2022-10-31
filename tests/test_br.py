@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-import ramo.best_response.best_response as br
+import ramo.strategy.best_response as br
 import ramo.game.monfgs as monfgs
 import ramo.utility_function.functions as uf
 
