@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="Ramo",  # The name of the package.
+    name="ramo",  # The name of the package.
     version="0.0.1",  # The current release version.
     author="Willem Röpke",  # The full name of the author.
     author_email="willem.ropke@vub.be",  # Email address of the author.
@@ -18,5 +18,4 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],  # Information to filter the project on PyPi website.
     python_requires='>=3.6',  # Minimum version requirement of the package.
-    py_modules=["ramo"],  # Name of the python package.
 )
