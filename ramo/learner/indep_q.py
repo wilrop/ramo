@@ -41,7 +41,7 @@ class IndependentQAgent:
 
         """
         self.update_q_table(action, reward)
-        self.policy = optimise_policy(self.q_table, self.u, init_strat=self.policy)
+        self.policy = optimise_policy(self.q_table, self.u, init_strat=self.policy)[1]
         self.update_parameters()
 
     def update_q_table(self, action, reward):
