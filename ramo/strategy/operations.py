@@ -19,6 +19,22 @@ def make_strat_from_action(action, num_actions):
     return strat
 
 
+def make_joint_strat_from_profile(joint_action, player_actions):
+    """Makes a joint strategy from an action profile.
+
+    Args:
+        joint_action (ndarray): An array with the action per player.
+        player_actions (Tuple[int]): The number of actions per player.
+
+    Returns:
+        List[ndarray]: A list of strategies.
+    """
+    joint_strat = []
+    for action, num_actions in zip(joint_action, player_actions):
+        joint_strat.append(make_strat_from_action(action, num_actions))
+    return joint_strat
+
+
 def make_action_from_pure_strat(strat):
     """Make an action from a pure strategy.
 
