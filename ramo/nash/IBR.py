@@ -2,7 +2,6 @@ import copy
 
 import numpy as np
 
-from ramo.game.properties import get_player_actions
 from ramo.nash.Player import IBRPlayer
 from ramo.nash.verify import verify_nash
 
@@ -20,7 +19,7 @@ def iterated_best_response(monfg, u_tpl, epsilon=0., max_iter=1000, init_joint_s
         of iterations is reached.
 
     Args:
-        monfg (List[ndarray]): A list of payoff matrices representing the MONFG.
+        monfg (MONFG): An MONFG object.
         u_tpl (Tuple[callable]): A tuple of utility functions.
         epsilon (float, optional): An optional parameter to allow for approximate Nash equilibria. (Default value = 0)
         max_iter (int, optional): The maximum amount of iterations to run IBR for. (Default value = 1000)
@@ -38,13 +37,10 @@ def iterated_best_response(monfg, u_tpl, epsilon=0., max_iter=1000, init_joint_s
     """
     rng = np.random.default_rng(seed=seed)
 
-    player_actions = get_player_actions(monfg)  # Get the number of actions available to each player.
     players = []  # A list to hold all the players.
     joint_strategy = []  # A list to hold the current joint strategy.
 
-    for player, num_actions in enumerate(player_actions):  # Loop over all players to create a new IBRAgent object.
-        u = u_tpl[player]
-        payoff_matrix = monfg[player]
+    for player, (payoff_matrix, u, num_actions) in enumerate(zip(monfg.payoffs, u_tpl, monfg.player_actions)):
         init_strategy = None
         if init_joint_strategy is not None:
             init_strategy = init_joint_strategy[player]

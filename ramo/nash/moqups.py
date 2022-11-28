@@ -8,7 +8,7 @@ def reduce_monfg(monfg, u_tpl):
     """Reduce an MONFG to an NFG by scalarisation. This is also known as the trade-off game.
 
     Args:
-        monfg (List[ndarray]): An MONFG as a list of payoff matrices.
+        monfg (MONFG): An MONFG object.
         u_tpl (Tuple[callable]): A tuple of utility functions.
 
     Returns:
@@ -86,15 +86,14 @@ def moqups(monfg, u_tpl):
             Normal-Form Games With Vectorial Payoffs.
 
     Args:
-        monfg (List[ndarray]): An MONFG as a list of payoff matrices.
+        monfg (MONFG): An MONFG object.
         u_tpl (Tuple[callable]): A tuple of utility functions.
 
     Returns:
         List[List[ndarray]]: A list of pure joint strategies that are Nash equilibria.
 
     """
-    player_actions = monfg[0].shape[:-1]  # Get the number of actions available to each player.
     nfg = reduce_monfg(monfg, u_tpl)  # Reduce the MONFG to an NFG.
-    psne_lst = calc_nfg_psne(nfg, player_actions)  # Calculate the PSNE from these payoff matrices.
-    psne_strats = psne_to_strats(psne_lst, player_actions)
+    psne_lst = calc_nfg_psne(nfg, monfg.player_actions)  # Calculate the PSNE from these payoff matrices.
+    psne_strats = psne_to_strats(psne_lst, monfg.player_actions)
     return psne_strats

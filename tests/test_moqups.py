@@ -2,8 +2,8 @@ import unittest
 
 import numpy as np
 
-import ramo.game.monfgs as monfgs
 import ramo.utility_function.functions as uf
+from ramo.game.example_games import get_monfg
 from ramo.nash.moqups import moqups
 
 
@@ -13,7 +13,7 @@ class TestMOQUPS(unittest.TestCase):
         game_str = 'game5'
         u_str = ('u6', 'u7')
 
-        game = monfgs.get_monfg(game_str)
+        game = get_monfg(game_str)
         u_tpl = []
         for i in range(len(u_str)):
             u_tpl.append(uf.get_u(u_str[i]))
@@ -29,7 +29,7 @@ class TestMOQUPS(unittest.TestCase):
         game_str = 'game14'
         u_str = ('u1', 'u5', 'u6')
 
-        game = monfgs.get_monfg(game_str)
+        game = get_monfg(game_str)
         u_tpl = []
         for i in range(len(u_str)):
             u_tpl.append(uf.get_u(u_str[i]))
@@ -46,7 +46,7 @@ class TestMOQUPS(unittest.TestCase):
         game_str = 'game15'
         u_str = ('u1', 'u5', 'u6')
 
-        game = monfgs.get_monfg(game_str)
+        game = get_monfg(game_str)
         u_tpl = []
         for i in range(len(u_str)):
             u_tpl.append(uf.get_u(u_str[i]))

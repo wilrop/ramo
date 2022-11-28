@@ -2,9 +2,9 @@ import unittest
 
 import numpy as np
 
-import ramo.game.monfgs as monfgs
 import ramo.utility_function.functions as uf
 from ramo.commitment.execute_commitment import execute_commitment
+from ramo.game.example_games import get_monfg
 
 
 class TestCommitment(unittest.TestCase):
@@ -19,13 +19,13 @@ class TestCommitment(unittest.TestCase):
         rollouts = 10
         alternate = True
 
-        game = monfgs.get_monfg(game_str)
+        monfg = get_monfg(game_str)
         u_tpl = []
         for i in range(len(u_str)):
             u_tpl.append(uf.get_u(u_str[i]))
         u_tpl = tuple(u_tpl)
 
-        data = execute_commitment(game, u_tpl, experiment=experiment, runs=runs, episodes=episodes, rollouts=rollouts,
+        data = execute_commitment(monfg, u_tpl, experiment=experiment, runs=runs, episodes=episodes, rollouts=rollouts,
                                   alternate=alternate, seed=self.test_seed)
         returns_log, action_probs_log, joint_action_log, com_probs_log, _ = data
 
@@ -61,7 +61,7 @@ class TestCommitment(unittest.TestCase):
             1: [[0, 1, 0.7, 0.3], [0, 3, 0.3, 0.7], [0, 5, 0.5, 0.5], [0, 7, 0.7, 0.3], [0, 9, 0.5, 0.5],
                 [1, 1, 0.7, 0.3], [1, 3, 0.7, 0.3], [1, 5, 0.5, 0.5], [1, 7, 0.3, 0.7], [1, 9, 0.4, 0.6]]}
 
-        for player in range(len(game)):
+        for player in range(monfg.num_players):
             for returns, correct_returns in zip(returns_log[player], correct_returns_log[player]):
                 np.testing.assert_almost_equal(returns, correct_returns)
             for action_probs, correct_action_probs in zip(action_probs_log[player], correct_action_probs_log[player]):

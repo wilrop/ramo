@@ -2,8 +2,8 @@ import unittest
 
 import numpy as np
 
-import ramo.game.monfgs as monfgs
 import ramo.utility_function.functions as uf
+from ramo.game.example_games import get_monfg
 from ramo.learner.execute_learner import execute_learner
 
 
@@ -18,13 +18,13 @@ class TestLearner(unittest.TestCase):
         episodes = 10
         rollouts = 10
 
-        game = monfgs.get_monfg(game_str)
+        monfg = get_monfg(game_str)
         u_tpl = []
         for i in range(len(u_str)):
             u_tpl.append(uf.get_u(u_str[i]))
         u_tpl = tuple(u_tpl)
 
-        data = execute_learner(game, u_tpl, experiment=experiment, runs=runs, episodes=episodes, rollouts=rollouts,
+        data = execute_learner(monfg, u_tpl, experiment=experiment, runs=runs, episodes=episodes, rollouts=rollouts,
                                seed=self.test_seed)
         returns_log, action_probs_log, joint_action_log, _ = data
 
@@ -53,7 +53,7 @@ class TestLearner(unittest.TestCase):
             [[0, 0, 2, 1], [0, 1, 0, 2], [0, 2, 0, 0], [0, 3, 1, 2], [0, 4, 0, 2], [0, 5, 1, 1], [0, 6, 2, 0],
              [0, 7, 2, 2], [0, 8, 2, 2], [0, 9, 0, 0], [1, 0, 2, 1], [1, 1, 0, 0], [1, 2, 0, 1], [1, 3, 2, 2],
              [1, 4, 2, 1], [1, 5, 0, 2], [1, 6, 0, 2], [1, 7, 1, 1], [1, 8, 1, 2], [1, 9, 1, 1]])
-        for player in range(len(game)):
+        for player in range(monfg.num_players):
             for returns, correct_returns in zip(returns_log[player], correct_returns_log[player]):
                 np.testing.assert_almost_equal(returns, correct_returns)
             for action_probs, correct_action_probs in zip(action_probs_log[player], correct_action_probs_log[player]):

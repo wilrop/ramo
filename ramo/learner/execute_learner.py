@@ -2,7 +2,6 @@ from collections import defaultdict
 
 import numpy as np
 
-from ramo.game.properties import get_player_actions, get_num_objectives, get_num_players
 from ramo.utils.agent_loader import create_agents
 from ramo.utils.experiments import calc_returns, calc_action_probs, get_payoffs
 
@@ -42,13 +41,13 @@ def update(agents, actions, payoffs, experiment):
             agent.update(actions, payoff)
 
 
-def execute_learner(payoff_matrices, u_tpl, experiment='indep_ac', runs=100, episodes=5000, rollouts=100,
+def execute_learner(monfg, u_tpl, experiment='indep_ac', runs=100, episodes=5000, rollouts=100,
                     alpha_q=0.01, alpha_theta=0.01, alpha_q_decay=1, alpha_theta_decay=1, epsilon=1,
                     epsilon_decay=0.995, min_epsilon=0.1, seed=None):
     """Execute a commitment experiment.
 
     Args:
-        payoff_matrices (List[ndarray]): A list of payoff matrices representing the MONFG.
+        monfg (MONFG): An MONFG object.
         u_tpl (Tuple[callable]): A tuple of utility functions.
         experiment (str, optional): The type of commitment experiment to execute. (Default value = 'coop_action')
         runs (int, optional): The number of times to repeat the experiment. (Default value = 100)
@@ -73,9 +72,10 @@ def execute_learner(payoff_matrices, u_tpl, experiment='indep_ac', runs=100, epi
     """
     rng = np.random.default_rng(seed=seed)  # Initialise a random number generator.
 
-    player_actions = get_player_actions(payoff_matrices)
-    num_objectives = get_num_objectives(payoff_matrices)
-    num_agents = get_num_players(payoff_matrices)
+    payoff_matrices = monfg.payoffs
+    player_actions = monfg.player_actions
+    num_objectives = monfg.get_num_objectives(0)
+    num_agents = monfg.num_players
 
     # Set up logging data structures.
     returns_log = defaultdict(list)

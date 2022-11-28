@@ -2,8 +2,8 @@ import unittest
 
 import numpy as np
 
-import ramo.game.monfgs as monfgs
 import ramo.utility_function.functions as uf
+from ramo.game.example_games import get_monfg
 from ramo.nash.mose import mose
 
 
@@ -13,7 +13,7 @@ class TestMOSE(unittest.TestCase):
         game_str = 'game5'
         u_str = ('u1', 'u2')
 
-        game = monfgs.get_monfg(game_str)
+        game = get_monfg(game_str)
         u_tpl = []
         for i in range(len(u_str)):
             u_tpl.append(uf.get_u(u_str[i]))
@@ -29,7 +29,7 @@ class TestMOSE(unittest.TestCase):
         game_str = 'game18'
         u_str = ('u1', 'u2')
 
-        game = monfgs.get_monfg(game_str)
+        game = get_monfg(game_str)
         u_tpl = []
         for i in range(len(u_str)):
             u_tpl.append(uf.get_u(u_str[i]))

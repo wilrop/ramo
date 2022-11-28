@@ -9,7 +9,7 @@ class MONFG:
         self.num_objectives = [self.payoffs[player].shape[-1] for player in range(self.num_players)]
         self.player_actions = self.payoffs[0].shape[:-1]
 
-        if len(players) != self.num_players:
+        if players is not None and len(players) != self.num_players:
             raise Exception('The player list that was provided does not have the correct size')
 
     def get_num_objectives(self, player=0):

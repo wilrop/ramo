@@ -1,6 +1,6 @@
 import numpy as np
 
-from ramo.game.monfg import Monfg
+from ramo.game.monfg import MONFG
 
 payoffs1 = [np.array([[(4, 0), (3, 1), (2, 2)],
                       [(3, 1), (2, 2), (1, 3)],
@@ -241,7 +241,7 @@ def get_monfg(game):
         game (str): The string of the game.
 
     Returns:
-        List[ndarray]: A list of payoff matrices.
+        MONFG: An MONFG object initiated with predefined payoffs.
     """
     if game == 'game1':
         payoffs = payoffs1
@@ -284,4 +284,4 @@ def get_monfg(game):
     else:
         raise Exception("The provided game does not exist.")
 
-    return Monfg(payoffs)
+    return MONFG(payoffs)

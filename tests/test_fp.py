@@ -3,8 +3,8 @@ import unittest
 import numpy as np
 
 import ramo.nash.fictitious_play as fp
-import ramo.game.monfgs as monfgs
 import ramo.utility_function.functions as uf
+from ramo.game.example_games import get_monfg
 
 
 class TestFictitiousPlay(unittest.TestCase):
@@ -14,13 +14,13 @@ class TestFictitiousPlay(unittest.TestCase):
         game_str = 'game14'
         u_str = ('u1', 'u2', 'u3')
 
-        game = monfgs.get_monfg(game_str)
+        monfg = get_monfg(game_str)
         u_tpl = []
         for i in range(len(u_str)):
             u_tpl.append(uf.get_u(u_str[i]))
         u_tpl = tuple(u_tpl)
 
-        is_ne, joint_strat, _ = fp.fictitious_play(game, u_tpl, variant='alternating', seed=self.test_seed)
+        is_ne, joint_strat, _ = fp.fictitious_play(monfg, u_tpl, variant='alternating', seed=self.test_seed)
 
         self.assertTrue(is_ne)
         correct = [np.array([0., 1.]), np.array([0., 1.]), np.array([1., 0.])]
@@ -31,13 +31,13 @@ class TestFictitiousPlay(unittest.TestCase):
         game_str = 'game14'
         u_str = ('u1', 'u2', 'u3')
 
-        game = monfgs.get_monfg(game_str)
+        monfg = get_monfg(game_str)
         u_tpl = []
         for i in range(len(u_str)):
             u_tpl.append(uf.get_u(u_str[i]))
         u_tpl = tuple(u_tpl)
 
-        is_ne, joint_strat, _ = fp.fictitious_play(game, u_tpl, variant='simultaneous', seed=self.test_seed)
+        is_ne, joint_strat, _ = fp.fictitious_play(monfg, u_tpl, variant='simultaneous', seed=self.test_seed)
 
         self.assertTrue(is_ne)
         correct = [np.array([0., 1.]), np.array([0., 1.]), np.array([1., 0.])]

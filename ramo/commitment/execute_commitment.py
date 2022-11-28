@@ -2,7 +2,6 @@ from collections import defaultdict
 
 import numpy as np
 
-from ramo.game.properties import get_player_actions, get_num_objectives, get_num_players
 from ramo.utils.agent_loader import create_agents
 from ramo.utils.experiments import calc_com_probs, calc_returns, calc_action_probs, get_payoffs
 
@@ -66,14 +65,14 @@ def update(agents, commitment, actions, payoffs):
         agent.update(commitment, actions, payoff)
 
 
-def execute_commitment(payoff_matrices, u_tpl, experiment='coop_action', runs=100, episodes=5000, rollouts=100,
+def execute_commitment(monfg, u_tpl, experiment='coop_action', runs=100, episodes=5000, rollouts=100,
                        alternate=False, alpha_lq=0.01, alpha_ltheta=0.01, alpha_fq=0.01, alpha_ftheta=0.01,
                        alpha_cq=0.01, alpha_ctheta=0.01, alpha_q_decay=1, alpha_theta_decay=1, alpha_com_decay=1,
                        seed=None):
     """Execute a commitment experiment.
 
     Args:
-        payoff_matrices (List[ndarray]): A list of payoff matrices representing the MONFG.
+        payoff_matrices (MONFG): An MONFG object.
         u_tpl (Tuple[callable]): A tuple of utility functions.
         experiment (str, optional): The type of commitment experiment to execute. (Default value = 'coop_action')
         runs (int, optional): The number of times to repeat the experiment. (Default value = 100)
@@ -101,7 +100,8 @@ def execute_commitment(payoff_matrices, u_tpl, experiment='coop_action', runs=10
         Exception: When the number of players does not equal two.
 
     """
-    num_agents = get_num_players(payoff_matrices)
+    payoff_matrices = monfg.payoffs
+    num_agents = monfg.num_players
 
     if num_agents != 2:
         raise Exception(f'Commitment experiments with {num_agents} are currently not supported')
@@ -109,8 +109,8 @@ def execute_commitment(payoff_matrices, u_tpl, experiment='coop_action', runs=10
     rng = np.random.default_rng(seed=seed)  # Set the seed.
 
     # Some basic setup.
-    player_actions = get_player_actions(payoff_matrices)
-    num_objectives = get_num_objectives(payoff_matrices)
+    player_actions = monfg.player_actions
+    num_objectives = monfg.get_num_objectives(player=0)
 
     returns_log = defaultdict(list)
     action_probs_log = defaultdict(list)

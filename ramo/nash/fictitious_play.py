@@ -78,7 +78,7 @@ def fictitious_play(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_strategy=
         of iterations is reached.
 
     Args:
-        monfg (List[ndarray]): A list of payoff matrices representing the MONFG.
+        monfg (MONFG): An MONFG object.
         u_tpl (Tuple[callable]): A tuple of utility functions.
         epsilon (float, optional): An optional parameter to allow for approximate Nash equilibria. (Default value = 0)
         max_iter (int, optional): The maximum amount of iterations to run IBR for. (Default value = 1000)
@@ -98,13 +98,12 @@ def fictitious_play(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_strategy=
     """
     rng = np.random.default_rng(seed=seed)
 
-    player_actions = monfg[0].shape[:-1]  # Get the number of actions available to each player.
+    player_actions = monfg.player_actions
     players = []  # A list to hold all the players.
     joint_strategy = []
     log = []  # Initialise the log
 
-    for player_id, u in enumerate(u_tpl):  # Loop over all players to create a new FPAgent object.
-        payoff_matrix = monfg[player_id]
+    for player_id, (payoff_matrix, u) in enumerate(zip(monfg.payoffs, u_tpl)):  # Create an FPAgent for each player.
         init_strategy = None
         if init_joint_strategy is not None:
             init_strategy = init_joint_strategy[player_id]

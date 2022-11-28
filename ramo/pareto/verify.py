@@ -147,14 +147,14 @@ def verify_pareto_nash(monfg, joint_strat):
     """Verify whether a joint strategy is a Pareto Nash equilibrium.
 
     Args:
-        monfg (List[ndarray]): A list of payoff matrices.
-        joint_strat (List[ndarray]: A list of strategy arrays.
+        monfg (MONFG): An MONFG object.
+        joint_strat (List[ndarray]): A list of strategy arrays.
 
     Returns:
         bool: Whether the joint strategy is a Pareto Nash equilibrium.
     """
-    for player, (payoffs, strat) in enumerate(zip(monfg, joint_strat)):
-        expected_returns = calc_expected_returns(player, payoffs, joint_strat)
+    for player, (payoff_matrix, strat) in enumerate(zip(monfg.payoffs, joint_strat)):
+        expected_returns = calc_expected_returns(player, payoff_matrix, joint_strat)
         candidates = set([tuple(vec) for vec in expected_returns])  # Get the candidates for the CCS.
         ccs = np.array(list(c_prune(candidates)))  # Compute a CCS.
         expected_vec = np.dot(strat, expected_returns)
@@ -167,7 +167,7 @@ def verify_all_pareto_nash(monfg, joint_strats):
     """Globally verify if each joint strategy in a list is a Nash equilibrium.
 
     Args:
-        monfg (List[ndarray]): An MONFG as a list of payoff matrices.
+        monfg (MONFG): An MONFG object.
         joint_strats (List[ndarray]): A list of joint strategies to check.
 
     Returns:

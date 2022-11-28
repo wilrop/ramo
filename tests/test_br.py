@@ -3,8 +3,8 @@ import unittest
 import numpy as np
 
 import ramo.strategy.best_response as br
-import ramo.game.monfgs as monfgs
 import ramo.utility_function.functions as uf
+from ramo.game.example_games import get_monfg
 
 
 class TestBestResponse(unittest.TestCase):
@@ -22,14 +22,14 @@ class TestBestResponse(unittest.TestCase):
 
     def test_calc_expected_returns(self):
         player = 0
-        payoff_matrix = monfgs.monfg1[0]
+        monfg = get_monfg('game1')
 
         joint_strategy1 = [np.array([1 / 3, 1 / 3, 1 / 3]), np.array([1 / 3, 1 / 3, 1 / 3])]
-        test1 = br.calc_expected_returns(player, payoff_matrix, joint_strategy1)
+        test1 = br.calc_expected_returns(player, monfg.payoffs[0], joint_strategy1)
         correct1 = np.array([[3., 1.], [2., 2.], [1., 3.]])
 
         joint_strategy2 = [np.array([1 / 3, 1 / 3, 1 / 3]), np.array([0.25, 0.35, 0.4])]
-        test2 = br.calc_expected_returns(player, payoff_matrix, joint_strategy2)
+        test2 = br.calc_expected_returns(player, monfg.payoffs[0], joint_strategy2)
         correct2 = np.array([[2.85, 1.15], [1.85, 2.15], [0.85, 3.15]])
 
         np.testing.assert_almost_equal(test1, correct1)
@@ -37,11 +37,11 @@ class TestBestResponse(unittest.TestCase):
 
     def test_best_response(self):
         player = 1
-        payoff_matrix = monfgs.monfg19[player]
+        monfg = get_monfg('game19')
         u = uf.u2
 
         joint_strategy = [np.array([0.5, 0.5]), np.array([0.75, 0.25])]
-        test = br.calc_best_response(u, player, payoff_matrix, joint_strategy, global_opt=True)
+        test = br.calc_best_response(u, player, monfg.payoffs[player], joint_strategy, global_opt=True)
         correct = np.array([0.75, 0.25])
 
         np.testing.assert_almost_equal(test, correct)

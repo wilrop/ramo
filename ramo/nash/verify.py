@@ -5,7 +5,7 @@ def verify_nash(monfg, u_tpl, joint_strat, epsilon=0, tol=1e-12, strict=False):
     """Verify whether the joint strategy is a Nash equilibrium
 
     Args:
-        monfg (List[ndarray]): A list of payoff matrices.
+        monfg (MONFG): An MONFG object.
         u_tpl (Tuple[callable]): A utility function per player.
         joint_strat (List[ndarray]): The joint strategy to verify.
         epsilon (float, optional): An optional parameter to allow for approximate Nash equilibria. (Default value = 0)
@@ -23,8 +23,8 @@ def verify_nash(monfg, u_tpl, joint_strat, epsilon=0, tol=1e-12, strict=False):
     Returns:
         bool: Whether the given joint strategy is a Nash equilibrium.
     """
-    for player, (payoffs, u, strat) in enumerate(zip(monfg, u_tpl, joint_strat)):
-        expected_returns = calc_expected_returns(player, payoffs, joint_strat)
+    for player, (payoff_matrix, u, strat) in enumerate(zip(monfg.payoffs, u_tpl, joint_strat)):
+        expected_returns = calc_expected_returns(player, payoff_matrix, joint_strat)
         utility_from_strat = objective(strat, expected_returns, u)
         success, br_strat, br_utility = optimise_policy(expected_returns, u, global_opt=True)
         if (not strict or success) and utility_from_strat + epsilon + tol < br_utility:
@@ -36,7 +36,7 @@ def verify_all_nash(monfg, u_tpl, joint_strats, epsilon=0, tol=1e-12):
     """Globally verify if each joint strategy in a list is a Nash equilibrium.
 
     Args:
-        monfg (List[ndarray]): An MONFG as a list of payoff matrices.
+        monfg (MONFG): An MONFG object.
         u_tpl (Tuple[callable]): A tuple of utility functions.
         joint_strats (List[ndarray]): A list of joint strategies to check.
         epsilon (float, optional): An optional parameter to allow for approximate Nash equilibria. (Default value = 0)
