@@ -27,6 +27,8 @@ and a bunch more, with even more on the way!
    :caption: Algorithms
 
    Overview <algorithms.rst>
+   Nash Equilibria <ramo.nash.rst>
+   Pareto <ramo.pareto.rst>
    Best Response <ramo.game.rst>
    Learners <ramo.learner.rst>
    Commitment <ramo.commitment.rst>
@@ -39,6 +41,7 @@ and a bunch more, with even more on the way!
    Game <ramo.game.rst>
    Strategy <ramo.strategy.rst>
    Utility Functions <ramo.utility_function.rst>
+   Printing <ramo.printing.rst>
    Other <ramo.utils.rst>
 
 

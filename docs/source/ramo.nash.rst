@@ -20,14 +20,6 @@ ramo.nash.Player module
    :undoc-members:
    :show-inheritance:
 
-ramo.nash.execute\_algorithm module
------------------------------------
-
-.. automodule:: ramo.nash.execute_algorithm
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 ramo.nash.fictitious\_play module
 ---------------------------------
 

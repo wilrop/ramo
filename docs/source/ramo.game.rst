@@ -12,6 +12,14 @@ ramo.game.checking module
    :undoc-members:
    :show-inheritance:
 
+ramo.game.example\_games module
+-------------------------------
+
+.. automodule:: ramo.game.example_games
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramo.game.generators module
 ---------------------------
 
@@ -20,18 +28,10 @@ ramo.game.generators module
    :undoc-members:
    :show-inheritance:
 
-ramo.game.monfgs module
------------------------
+ramo.game.monfg module
+----------------------
 
-.. automodule:: ramo.game.monfgs
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-ramo.game.properties module
----------------------------
-
-.. automodule:: ramo.game.properties
+.. automodule:: ramo.game.monfg
    :members:
    :undoc-members:
    :show-inheritance:
