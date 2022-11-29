@@ -34,7 +34,7 @@ def print_two_player_monfg(monfg, name='MONFG', highlight_cells=None):
                 data = f'{tuple(monfg.payoffs[0][p1_a, p2_a])}; {tuple(monfg.payoffs[1][p1_a, p2_a])}'
 
                 for highlight_strat in highlight_cells:
-                    if ([p1_a, p2_a] == highlight_strat).all():
+                    if [p1_a, p2_a] == list(highlight_strat):
                         data = f'[black on green3]{data}'
                         break
 
@@ -81,7 +81,7 @@ def print_payoff_matrices(monfg, name='MONFG', highlight_cells=None):
                 data = f'{payoff_vec}'
 
                 for highlight_strat in highlight_cells:
-                    if (joint_strat == highlight_strat).all():
+                    if list(joint_strat) == list(highlight_strat):
                         data = f'[black on green3]{payoff_vec}'
                         break
 
