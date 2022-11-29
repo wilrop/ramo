@@ -1,5 +1,5 @@
 # Example 1: Solving a game
-from ramo.game.monfgs import get_monfg
+from ramo.game.example_games import get_monfg
 from ramo.utility_function.functions import get_u
 
 game = get_monfg('game1')  # Get a predefined game.
@@ -12,9 +12,9 @@ pt.print_monfg(game, 'Game 1')
 
 ##########
 
-import ramo.nash.execute_algorithm as ea
+from ramo.nash.moqups import moqups
 u_tpl = (u1, u2)
-psne = ea.execute_algorithm(game, u_tpl, algorithm='MOQUPS')
+psne = moqups(game, u_tpl)
 print(psne)
 
 ##########
@@ -24,9 +24,11 @@ action_profiles = [make_profile_from_pure_joint_strat(joint_strat) for joint_str
 pt.print_monfg(game, 'Game 1', highlight_cells=action_profiles)
 
 ##########
+from ramo.nash.fictitious_play import fictitious_play
+from ramo.nash.IBR import iterated_best_response
 
-ne_fp = ea.execute_algorithm(game, u_tpl, algorithm='FP')
-ne_ibr = ea.execute_algorithm(game, u_tpl, algorithm='IBR')
+ne_fp = fictitious_play(game, u_tpl)
+ne_ibr = iterated_best_response(game, u_tpl)
 
 
 # Example 2: Running baseline algorithms
@@ -95,30 +97,34 @@ print(res3)
 ##########
 
 import numpy as np
+from ramo.game.monfg import MONFG
 from ramo.game.checking import is_degenerate_pure
 
-game = [np.array([[(1, 2), (2, 1)],
-                  [(1, 2), (1, 2)]], dtype=float),
-        np.array([[(1, 2), (2, 1)],
-                  [(2, 1), (1, 2)]], dtype=float)]
-res = is_degenerate_pure(game)
+payoffs = [np.array([[(1, 2), (2, 1)],
+                     [(1, 2), (1, 2)]], dtype=float),
+           np.array([[(1, 2), (2, 1)],
+                     [(2, 1), (1, 2)]], dtype=float)]
+
+monfg = MONFG(payoffs)
+res = is_degenerate_pure(monfg)
 print(res)
 
 ##########
 
-game = [np.array([[(1, 2), (2, 1)],
-                  [(2, 1), (1, 2)]], dtype=float),
-        np.array([[(1, 2), (2, 1)],
-                  [(2, 1), (1, 2)]], dtype=float)]
+payoffs = [np.array([[(1, 2), (2, 1)],
+                     [(2, 1), (1, 2)]], dtype=float),
+           np.array([[(1, 2), (2, 1)],
+                     [(2, 1), (1, 2)]], dtype=float)]
 
-res = is_degenerate_pure(game)
+monfg = MONFG(payoffs)
+res = is_degenerate_pure(monfg)
 print(res)
 
 ##########
 
-from ramo.nash.execute_algorithm import execute_algorithm
+from ramo.nash.moqups import moqups
 
-psne = execute_algorithm(game, u_tpl)
+psne = moqups(monfg, u_tpl)
 print(psne)
 
 ##########
@@ -127,7 +133,7 @@ from ramo.printing import print_monfg
 from ramo.strategy.operations import make_profile_from_pure_joint_strat
 
 action_profiles = [make_profile_from_pure_joint_strat(ne) for ne in psne]
-print_monfg(game, 'Special Game', action_profiles)
+print_monfg(monfg, 'Special Game', action_profiles)
 
 ##########
 
@@ -139,15 +145,15 @@ joint_strat = [strat1, strat2]
 
 from ramo.strategy.best_response import calc_expected_returns
 
-exp1 = calc_expected_returns(0, game[0], joint_strat)
+exp1 = calc_expected_returns(0, monfg.payoffs[0], joint_strat)
 print(exp1)
 
-exp2 = calc_expected_returns(1, game[1], joint_strat)
+exp2 = calc_expected_returns(1, monfg.payoffs[1], joint_strat)
 print(exp2)
 
 ##########
 
 from ramo.nash.verify import verify_nash
 
-is_ne = verify_nash(game, u_tpl, joint_strat)
+is_ne = verify_nash(monfg, u_tpl, joint_strat)
 print(is_ne)

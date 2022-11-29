@@ -13,7 +13,7 @@ To begin, let us import a predefined game and utility functions.
 
 .. code-block:: Python
 
-    from ramo.game.monfgs import get_monfg
+    from ramo.game.example_games import get_monfg
     from ramo.utility_function.functions import get_u
 
     game = get_monfg('game1')  # Get a predefined game.
@@ -34,9 +34,9 @@ Ramo comes with a collection of games and utility functions that are frequently 
 
 .. code-block:: Python
 
-    import ramo.nash.execute_algorithm as ea
+    from ramo.nash.moqups import moqups
     u_tpl = (u1, u2)
-    psne = ea.execute_algorithm(game, u_tpl, algorithm='MOQUPS')
+    psne = moqups(game, u_tpl)
     print(psne)
 
 This prints the list :code:`[[array([1., 0., 0.]), array([1., 0., 0.])], [array([0., 0., 1.]), array([0., 0., 1.])]]`. Again, we can visualise this by utilising Ramo's printing functionality:
@@ -55,15 +55,18 @@ We can use exactly the same setup as described here to find a sample mixed strat
 
 .. code-block:: Python
 
-    ne_fp = ea.execute_algorithm(game, u_tpl, algorithm='FP')
-    ne_ibr = ea.execute_algorithm(game, u_tpl, algorithm='IBR')
+    from ramo.nash.fictitious_play import fictitious_play
+    from ramo.nash.IBR import iterated_best_response
+
+    ne_fp = fictitious_play(game, u_tpl)
+    ne_ibr = iterated_best_response(game, u_tpl)
 
 
 Example 2: Running baseline algorithms
 ----------------------------------------
 When doing research or writing papers, it is often important to benchmark your algorithms to existing state of the art. This process is made tedious by a lack of standard baseline implementations and environments, requiring everyone to come up with their own. Luckily in Ramo, we provide several learning algorithms which work out of the box on all our games and utility functions.
 
-Let's first define your experimental setup. We gan generate some random game from the :code:`game.generators` module. This will generate a game with payoffs randomly drawn from a discrete uniform distribution.
+Let's first define your experimental setup. We gan generate some random game from the :code:`game.generators` module. The code below will generate a game with payoffs randomly drawn from a discrete uniform distribution.
 
 .. code-block:: Python
 
@@ -134,7 +137,7 @@ Ramo comes with a module which allows you to analyse (utility) functions. This i
 .. warning::
     Function checking is currently in an experimental stage and we do not encourage using it without performing additional analysis. We are investigating possible updates for the future.
 
-In order for Ramo to check your function, you have to define your function with Sage. Below, we'll redefine the same utility functions as below and confirm that the first is a convex function while the second is a strictly convex function.
+In order for Ramo to check your function, you have to define your function with Sage. Here, we redefine the same utility functions as before and confirm that the first is a convex function while the second is a strictly convex function.
 
 .. code-block:: Python
 
@@ -156,39 +159,43 @@ For good measure we can also check whether utility function 1 is strictly convex
     res3 = is_strictly_convex(symb_u1)
     print(res3)
 
-Next we also define a custom MONFG. MONFGs in Ramo are defined as a list with a payoff matrix per player. Similar to the functionality for utility functions, we can also check some properties of our games. One property that is often annoying in games is when they are *degenerate*. Ramo allows you to check if a game is degenerate *in pure strategies*.
+Next we also define a custom MONFG. MONFGs in Ramo have a custom class, which we can initiate by simply passing a list of payoff matrices to the constructor. Similar to the functionality for utility functions, we can also check some properties of our games. One property that is often annoying in games is when they are *degenerate*. Ramo allows you to check if a game is degenerate *in pure strategies*.
 
 .. code-block:: Python
 
     import numpy as np
+    from ramo.game.monfg import MONFG
     from ramo.game.checking import is_degenerate_pure
 
-    game = [np.array([[(1, 2), (2, 1)],
-                      [(1, 2), (1, 2)]], dtype=float),
-            np.array([[(1, 2), (2, 1)],
-                      [(2, 1), (1, 2)]], dtype=float)]
-    res = is_degenerate_pure(game)
+    payoffs = [np.array([[(1, 2), (2, 1)],
+                         [(1, 2), (1, 2)]], dtype=float),
+               np.array([[(1, 2), (2, 1)],
+                         [(2, 1), (1, 2)]], dtype=float)]
+
+    monfg = MONFG(payoffs)
+    res = is_degenerate_pure(monfg)
     print(res)
 
 It turns out that this game is in fact degenerate, which is unfortunate. However, we can quickly resolve this by changing the payoffs for player 1 and rechecking for degeneracy in pure strategies.
 
 .. code-block:: Python
 
-    game = [np.array([[(1, 2), (2, 1)],
-                      [(2, 1), (1, 2)]], dtype=float),
-            np.array([[(1, 2), (2, 1)],
-                      [(2, 1), (1, 2)]], dtype=float)]
+    payoffs = [np.array([[(1, 2), (2, 1)],
+                         [(2, 1), (1, 2)]], dtype=float),
+               np.array([[(1, 2), (2, 1)],
+                         [(2, 1), (1, 2)]], dtype=float)]
 
-    res = is_degenerate_pure(game)
+    monfg = MONFG(payoffs)
+    res = is_degenerate_pure(monfg)
     print(res)
 
 A sensible first step at this point would be to check what the pure strategy Nash equilibria are in this game. Given that both utility functions are convex, we can use the *MOQUPS* algorithm for this purpose.
 
 .. code-block:: Python
 
-    from ramo.nash.execute_algorithm import execute_algorithm
+    from ramo.nash.moqups import moqups
 
-    psne = execute_algorithm(game, u_tpl)
+    psne = moqups(monfg, u_tpl)
     print(psne)
 
 It turns out there are two: :code:`[[array([1., 0.]), array([0., 1.])], [array([0., 1.]), array([1., 0.])]]`. We can visualise these equilibria on the payoff matrices to get a better feel of the structure.
@@ -199,7 +206,7 @@ It turns out there are two: :code:`[[array([1., 0.]), array([0., 1.])], [array([
     from ramo.strategy.operations import make_profile_from_pure_joint_strat
 
     action_profiles = [make_profile_from_pure_joint_strat(ne) for ne in psne]
-    print_monfg(game, 'Special Game', action_profiles)
+    print_monfg(monfg, 'Special Game', action_profiles)
 
 This returns you a nice overview that should look as the image below.
 
@@ -219,10 +226,10 @@ We can now check the expected vectorial payoff for both players by calling a fun
 
     from ramo.strategy.best_response import calc_expected_returns
 
-    exp1 = calc_expected_returns(0, game[0], joint_strat)
+    exp1 = calc_expected_returns(0, monfg.payoffs[0], joint_strat)
     print(exp1)
 
-    exp2 = calc_expected_returns(1, game[1], joint_strat)
+    exp2 = calc_expected_returns(1, monfg.payoffs[1], joint_strat)
     print(exp2)
 
 The output from this function should look like below.
@@ -240,7 +247,7 @@ This indicates that for both players, the expected payoff for their two actions 
 
     from ramo.nash.verify import verify_nash
 
-    is_ne = verify_nash(game, u_tpl, joint_strat)
+    is_ne = verify_nash(monfg, u_tpl, joint_strat)
     print(is_ne)
 
 Under the hood, the verification algorithm runs a global optimisation routine to check that no player can change their strategy and still obtain a higher utility. The return from our verification is :code:`True`, meaning that the strategy is indeed a Nash equilibrium and shows the exploratory power of Ramo!
