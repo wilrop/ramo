@@ -28,7 +28,7 @@ def print_two_player_monfg(monfg, name='MONFG', highlight_cells=None):
         table.add_row(*top_row)
 
         for p1_a in range(monfg.player_actions[0]):
-            row_data = [f'[bold light_slate_blue]{p1_action}.']
+            row_data = [f'[bold light_slate_blue]{p1_a}.']
 
             for p2_a in range(monfg.player_actions[1]):
                 data = f'{tuple(monfg.payoffs[0][p1_a, p2_a])}; {tuple(monfg.payoffs[1][p1_a, p2_a])}'
@@ -102,7 +102,7 @@ def print_monfg(monfg, name='MONFG', highlight_cells=None):
     Returns:
 
     """
-    if len(monfg) == 2:
+    if monfg.num_players == 2:
         print_two_player_monfg(monfg, name, highlight_cells=highlight_cells)
     else:
         print_payoff_matrices(monfg, name, highlight_cells=highlight_cells)
