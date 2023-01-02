@@ -22,3 +22,14 @@ class MONFG:
             int: The number of objectives in the game for the given player.
         """
         return self.num_objectives[player]
+
+    def get_payoff_matrix(self, player):
+        """Get the payoff matrix for a specific player.
+
+        Args:
+            player (int): The player index.
+
+        Returns:
+            ndarray: A payoff matrix.
+        """
+        return self.payoffs[player]
