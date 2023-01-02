@@ -96,7 +96,9 @@ def p_prune(candidates):
             if pareto_dominates(alternative, vector):
                 vector = alternative
                 to_remove.add(alternative)
-        candidates.difference(to_remove)
+            if pareto_dominates(vector, alternative):
+                to_remove.add(alternative)
+        candidates -= to_remove
         pcs.add(vector)
     return pcs
 
