@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="ramo",  # The name of the package.
-    version="0.1.1",  # The current release version.
+    version="0.1.2",  # The current release version.
     author="Willem Röpke",  # The full name of the author.
     author_email="willem.ropke@vub.be",  # Email address of the author.
     description="Algorithms for computing or learning equilibria in multi-objective games",  # Short tagline.
