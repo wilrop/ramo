@@ -91,13 +91,16 @@ def p_prune(candidates):
     pcs = set()
     while candidates:
         vector = candidates.pop()
-        to_remove = set(vector)
+
         for alternative in candidates:
             if pareto_dominates(alternative, vector):
                 vector = alternative
-                to_remove.add(alternative)
+
+        to_remove = set(vector)
+        for alternative in candidates:
             if pareto_dominates(vector, alternative):
                 to_remove.add(alternative)
+
         candidates -= to_remove
         pcs.add(vector)
     return pcs
