@@ -75,7 +75,7 @@ def normal_distributed_monfg(player_actions=(2, 2), num_objectives=2, mean=0, st
     return MONFG(payoffs)
 
 
-def covariance_monfg(player_actions=(2, 2), num_objectives=2, mean=0, std=1, rho=0, rng=None):
+def covariant_monfg(player_actions=(2, 2), num_objectives=2, mean=0, std=1, rho=0, rng=None):
     """Generate a random MONFG with payoffs from a normal distribution and given covariance.
 
     Args:
