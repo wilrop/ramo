@@ -60,4 +60,4 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
 # Fix imports for autodoc.
-autodoc_mock_imports = ["numpy", "sympy", "jax", "scipy", "matplotlib", "pandas", "seaborn", "rich"]
+autodoc_mock_imports = ["numpy", "sympy", "jax", "scipy", "matplotlib", "pandas", "seaborn", "rich", "pulp"]
