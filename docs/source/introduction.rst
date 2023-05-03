@@ -39,14 +39,14 @@ A very simple use-case could be to compute a best-response from a multi-objectiv
 
     import numpy as np
 
-    from ramo.game.monfgs import get_monfg
+    from ramo.game.example_games import get_monfg
     from ramo.utility_function.functions import get_u
-    from ramo.best_response.best_response import calc_best_response
+    from ramo.strategy.best_response import calc_best_response
 
     game = get_monfg('game1')  # Get a predefined game.
     u = get_u('u1')  # Get a utility function.
     player = 0  # Player zero.
-    payoff_matrix = game[player]  # Get this player's payoff matrix.
+    payoff_matrix = game.get_payoff_matrix(player)  # Get this player's payoff matrix.
     player_strategy = np.array([0, 0, 1])  # This strategy will be optimised. The starting point does actually not matter.
     opponent_strategy = np.array([1, 0, 0])  # Define an opponent strategy, here a pure strategy playing only action 1.
     joint_strategy = [player_strategy, opponent_strategy]  # A joint strategy.

@@ -24,6 +24,7 @@ Due to Ramo's printing module, we can visualise the payoffs of this game to get 
 .. code-block:: Python
 
     import ramo.printing as pt
+
     pt.print_monfg(game, 'Game 1')
 
 This results in a game matrix that should look like this:
@@ -35,6 +36,7 @@ Ramo comes with a collection of games and utility functions that are frequently 
 .. code-block:: Python
 
     from ramo.nash.moqups import moqups
+
     u_tpl = (u1, u2)
     psne = moqups(game, u_tpl)
     print(psne)
@@ -44,6 +46,7 @@ This prints the list :code:`[[array([1., 0., 0.]), array([1., 0., 0.])], [array(
 .. code-block:: Python
 
     from ramo.strategy.operations import make_profile_from_pure_joint_strat
+
     action_profiles = [make_profile_from_pure_joint_strat(joint_strat) for joint_strat in psne]
     pt.print_monfg(game, 'Game 1', highlight_cells=action_profiles)
 
@@ -126,9 +129,11 @@ Let's first define two custom utility function. A utility function can be any Py
         x, y = vec
         return x ** 2 + y
 
+
     def u2(vec):
         x, y = vec
         return x ** 2 + x * y + y ** 2
+
 
     u_tpl = (u1, u2)
 

@@ -4,6 +4,14 @@ ramo.pareto package
 Submodules
 ----------
 
+ramo.pareto.dominance module
+----------------------------
+
+.. automodule:: ramo.pareto.dominance
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramo.pareto.pareto\_nash module
 -------------------------------
 
