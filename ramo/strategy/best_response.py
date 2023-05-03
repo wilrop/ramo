@@ -105,10 +105,7 @@ def calc_expected_returns(player, payoff_matrix, joint_strategy):
         ndarray: The expected returns for the given player's actions.
 
     """
-    num_objectives = payoff_matrix.shape[-1]
-    num_actions = len(joint_strategy[player])
-    num_players = len(joint_strategy)
-    opponents = np.delete(np.arange(num_players), player)
+    opponents = [i for i in range(len(joint_strategy)) if i != player]
     expected_returns = payoff_matrix
 
     for opponent in opponents:  # Loop over all opponent strategies.
@@ -117,18 +114,14 @@ def calc_expected_returns(player, payoff_matrix, joint_strategy):
         # We reshape this strategy to be able to multiply along the correct axis for weighting expected returns.
         # For example if you end up in [1, 2] or [2, 3] with 50% probability.
         # We calculate the individual expected returns first: [0.5, 1] or [1, 1.5]
-        dim_array = np.ones((1, expected_returns.ndim), int).ravel()
+        dim_array = [1] * expected_returns.ndim
         dim_array[opponent] = -1
         strategy_reshaped = strategy.reshape(dim_array)
 
         expected_returns = expected_returns * strategy_reshaped  # Calculate the probability of a joint state occurring.
-        # We now take the sum of the weighted returns to get the expected returns.
-        # We need keepdims=True to make sure that the opponent still exists at the correct axis, their action space is
-        # just reduced to one action resulting in the expected return now.
-        expected_returns = np.sum(expected_returns, axis=opponent, keepdims=True)
 
-    expected_returns = expected_returns.reshape(num_actions, num_objectives)  # Cast the result to a correct shape.
-
+    # We now take the sum of the weighted returns over the correct axes to get the expected returns.
+    expected_returns = np.sum(expected_returns, axis=tuple(opponents))
     return expected_returns
 
 
