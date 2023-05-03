@@ -4,6 +4,7 @@ import numpy as np
 
 import ramo.strategy.best_response as br
 import ramo.utility_function.functions as uf
+from ramo.nash.verify import verify_nash
 from ramo.game.example_games import get_monfg
 
 
@@ -45,6 +46,15 @@ class TestBestResponse(unittest.TestCase):
         correct = np.array([0.75, 0.25])
 
         np.testing.assert_almost_equal(test, correct)
+
+    def test_verify(self):
+        monfg = get_monfg('game19')
+        u1 = uf.u2
+        u2 = uf.u2
+        joint_strat = [np.array([0.5, 0.5]), np.array([0.75, 0.25])]
+
+        res = verify_nash(monfg, [u1, u2], joint_strat)
+        self.assertTrue(res)
 
 
 if __name__ == '__main__':
