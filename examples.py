@@ -1,3 +1,21 @@
+# Quickstart
+import numpy as np
+
+from ramo.game.example_games import get_monfg
+from ramo.utility_function.functions import get_u
+from ramo.strategy.best_response import calc_best_response
+
+game = get_monfg('game1')  # Get a predefined game.
+u = get_u('u1')  # Get a utility function.
+player = 0  # Player zero.
+payoff_matrix = game.get_payoff_matrix(player)  # Get this player's payoff matrix.
+player_strategy = np.array([0, 0, 1])  # This strategy will be optimised. The starting point does actually not matter.
+opponent_strategy = np.array([1, 0, 0])  # Define an opponent strategy, here a pure strategy playing only action 1.
+joint_strategy = [player_strategy, opponent_strategy]  # A joint strategy.
+
+best_response = calc_best_response(u, player, payoff_matrix, joint_strategy)
+print(best_response)
+
 # Example 1: Solving a game
 from ramo.game.example_games import get_monfg
 from ramo.utility_function.functions import get_u
@@ -8,11 +26,13 @@ u1, u2 = get_u('u1'), get_u('u1')  # Get a utility function.
 ##########
 
 import ramo.printing as pt
+
 pt.print_monfg(game, 'Game 1')
 
 ##########
 
 from ramo.nash.moqups import moqups
+
 u_tpl = (u1, u2)
 psne = moqups(game, u_tpl)
 print(psne)
@@ -20,6 +40,7 @@ print(psne)
 ##########
 
 from ramo.strategy.operations import make_profile_from_pure_joint_strat
+
 action_profiles = [make_profile_from_pure_joint_strat(joint_strat) for joint_strat in psne]
 pt.print_monfg(game, 'Game 1', highlight_cells=action_profiles)
 
@@ -29,7 +50,6 @@ from ramo.nash.IBR import iterated_best_response
 
 ne_fp = fictitious_play(game, u_tpl)
 ne_ibr = iterated_best_response(game, u_tpl)
-
 
 # Example 2: Running baseline algorithms
 from ramo.game.generators import discrete_uniform_monfg
@@ -61,7 +81,8 @@ episodes = 10
 rollouts = 10
 alternate = False
 
-data = execute_commitment(game, u_tpl, experiment=experiment, runs=runs, episodes=episodes, rollouts=rollouts, alternate=alternate)
+data = execute_commitment(game, u_tpl, experiment=experiment, runs=runs, episodes=episodes, rollouts=rollouts,
+                          alternate=alternate)
 returns_log, action_probs_log, state_dist_log, com_probs_log, metadata = data
 
 
@@ -70,9 +91,11 @@ def u1(vec):
     x, y = vec
     return x ** 2 + y
 
+
 def u2(vec):
     x, y = vec
     return x ** 2 + x * y + y ** 2
+
 
 u_tpl = (u1, u2)
 
