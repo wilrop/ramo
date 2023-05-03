@@ -75,7 +75,7 @@ def normal_distributed_monfg(player_actions=(2, 2), num_objectives=2, mean=0, st
     return MONFG(payoffs)
 
 
-def covariant_monfg(player_actions=(2, 2), num_objectives=2, mean=0, std=1, rho=0, rng=None):
+def covariant_monfg(player_actions, num_objectives=2, mean=0, std=1, cov=0, rng=None):
     """Generate a random MONFG with payoffs from a normal distribution and given covariance.
 
     Args:
@@ -83,25 +83,29 @@ def covariant_monfg(player_actions=(2, 2), num_objectives=2, mean=0, std=1, rho=
         num_objectives (int, optional): The number of objectives in the game. (Default value = 2)
         mean (float, optional): The mean of the normal distribution. (Default value = 0)
         std (float, optional): The standard deviation of the normal distribution. (Default value = 1)
-        rho (float, optional): The covariance between the players. (Default value = 0)
+        cov (float, optional): The covariance between the players. (Default value = 0)
         rng (Generator, optional): A random number generator. (Default value = None)
 
     Returns:
         MONFG: The generated MONFG.
     """
-    rng = rng if rng is not None else np.random.default_rng()
     num_players = len(player_actions)
-    mean_arr = np.full(num_players, mean)
-    std_arr = np.full(num_players, std)
-    cov_matrix = np.full((num_players, num_players), rho)
-    np.fill_diagonal(cov_matrix, std_arr)
-    payoffs_shape = player_actions + tuple([num_objectives])  # Define the shape of the payoff matrices.
-    all_payoffs = rng.multivariate_normal(mean_arr, cov_matrix, payoffs_shape)
-    payoffs = [all_payoffs[..., -1:].reshape(payoffs_shape)]  # Set payoffs for the first player
-    for player in range(1, num_players):
-        player_payoffs = all_payoffs[..., -player - 1:-player].reshape(payoffs_shape)
-        payoffs.append(player_payoffs)
-    return MONFG(payoffs)
+    rng = rng if rng is not None else np.random.default_rng()
+
+    if type(mean) == int or type(mean) == float:
+        mean = np.full(num_players, mean)
+        cov = np.full((num_players, num_players), cov)
+        np.fill_diagonal(cov, std)
+
+    num_payoffs = np.prod(player_actions) * num_objectives
+
+    player_payoffs = rng.multivariate_normal(mean, cov, size=num_payoffs)
+    payoff_matrices = np.expand_dims(player_payoffs, -1).swapaxes(0, 1).reshape(
+        (num_players, *player_actions, num_objectives))
+    if num_objectives == 1:
+        payoff_matrices = payoff_matrices.squeeze(-1)
+
+    return MONFG(payoff_matrices)
 
 
 def identity_game(player_actions):
