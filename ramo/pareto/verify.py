@@ -151,24 +151,46 @@ def fast_c_prune(candidates):
     return fast_p_prune(ccs)
 
 
-def fast_p_prune(candidates):
+def arg_p_prune(candidates, remove_duplicates=True):
+    """A batched and fast version of the Pareto coverage set algorithm.
+
+        Args:
+            candidates (ndarray): A numpy array of vectors.
+            remove_duplicates (bool, optional): Whether to remove duplicate vectors. Defaults to True.
+
+        Returns:
+            ndarray: A Pareto coverage set.
+        """
+    if len(candidates) == 1:
+        return candidates
+
+    uniques, indcs, invs, counts = np.unique(candidates, return_index=True, return_inverse=True, return_counts=True,
+                                             axis=0)
+
+    res_eq = np.all(candidates[:, None, None] <= candidates, axis=-1).squeeze()
+    res_g = np.all(candidates[:, None, None] < candidates, axis=-1).squeeze()
+    c1 = np.sum(res_eq, axis=-1) == counts[invs]
+    c2 = np.any(~res_g, axis=-1)
+    if remove_duplicates:
+        to_keep = np.zeros(len(candidates), dtype=bool)
+        to_keep[indcs] = 1
+    else:
+        to_keep = np.ones(len(candidates), dtype=bool)
+
+    return np.logical_and(c1, c2) & to_keep
+
+
+def fast_p_prune(candidates, remove_duplicates=True):
     """A batched and fast version of the Pareto coverage set algorithm.
 
     Args:
         candidates (ndarray): A numpy array of vectors.
+        remove_duplicates (bool, optional): Whether to remove duplicate vectors. Defaults to True.
 
     Returns:
         ndarray: A Pareto coverage set.
     """
-    candidates = np.unique(candidates, axis=0)
-    if len(candidates) == 1:
-        return candidates
-
-    res_eq = np.all(candidates[:, None, None] <= candidates, axis=-1).squeeze()
-    res_g = np.all(candidates[:, None, None] < candidates, axis=-1).squeeze()
-    c1 = np.sum(res_eq, axis=-1) == 1
-    c2 = np.any(~res_g, axis=-1)
-    return candidates[np.logical_and(c1, c2)]
+    return candidates[arg_p_prune(candidates, remove_duplicates=remove_duplicates)]
 
 
 def verify_pareto_nash(monfg, joint_strat):
